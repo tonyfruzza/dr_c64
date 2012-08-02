@@ -343,3 +343,6 @@ inx
 jsr CHROUT 
 jmp printLoop
 printComplete   rts
+
+
+; Draw game board
