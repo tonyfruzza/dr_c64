@@ -49,6 +49,7 @@ ORIENTATION .byte $00 ; 0 = 12, 1 = 1, 2 = 21, 3 = 2
 
 init
 ;jsr ClearScreen
+jsr DrawGameBoarder
             ldy #$00  ; set to 1024 our screen pos
 sty VIC_MEM+33
             sty zpPtr1
@@ -345,4 +346,16 @@ jmp printLoop
 printComplete   rts
 
 
-; Draw game board
+; Draw game board using char $7E as the boarder
+; We'll start at the top left +3, draw down 16, 8 accross
+DrawGameBoarder
+lda #$03
+sta zpPtr2
+lda #$04
+sta zpPtr2+1
+lda #$7E
+ldy #$00
+sta (zpPtr2), y
+ldy #40
+sta (zpPtr2), y
+rts

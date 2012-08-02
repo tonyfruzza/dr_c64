@@ -8,7 +8,7 @@
 
 /* Begin PBXFileReference section */
 		EAB47DD0155219BF00516343 /* baseGame.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = baseGame.s; sourceTree = "<group>"; };
-		EAB47DD2155221A700516343 /* baseGame.t64 */ = {isa = PBXFileReference; lastKnownFileType = file; path = baseGame.t64; sourceTree = "<group>"; };
+		EABC8DE215CA2145006F2067 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		EAE21A1115A3BB9600DCE4B2 /* Notes.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = Notes.s; sourceTree = "<group>"; };
 		EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = SimpleAddition.s; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -17,6 +17,7 @@
 		EAB47DC31552197000516343 = {
 			isa = PBXGroup;
 			children = (
+				EABC8DE215CA2145006F2067 /* Makefile */,
 				EAB47DD0155219BF00516343 /* baseGame.s */,
 				EAE21A1115A3BB9600DCE4B2 /* Notes.s */,
 				EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */,
@@ -27,7 +28,6 @@
 		EAB47DD11552219800516343 /* Target */ = {
 			isa = PBXGroup;
 			children = (
-				EAB47DD2155221A700516343 /* baseGame.t64 */,
 			);
 			name = Target;
 			sourceTree = "<group>";
