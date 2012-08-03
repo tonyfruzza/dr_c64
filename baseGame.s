@@ -59,11 +59,11 @@ jsr DrawGameBoarder
             ldy #$00  ; set to 1024 our screen pos
             sty VIC_MEM+33
 
-DropNew     ldy #06
+DropNew     ldy #$13 ; Offset low byte location
             sty zpPtr1
             iny
             sty piece2
-            lda #$04
+            lda #$04 ; Offset high byte location
             sta zpPtr1+1
             sta piece2+1
 
@@ -82,6 +82,8 @@ cmp #$10
 BCS MoveDownJump
 
         JSR GETIN ; get a key input
+        cmp #'w'
+        beq SwapColors
         cmp #'d'
         beq MoveRightOne
         cmp #'a'
@@ -98,6 +100,8 @@ BCS MoveDownJump
 
 MoveDownJump jmp ZeroCountAndMoveDown
 MoveDown     jmp MoveDownOne
+SwapColors   jsr ColorSwap
+                jmp GameLoop
 
 
 
@@ -122,6 +126,14 @@ Return      rts
 
 
 MoveRightOne
+lda piece2
+sta zpPtr2
+lda piece2+1
+sta zpPtr2+1
+
+jsr CheckCollisionRight_zpPtr2
+bne rightMoveDone
+
 ; Secondary piece
                 ldy #$00 ; offset from current char pos
 lda #' '
@@ -153,18 +165,23 @@ sta (piece2), y
                 sta (zpPtr1), y
 
 JSR ChangeColor
-                jmp MoveDone
+rightMoveDone   jmp MoveDone
 
 
 
 
 
-MoveLeftOne     ; Clear the current pos
+MoveLeftOne
+                lda zpPtr1
+                sta zpPtr2
+                lda zpPtr1+1
+                sta zpPtr2+1
+                jsr CheckCollisionLeft_zpPtr2
+                bne leftMoveDone
+
+                ; Clear the current pos
                 ldy #$00 ; offset from current char pos
-
-; primary
-
-                lda #' '
+                lda #" "
                 sta (zpPtr1), y
 
                 ; decrement the pointer value by one
@@ -179,7 +196,7 @@ MoveLeftOne     ; Clear the current pos
                 sta (zpPtr1), y
 
 ; Second
-lda #' '
+lda #" "
 sta (piece2), y
 
 ; decrement the pointer value by one
@@ -194,7 +211,7 @@ lda #87
 sta (piece2), y
 
 JSR ChangeColor
-                jmp MoveDone
+leftMoveDone                jmp MoveDone
 
 
 
@@ -206,46 +223,15 @@ ZeroCountAndMoveDown
                 lda #$00
                 sta DRAWCOUNT
 MoveDownOne     lda ORIENTATION
-;                beq check2ndRight ; 1-2
-;               cmp #1
-;               beq check2ndAsBottom 
-;               cmp #2
-;               beq check2left ; 2-1
-;               cmp #3
-;               beq checkPrimaryBottom
-
-
-;check2ndRight   ldy #$02 ; offset from current char pos
-               ; See if we can move down, is something there already??
-;               lda zpPtr1, y ; Make a copy of the current possition
-;               sta zpPtr2, y
-;               iny
-;               lda zpPtr1, y
-;               sta zpPtr2, y
-;               dey ; back to 0
-;
-;               ; Look below to see what's there, is it a space?
-;               clc
-;               lda #40
-;               adc zpPtr2
-;               sta zpPtr2
-;               lda #$00 ; Add any roll over to the high byte
-;               adc zpPtr2+1
-;               sta zpPtr2+1
-;               lda (zpPtr2), y
-;               cmp #' '
-;               bne MoveDone
-
-
 
 checkPrimaryBottom ldy #$00 ; offset from current char pos
                 ; See if we can move down, is something there already??
 
-                lda zpPtr1, y ; Copy piece into zpPtr2 for checking
-                sta zpPtr2, y
+                lda zpPtr1 ; Copy piece into zpPtr2 for checking
+                sta zpPtr2
                 iny
-                lda zpPtr1, y
-                sta zpPtr2, y
+                lda zpPtr1+1
+                sta zpPtr2+1
                 jsr CheckCollisionBelow_zpPtr2
                 bne DropNewPiece
                 ; Moving piece down first clear value then add 40 to main piece
@@ -293,13 +279,10 @@ DropNewPiece    jmp DropNew
 
 
 CheckCollisionBelow_zpPtr2 ; Sets a = 1 if there will be collition below then rts
-                ldy #$00
-                lda zpPtr2, y ; Make a copy of the current possition
-                sta zpPtr3, y ; into zpPtr3
-                iny
-                lda zpPtr2, y
-                sta zpPtr3, y
-                dey ; back to 0
+                lda zpPtr2 ; Make a copy of the current possition
+                sta zpPtr3 ; into zpPtr3
+                lda zpPtr2+1
+                sta zpPtr3+1
 
                 ; Look below to see what's there, is it a space?
                 clc
@@ -309,6 +292,8 @@ CheckCollisionBelow_zpPtr2 ; Sets a = 1 if there will be collition below then rt
                 lda #$00 ; Add any roll over to the high byte
                 adc zpPtr3+1
                 sta zpPtr3+1
+            
+                ldy #$00
                 lda (zpPtr3), y
                 cmp #" "
                 beq noCollitionDetected
@@ -323,6 +308,56 @@ lda #"0"
 sta 1024
                 lda #$00
                 rts
+
+; function CheckCollisionLeft_zpPtr2
+CheckCollisionLeft_zpPtr2 ; Sets a = 1 if there will be collition below then rts
+            lda zpPtr2 ; Make a copy of the current possition
+            sta zpPtr3 ; into zpPtr3
+            lda zpPtr2+1
+            sta zpPtr3+1
+
+            ; Look below to see what's there, is it a space?
+            sec
+            lda zpPtr3
+            sbc #$01
+            sta zpPtr3
+            lda zpPtr3+1
+            sbc #$00
+            sta zpPtr3+1
+            ldy #$00
+            lda (zpPtr3), y
+            cmp #" "
+            beq noCollitionDetectedLeft
+            bne collitionDetectedLeft
+noCollitionDetectedLeft
+            lda #"0"
+            sta 1024
+            lda #$00
+            rts
+collitionDetectedLeft
+            lda #"1"
+            sta 1024
+            lda #$01
+            rts
+
+; function CheckCollisionLeft_zpPtr2
+CheckCollisionRight_zpPtr2 ; Sets a = 1 if there will be collition below then rts
+            ldy #$01
+            lda (zpPtr2), y
+            cmp #" "
+            beq noCollitionDetectedRight
+            bne collitionDetectedRight
+noCollitionDetectedRight
+            lda #"0"
+            sta 1024
+            lda #$00
+            rts
+collitionDetectedRight
+            lda #"1"
+            sta 1024
+            lda #$01
+            rts
+
 
 
 
@@ -363,7 +398,12 @@ ChangeColor ; Messes with zpPtr2
             sta (zpPtr2), y
             RTS
 
-
+ColorSwap   lda PRICOLOR
+            ldx SECCOLOR
+            sta SECCOLOR
+            stx PRICOLOR
+            jsr ChangeColor
+            rts
 
 
 
@@ -407,9 +447,9 @@ printComplete   rts
 ; We'll start at the top left +3, draw down 16, 8 accross
 DrawGameBoarder
         ldx #$00 ; Our counter
-        lda #$03
+        lda #$0F ; Low byte start location
         sta zpPtr2
-        lda #$04
+        lda #$04 ; High byte start location
         sta zpPtr2+1
         lda #230
         ldy #$00
@@ -439,6 +479,7 @@ iny
 cpy #9
 bne DrawBottom
 dgbDone rts
+
 
 get_random_number
             lda $d012 ; load current screen raster value
