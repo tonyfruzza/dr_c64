@@ -35,6 +35,9 @@ COLOR_L_GREY    .equ $0f
 zpPtr1          .equ $b0
 zpPtr2          .equ $b2
 piece2          .equ $b4
+zpPtr3          .equ $b6
+
+
 
 
 jmp init
@@ -46,12 +49,17 @@ ORGBGRND    .byte $00
 DRAWCOUNT   .byte $00 ; How many screen draws since last reset used as a timer
 ORIENTATION .byte $00 ; 0 = 12, 1 = 1, 2 = 21, 3 = 2
                       ;             2              1
+PRICOLOR    .byte $00
+SECCOLOR    .byte $00
+colors      .byte COLOR_RED, COLOR_RED, COLOR_YELLOW, COLOR_BLUE
 
 init
-;jsr ClearScreen
+jsr ClearScreen
 jsr DrawGameBoarder
             ldy #$00  ; set to 1024 our screen pos
-sty VIC_MEM+33
+            sty VIC_MEM+33
+
+DropNew     ldy #06
             sty zpPtr1
             iny
             sty piece2
@@ -63,6 +71,7 @@ ldy #$00
 lda #87 ; 'o'
 sta (zpPtr1), y
 sta (piece2), y
+jsr NewColors
 
 
 ;the main game loop
@@ -231,29 +240,30 @@ MoveDownOne     lda ORIENTATION
 
 checkPrimaryBottom ldy #$00 ; offset from current char pos
                 ; See if we can move down, is something there already??
-                lda zpPtr1, y ; Make a copy of the current possition
+
+                lda zpPtr1, y ; Copy piece into zpPtr2 for checking
                 sta zpPtr2, y
                 iny
                 lda zpPtr1, y
                 sta zpPtr2, y
-                dey ; back to 0
-
-                ; Look below to see what's there, is it a space?
-                clc
-                lda #40
-                adc zpPtr2
-                sta zpPtr2
-                lda #$00 ; Add any roll over to the high byte
-                adc zpPtr2+1
-                sta zpPtr2+1
-                lda (zpPtr2), y
-                cmp #' '
-                bne MoveComplete
-
-
+                jsr CheckCollisionBelow_zpPtr2
+                bne DropNewPiece
                 ; Moving piece down first clear value then add 40 to main piece
 
-movePrimaryDown lda #' '
+checkSecondaryBottom
+                ldy #$00 ; offset from current char pos
+                ; See if we can move down, is something there already??
+
+                lda piece2, y ; Copy piece into zpPtr2 for checking
+                sta zpPtr2, y
+                iny
+                lda piece2, y
+                sta zpPtr2, y
+                jsr CheckCollisionBelow_zpPtr2
+                bne DropNewPiece
+                ; Moving piece down first clear value then add 40 to main piece
+
+movePrimaryDown lda #" "
                 sta (zpPtr1), y
                 ; increment the pointer value by 40, we should check to see that it didn't go over 2024
                 clc
@@ -265,24 +275,70 @@ movePrimaryDown lda #' '
                 sta zpPtr1+1
                 lda #87
                 sta (zpPtr1), y
-moveSecondaryDown lda #' '
-sta (piece2), y
-clc
-lda #40
-adc piece2
-sta piece2
-lda #$00 ; Add any roll over to the high byte
-adc piece2+1
-sta piece2+1
-lda #87
-sta (piece2), y
-
-
-; for fun set the color here
-JSR ChangeColor
+moveSecondaryDown lda #" "
+                sta (piece2), y
+                clc
+                lda #40
+                adc piece2
+                sta piece2
+                lda #$00 ; Add any roll over to the high byte
+                adc piece2+1
+                sta piece2+1
+                lda #87
+                sta (piece2), y
+                JSR ChangeColor
 
 MoveComplete    jmp MoveDone
+DropNewPiece    jmp DropNew
 
+
+CheckCollisionBelow_zpPtr2 ; Sets a = 1 if there will be collition below then rts
+                ldy #$00
+                lda zpPtr2, y ; Make a copy of the current possition
+                sta zpPtr3, y ; into zpPtr3
+                iny
+                lda zpPtr2, y
+                sta zpPtr3, y
+                dey ; back to 0
+
+                ; Look below to see what's there, is it a space?
+                clc
+                lda #40
+                adc zpPtr3
+                sta zpPtr3
+                lda #$00 ; Add any roll over to the high byte
+                adc zpPtr3+1
+                sta zpPtr3+1
+                lda (zpPtr3), y
+                cmp #" "
+                beq noCollitionDetected
+                bne collitionDetected
+collitionDetected
+lda #"1"
+sta 1024
+                lda #$01
+                rts
+noCollitionDetected
+lda #"0"
+sta 1024
+                lda #$00
+                rts
+
+
+
+
+NewColors
+            jsr get_random_number
+            and #3
+            tay
+            lda colors, y
+            sta PRICOLOR
+            jsr get_random_number
+            and #3
+            tay
+            lda colors, y
+            sta SECCOLOR
+            ldy #00
 ChangeColor ; Messes with zpPtr2
             lda zpPtr1
             sta zpPtr2
@@ -292,18 +348,19 @@ ChangeColor ; Messes with zpPtr2
             clc
             adc zpPtr2+1
             sta zpPtr2+1
-            lda #COLOR_GREEN
+
+            lda PRICOLOR
             sta (zpPtr2), y
-lda piece2
-sta zpPtr2
-lda piece2+1
-sta zpPtr2+1
-lda #$D4
-clc
-adc zpPtr2+1
-sta zpPtr2+1
-lda #COLOR_RED
-sta (zpPtr2), y
+            lda piece2
+            sta zpPtr2
+            lda piece2+1
+            sta zpPtr2+1
+            lda #$D4
+            clc
+            adc zpPtr2+1
+            sta zpPtr2+1
+            lda SECCOLOR
+            sta (zpPtr2), y
             RTS
 
 
@@ -327,7 +384,7 @@ printNumsLoop           tya
 
 
 ClearScreen LDX #$00
-            LDA #' ' ; Space
+            LDA #" " ; Space
 Clearing    STA SCREENMEM, X
             STA SCREENMEM + $100, x
             STA SCREENMEM + $200, x
@@ -349,13 +406,42 @@ printComplete   rts
 ; Draw game board using char $7E as the boarder
 ; We'll start at the top left +3, draw down 16, 8 accross
 DrawGameBoarder
-lda #$03
-sta zpPtr2
-lda #$04
-sta zpPtr2+1
-lda #$7E
-ldy #$00
+        ldx #$00 ; Our counter
+        lda #$03
+        sta zpPtr2
+        lda #$04
+        sta zpPtr2+1
+        lda #230
+        ldy #$00
+        sta (zpPtr2), y
+        ldy #9
+        sta (zpPtr2), y
+dgbLoop ldy #00
+        clc
+        lda #40
+        adc zpPtr2
+        sta zpPtr2
+        lda #$00
+        adc zpPtr2+1
+        sta zpPtr2+1
+        lda #230
+        sta (zpPtr2), y
+        ldy #9
+        sta (zpPtr2), y
+        inx
+        cpx #16
+        bne dgbLoop
+; then finish off the bottom line
+ldy #1
+DrawBottom
 sta (zpPtr2), y
-ldy #40
-sta (zpPtr2), y
-rts
+iny
+cpy #9
+bne DrawBottom
+dgbDone rts
+
+get_random_number
+            lda $d012 ; load current screen raster value
+            eor $dc04 ; xor against value in $dc04
+            sbc $dc05 ; then subtract value in $dc05
+            rts
