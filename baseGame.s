@@ -32,7 +32,7 @@ COLOR_L_BLUE    .equ $0e
 COLOR_L_GREY    .equ $0f
 
 ; Zero Page Pointers for indirect indexing
-zpPtr1          .equ $b0
+piece1          .equ $b0
 zpPtr2          .equ $b2
 piece2          .equ $b4
 zpPtr3          .equ $b6
@@ -42,8 +42,17 @@ zpPtr3          .equ $b6
 
 jmp init
 
+
+
+
+
+lda #$00
+sta 1025
+rts
+
+
 ; Some vars
-ENDMSG      .byte "END", $0d, 0
+ENDMSG      .byte 5,14,4,0
 ORGBOARDER  .byte $00
 ORGBGRND    .byte $00
 DRAWCOUNT   .byte $00 ; How many screen draws since last reset used as a timer
@@ -56,20 +65,31 @@ colors      .byte COLOR_RED, COLOR_RED, COLOR_YELLOW, COLOR_BLUE
 init
 jsr ClearScreen
 jsr DrawGameBoarder
+
             ldy #$00  ; set to 1024 our screen pos
-            sty VIC_MEM+33
+            sty SCREEN_BG_COLOR
+            sty SCREEN_BOARDER
 
 DropNew     ldy #$13 ; Offset low byte location
-            sty zpPtr1
+            sty piece1
             iny
             sty piece2
             lda #$04 ; Offset high byte location
-            sta zpPtr1+1
+            sta piece1+1
             sta piece2+1
 
 ldy #$00
+sty ORIENTATION ; reset to 0
+lda (piece1), y
+cmp #" "
+bne EndGame
+lda (piece2), y
+cmp #" "
+bne EndGame
+
 lda #87 ; 'o'
-sta (zpPtr1), y
+
+sta (piece1), y
 sta (piece2), y
 jsr NewColors
 
@@ -85,24 +105,28 @@ BCS MoveDownJump
         cmp #'w'
         beq SwapColors
         cmp #'d'
-        beq MoveRightOne
+        beq MoveRightOneJump
         cmp #'a'
-        beq MoveLeftOne
+        beq MoveLeftOneJump
         cmp #'s'
         beq MoveDownJump
-        cmp #'q'
+        cmp #"q"
         beq Return
-;        cmp #' '
-;        beq rotate
+        cmp #" "
+        beq rotateJsr
         MoveDone
         jsr WaitFrame
         jmp GameLoop
 
+MoveLeftOneJump jmp MoveLeftOne
 MoveDownJump jmp ZeroCountAndMoveDown
 MoveDown     jmp MoveDownOne
 SwapColors   jsr ColorSwap
-                jmp GameLoop
+rotateJsr    jmp rotate
+MoveRightOneJump    jmp MoveRightOne
 
+                jmp GameLoop
+EndGame      jmp printMsg
 
 
 WaitFrame   lda $d012
@@ -120,8 +144,86 @@ Return      rts
 
 
 
-;rotate      lda ORIENTATION
-;            jmp MoveDone
+
+
+
+
+rotate
+; Cleared printed pill first
+ldy #$00
+lda #" "
+sta (piece1), y
+sta (piece2), y
+lda ORIENTATION
+
+beq rotateUnder
+cmp #$01
+beq rotateToLeft
+cmp #$02
+beq rotateToTop
+cmp #$03
+beq rotateToRight
+
+rotateUnder
+        inc ORIENTATION
+        lda piece1
+        sta zpPtr2
+        lda piece1+1
+        sta zpPtr2+1
+
+        lda zpPtr2
+        sta piece2
+        lda zpPtr2+1
+        sta piece2+1
+        ; Subtract one row from zptr2
+        lda zpPtr2
+        sec
+        sbc #40
+        sta piece1
+        lda zpPtr2+1
+        sbc #$00
+        sta piece1+1
+        jmp RotateFinished
+
+
+
+
+rotateToLeft
+; Just put them back horizontally and swap the colors
+        inc ORIENTATION
+; piece one is on top, return it to the bottom, and move
+; piece2 to the right
+; Piece2 is currently where we want 1 at
+        clc
+        lda piece2
+        sta piece1
+        adc #$01
+        sta piece2
+
+        lda piece2+1
+        sta piece1+1
+        adc #$00
+        sta piece2+1
+        jsr ColorSwap
+        lda #$00
+        sta ORIENTATION
+        jmp RotateFinished
+
+
+
+RotateFinished
+        jsr ChangeColor
+        ; print the result
+        ldy #$00
+        lda #87 ; 'o'
+        sta (piece1), y
+        sta (piece2), y
+        jmp MoveDone
+
+    jmp MoveDone
+rotateToTop     jmp MoveDone
+rotateToRight   jmp MoveDone
+
 
 
 
@@ -152,17 +254,17 @@ sta (piece2), y
 ; clear pos
 
                 lda #' '
-                sta (zpPtr1), y
+                sta (piece1), y
                 ; increment the pointer value by one
                 clc
                 lda #$01
-                adc zpPtr1
-                sta zpPtr1
+                adc piece1
+                sta piece1
                 lda #$00 ; Add any roll over to the high byte
-                adc zpPtr1+1
-                sta zpPtr1+1
+                adc piece1+1
+                sta piece1+1
                 lda #87
-                sta (zpPtr1), y
+                sta (piece1), y
 
 JSR ChangeColor
 rightMoveDone   jmp MoveDone
@@ -172,9 +274,9 @@ rightMoveDone   jmp MoveDone
 
 
 MoveLeftOne
-                lda zpPtr1
+                lda piece1
                 sta zpPtr2
-                lda zpPtr1+1
+                lda piece1+1
                 sta zpPtr2+1
                 jsr CheckCollisionLeft_zpPtr2
                 bne leftMoveDone
@@ -182,18 +284,18 @@ MoveLeftOne
                 ; Clear the current pos
                 ldy #$00 ; offset from current char pos
                 lda #" "
-                sta (zpPtr1), y
+                sta (piece1), y
 
                 ; decrement the pointer value by one
                 sec
-                lda zpPtr1
+                lda piece1
                 sbc #$01
-                sta zpPtr1
-                lda zpPtr1+1 ; subtract 0 and any borrow generated above
+                sta piece1
+                lda piece1+1 ; subtract 0 and any borrow generated above
                 sbc #$00
-                sta zpPtr1+1
+                sta piece1+1
                 lda #87
-                sta (zpPtr1), y
+                sta (piece1), y
 
 ; Second
 lda #" "
@@ -222,15 +324,24 @@ leftMoveDone                jmp MoveDone
 ZeroCountAndMoveDown
                 lda #$00
                 sta DRAWCOUNT
-MoveDownOne     lda ORIENTATION
+MoveDownOne
+; Clear
+ldy #$00
+lda #" "
+sta (piece1), y
+sta (piece2), y
+
+lda ORIENTATION
+cmp #$01
+beq checkSecondaryBottom
 
 checkPrimaryBottom ldy #$00 ; offset from current char pos
                 ; See if we can move down, is something there already??
 
-                lda zpPtr1 ; Copy piece into zpPtr2 for checking
+                lda piece1 ; Copy piece into zpPtr2 for checking
                 sta zpPtr2
                 iny
-                lda zpPtr1+1
+                lda piece1+1
                 sta zpPtr2+1
                 jsr CheckCollisionBelow_zpPtr2
                 bne DropNewPiece
@@ -249,20 +360,15 @@ checkSecondaryBottom
                 bne DropNewPiece
                 ; Moving piece down first clear value then add 40 to main piece
 
-movePrimaryDown lda #" "
-                sta (zpPtr1), y
-                ; increment the pointer value by 40, we should check to see that it didn't go over 2024
+movePrimaryDown ; increment the pointer value by 40, we should check to see that it didn't go over 2024
                 clc
                 lda #40
-                adc zpPtr1
-                sta zpPtr1
+                adc piece1
+                sta piece1
                 lda #$00 ; Add any roll over to the high byte
-                adc zpPtr1+1
-                sta zpPtr1+1
-                lda #87
-                sta (zpPtr1), y
-moveSecondaryDown lda #" "
-                sta (piece2), y
+                adc piece1+1
+                sta piece1+1
+moveSecondaryDown
                 clc
                 lda #40
                 adc piece2
@@ -270,12 +376,19 @@ moveSecondaryDown lda #" "
                 lda #$00 ; Add any roll over to the high byte
                 adc piece2+1
                 sta piece2+1
-                lda #87
-                sta (piece2), y
+
                 JSR ChangeColor
 
-MoveComplete    jmp MoveDone
-DropNewPiece    jmp DropNew
+MoveComplete
+lda #87
+sta (piece1), y
+sta (piece2), y
+jmp MoveDone
+DropNewPiece
+lda #87
+sta (piece1), y
+sta (piece2), y
+jmp DropNew
 
 
 CheckCollisionBelow_zpPtr2 ; Sets a = 1 if there will be collition below then rts
@@ -373,11 +486,10 @@ NewColors
             tay
             lda colors, y
             sta SECCOLOR
-            ldy #00
-ChangeColor ; Messes with zpPtr2
-            lda zpPtr1
+ChangeColor ldy #00
+            lda piece1
             sta zpPtr2
-            lda zpPtr1+1
+            lda piece1+1
             sta zpPtr2+1
             lda #$D4
             clc
@@ -434,16 +546,35 @@ Clearing    STA SCREENMEM, X
             RTS
 
 ; Print Message subrutine
-printMsg        ldx #$00
-printLoop       lda ENDMSG, x
-beq printComplete
-inx
-jsr CHROUT 
-jmp printLoop
-printComplete   rts
+
+printMsg    lda #$53   ; low byte character location
+            STA zpPtr2 ; low byte
+            STA zpPtr3 ; temp low byte of color
+            lda #$05   ; high byte offset
+            sta zpPtr2+1 ; Temp character location
+            sta zpPtr3+1 ; Temp color location
+            lda #$D4
+            clc
+            adc zpPtr3+1 ; add to high byte of color to get location
+            sta zpPtr3+1
+
+            ldy #$00
+printLoop   lda ENDMSG, y
+            beq printComplete
+            sta (zpPtr2), y
+            lda #COLOR_WHITE
+            sta (zpPtr3), y
+            iny
+            jmp printLoop
+printComplete
+            jsr WaitFrame
+            jsr WaitFrame
+            jsr WaitFrame
+            jsr WaitFrame
+            jmp init
 
 
-; Draw game board using char $7E as the boarder
+; Draw game board using char 230 as the boarder
 ; We'll start at the top left +3, draw down 16, 8 accross
 DrawGameBoarder
         ldx #$00 ; Our counter
