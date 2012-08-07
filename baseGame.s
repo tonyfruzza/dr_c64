@@ -56,10 +56,12 @@ ENDMSG      .byte 5,14,4,0
 ORGBOARDER  .byte $00
 ORGBGRND    .byte $00
 DRAWCOUNT   .byte $00 ; How many screen draws since last reset used as a timer
+WAITTIME    .byte $00 ; How many frames to wait till we start over
 ORIENTATION .byte $00 ; 0 = 12, 1 = 1, 2 = 21, 3 = 2
                       ;             2              1
 PRICOLOR    .byte $00
 SECCOLOR    .byte $00
+CONNECTCNT  .byte $00
 colors      .byte COLOR_RED, COLOR_RED, COLOR_YELLOW, COLOR_BLUE
 
 init
@@ -70,7 +72,12 @@ jsr DrawGameBoarder
             sty SCREEN_BG_COLOR
             sty SCREEN_BOARDER
 
-DropNew     ldy #$13 ; Offset low byte location
+DropNew
+            ; Testing Counting connections
+            jsr lookForConnect4c
+            jsr printConnectCount
+
+            ldy #$13 ; Offset low byte location
             sty piece1
             iny
             sty piece2
@@ -78,20 +85,19 @@ DropNew     ldy #$13 ; Offset low byte location
             sta piece1+1
             sta piece2+1
 
-ldy #$00
-sty ORIENTATION ; reset to 0
-lda (piece1), y
-cmp #" "
-bne EndGame
-lda (piece2), y
-cmp #" "
-bne EndGame
-
-lda #87 ; 'o'
-
-sta (piece1), y
-sta (piece2), y
-jsr NewColors
+            ldy #$00
+            sty ORIENTATION ; reset to 0
+            sty CONNECTCNT ; reset to 0
+            lda (piece1), y ; See if there is a piece in the way at the top
+            cmp #" "
+            bne EndGame
+            lda (piece2), y ; See if there is a piece in the way at the top
+            cmp #" "
+            bne EndGame
+            lda #87 ; 'o'
+            sta (piece1), y ; print new pieces
+            sta (piece2), y
+            jsr NewColors ; Set their new random colors
 
 
 ;the main game loop
@@ -567,11 +573,75 @@ printLoop   lda ENDMSG, y
             iny
             jmp printLoop
 printComplete
+            sty WAITTIME
+waitDrawLoop
+            lda WAITTIME
+            beq RestartGame
+            inc WAITTIME
             jsr WaitFrame
-            jsr WaitFrame
-            jsr WaitFrame
-            jsr WaitFrame
-            jmp init
+            jmp waitDrawLoop
+RestartGame jmp init
+
+
+
+
+
+
+
+
+
+
+; Look for blocks to clear
+lookForConnect4c
+            lda piece1
+            sta zpPtr2
+            lda piece1+1
+            sta zpPtr2+1
+lookDown
+            clc
+            lda #40
+            adc zpPtr2
+            sta zpPtr2
+            lda #$00
+            adc zpPtr2+1
+            sta zpPtr2+1
+            ldy #$00
+            lda (zpPtr2), y
+            cmp #87
+            bne lookDownDone
+            clc
+            lda #$D4
+            adc zpPtr2+1
+            sta zpPtr2+1
+            lda (zpPtr2), y
+            sta CONNECTCNT
+            cmp PRICOLOR
+            bne lookDownDone
+            inc CONNECTCNT
+            jmp lookDown ; loop until we've counted them all
+lookDownDone rts
+
+printConnectCount
+            lda #$01 ; Low byte location
+            sta zpPtr2
+            lda #$04 ; high byte of character location
+            sta zpPtr2+1
+            lda CONNECTCNT
+            ora #$30
+            ldy #$00
+            sta (zpPtr2), y
+            rts
+
+
+
+
+
+
+
+
+
+
+
 
 
 ; Draw game board using char 230 as the boarder
