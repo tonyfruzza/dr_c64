@@ -9,6 +9,15 @@ STOP    .equ $FFE1 ; Check for run stop, sets Z flag, then exit
 SCREENMEM   .equ 1024 ; Start of character screen map, color map is + $D400
 VMEM    .equ $D000
 
+; VICE Monitor Label File Loading: load_labels "/Users/Tony/Development/DrC64/labels.txt"
+; Quick VICE monitor notes:
+; show_labels
+; m H .piece2 .piece2
+; m H .varrayindex .varrayindex
+; watch store .varrayindex
+; watch store .varrayindex .varrayindex
+; break .brkhere
+; return
 
 VIC_MEM         .equ 53248
 SCREEN_BOARDER  .equ VIC_MEM + 32
@@ -30,26 +39,23 @@ COLOR_GREY      .equ $0c
 COLOR_L_GREEN   .equ $0d
 COLOR_L_BLUE    .equ $0e
 COLOR_L_GREY    .equ $0f
+DELAY           .equ $10
+PILL_SIDE       .equ 81 ; 'o'
+
 
 ; Zero Page Pointers for indirect indexing
 piece1          .equ $b0
-zpPtr2          .equ $b2
-piece2          .equ $b4
+piece2          .equ $b2
+
+zpPtr1          .equ $ba
+zpPtr2          .equ $b4
 zpPtr3          .equ $b6
+zpPtr4          .equ $b8
 
 
 
 
 jmp init
-
-
-
-
-
-lda #$00
-sta 1025
-rts
-
 
 ; Some vars
 ENDMSG      .byte 5,14,4,0
@@ -63,25 +69,58 @@ PRICOLOR    .byte $00
 SECCOLOR    .byte $00
 CONNECTCNT  .byte $00
 colors      .byte COLOR_RED, COLOR_RED, COLOR_YELLOW, COLOR_BLUE
+P1_SCORE    .byte $00, $00, $00, $00
+varray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+varrayIndex .byte $00
+varray2     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+varrayIndex2 .byte $00
+harray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+harrayIndex .byte $00
+harray2     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+harrayIndex2 .byte $00
+
+RET1        .byte $00, $00
+RETX        .byte $00
+RETY        .byte $00
+TMP         .byte $00
+TMP1        .byte $00
+TMP2        .byte $00
+TMP3        .byte $00
+TMP4        .byte $00
+TMP5        .byte $00
+TMP6        .byte $00
+TMP7        .byte $00
 
 init
-jsr ClearScreen
-jsr DrawGameBoarder
-
+            jsr ClearScreen
+            jsr DrawGameBoarder
+            jsr initClearArrays
             ldy #$00  ; set to 1024 our screen pos
             sty SCREEN_BG_COLOR
-            sty SCREEN_BOARDER
+            lda COLOR_DARK_GREY
+            sta SCREEN_BOARDER
 
 DropNew
             ; Testing Counting connections
+;            lda piece1
+;            pha
+;            lda piece1+1
+;            pha
+;            jsr lookForConnect4c ; varray (return>, return<, piece>, piece<)
+
+            lda piece2
+            pha
+            lda piece2+1
+            pha
             jsr lookForConnect4c
+
             jsr printConnectCount
 
-            ldy #$13 ; Offset low byte location
+            ldy #$13 ; Start Offset low byte location
             sty piece1
             iny
             sty piece2
-            lda #$04 ; Offset high byte location
+            lda #$04 ; Start Offset high byte location
             sta piece1+1
             sta piece2+1
 
@@ -94,19 +133,22 @@ DropNew
             lda (piece2), y ; See if there is a piece in the way at the top
             cmp #" "
             bne EndGame
-            lda #87 ; 'o'
+            lda #PILL_SIDE ; 'o'
             sta (piece1), y ; print new pieces
             sta (piece2), y
             jsr NewColors ; Set their new random colors
 
+; Inserted for debugging
+jsr printArrayValues
+
+; end of debugging
+
 
 ;the main game loop
-;jsr printNumbersAlongTop
 GameLoop
-lda DRAWCOUNT
-cmp #$10
-BCS MoveDownJump
-
+        lda DRAWCOUNT
+        cmp #DELAY
+        BCS MoveDownJump
         JSR GETIN ; get a key input
         cmp #'w'
         beq SwapColors
@@ -135,7 +177,9 @@ MoveRightOneJump    jmp MoveRightOne
 EndGame      jmp printMsg
 
 
-WaitFrame   lda $d012
+WaitFrame
+            stx RETX
+            lda $d012
             cmp #$F8
             beq WaitFrame
             ;wait for the raster to reach line $f8 (should be closer to the start of this line this way)
@@ -146,7 +190,9 @@ WaitStep2   lda $d012
             ldx DRAWCOUNT
             inx
             stx DRAWCOUNT
-Return      rts
+Return
+            ldx RETX
+            rts
 
 
 
@@ -155,21 +201,19 @@ Return      rts
 
 
 rotate
-; Cleared printed pill first
-ldy #$00
-lda #" "
-sta (piece1), y
-sta (piece2), y
-lda ORIENTATION
-
-beq rotateUnder
-cmp #$01
-beq rotateToLeft
-cmp #$02
-beq rotateToTop
-cmp #$03
-beq rotateToRight
-
+        ; Cleared printed pill first
+        ldy #$00
+        lda #" "
+        sta (piece1), y
+        sta (piece2), y
+        lda ORIENTATION
+        beq rotateUnder
+        cmp #$01
+        beq rotateToLeft
+        cmp #$02
+        beq rotateToTop
+        cmp #$03
+        beq rotateToRight
 rotateUnder
         inc ORIENTATION
         lda piece1
@@ -181,6 +225,7 @@ rotateUnder
         sta piece2
         lda zpPtr2+1
         sta piece2+1
+
         ; Subtract one row from zptr2
         lda zpPtr2
         sec
@@ -190,10 +235,6 @@ rotateUnder
         sbc #$00
         sta piece1+1
         jmp RotateFinished
-
-
-
-
 rotateToLeft
 ; Just put them back horizontally and swap the colors
         inc ORIENTATION
@@ -213,20 +254,15 @@ rotateToLeft
         jsr ColorSwap
         lda #$00
         sta ORIENTATION
-        jmp RotateFinished
-
-
-
+;        jmp RotateFinished
 RotateFinished
         jsr ChangeColor
         ; print the result
         ldy #$00
-        lda #87 ; 'o'
+        lda #PILL_SIDE ; 'o'
         sta (piece1), y
         sta (piece2), y
         jmp MoveDone
-
-    jmp MoveDone
 rotateToTop     jmp MoveDone
 rotateToRight   jmp MoveDone
 
@@ -234,46 +270,43 @@ rotateToRight   jmp MoveDone
 
 
 MoveRightOne
-lda piece2
-sta zpPtr2
-lda piece2+1
-sta zpPtr2+1
+        lda piece2
+        sta zpPtr2
+        lda piece2+1
+        sta zpPtr2+1
 
-jsr CheckCollisionRight_zpPtr2
-bne rightMoveDone
+        jsr CheckCollisionRight_zpPtr2
+        bne rightMoveDone
 
 ; Secondary piece
-                ldy #$00 ; offset from current char pos
-lda #' '
-sta (piece2), y
-clc
-lda #$01
-adc piece2
-sta piece2
-lda #$00 ; Add any roll over to the high byte
-adc piece2+1
-sta piece2+1
-lda #87
-sta (piece2), y
-
-
-; clear pos
-
-                lda #' '
-                sta (piece1), y
-                ; increment the pointer value by one
-                clc
-                lda #$01
-                adc piece1
-                sta piece1
-                lda #$00 ; Add any roll over to the high byte
-                adc piece1+1
-                sta piece1+1
-                lda #87
-                sta (piece1), y
-
-JSR ChangeColor
-rightMoveDone   jmp MoveDone
+        ldy #$00 ; offset from current char pos
+        lda #' '
+        sta (piece2), y
+        clc
+        lda #$01
+        adc piece2
+        sta piece2
+        lda #$00 ; Add any roll over to the high byte
+        adc piece2+1
+        sta piece2+1
+        lda #PILL_SIDE
+        sta (piece2), y
+        ; clear pos
+        lda #' '
+        sta (piece1), y
+        ; increment the pointer value by one
+        clc
+        lda #$01
+        adc piece1
+        sta piece1
+        lda #$00 ; Add any roll over to the high byte
+        adc piece1+1
+        sta piece1+1
+        lda #PILL_SIDE
+        sta (piece1), y
+        JSR ChangeColor
+rightMoveDone
+        jmp MoveDone
 
 
 
@@ -300,7 +333,7 @@ MoveLeftOne
                 lda piece1+1 ; subtract 0 and any borrow generated above
                 sbc #$00
                 sta piece1+1
-                lda #87
+                lda #PILL_SIDE
                 sta (piece1), y
 
 ; Second
@@ -315,7 +348,7 @@ sta piece2
 lda piece2+1 ; subtract 0 and any borrow generated above
 sbc #$00
 sta piece2+1
-lda #87
+lda #PILL_SIDE
 sta (piece2), y
 
 JSR ChangeColor
@@ -386,12 +419,12 @@ moveSecondaryDown
                 JSR ChangeColor
 
 MoveComplete
-lda #87
+lda #PILL_SIDE
 sta (piece1), y
 sta (piece2), y
 jmp MoveDone
 DropNewPiece
-lda #87
+lda #PILL_SIDE
 sta (piece1), y
 sta (piece2), y
 jmp DropNew
@@ -523,36 +556,7 @@ ColorSwap   lda PRICOLOR
             jsr ChangeColor
             rts
 
-
-
-printNumbersAlongTop    ldx #$00
-resetTo0                ldy #"0"
-printNumsLoop           tya
-                        cmp #':'
-                        beq resetTo0
-                        sta 1024, x
-                        inx
-                        iny
-                        cpx #40
-                        bne printNumsLoop
-                        rts
-
-
-
-
-
-ClearScreen LDX #$00
-            LDA #" " ; Space
-Clearing    STA SCREENMEM, X
-            STA SCREENMEM + $100, x
-            STA SCREENMEM + $200, x
-            STA SCREENMEM + $300, x
-            INX
-            BNE Clearing;
-            RTS
-
 ; Print Message subrutine
-
 printMsg    lda #$53   ; low byte character location
             STA zpPtr2 ; low byte
             STA zpPtr3 ; temp low byte of color
@@ -591,14 +595,62 @@ RestartGame jmp init
 
 
 
-; Look for blocks to clear
-lookForConnect4c
-            lda piece1
+
+lookForConnect4c ; varray (return>, return<, piece>, piece<)
+            pla
+            sta ret1+1
+            pla
+            sta ret1
+            pla
+            sta tmp+1
+            pla
+            sta tmp
+            ; put back return address onto stack
+            lda ret1
+            pha
+            lda ret1+1
+            pha
+; clear out the arrays we're going to use
+            jsr initClearArrays
+; Look for vertical blocks to clear on piece one
+lookUp ; start at the top and work my way down
+            sec
+            lda tmp ; piece
+            sbc #40
             sta zpPtr2
-            lda piece1+1
+            lda tmp+1
+            sbc #$00
             sta zpPtr2+1
-lookDown
+            ldy #$00 ; index offset for zp load
+            lda (zpPtr2),y
+            cmp #PILL_SIDE
+            bne lookUpComplete
             clc
+            lda zpPtr2 ; load back in low byte
+            sta zpPtr3 ; and copy it over to the color place
+            lda #$D4
+            adc zpPtr2+1
+            sta zpPtr3+1
+            lda (zpPtr3),y
+            and #$0f
+            cmp PRICOLOR
+            bne lookUpComplete
+            ; Piece is the same color, and type
+            lda zpPtr2
+            sta tmp ; make it the active top piece
+            lda zpPtr2+1
+            sta tmp+1
+            jmp lookUp
+lookUpComplete
+            lda tmp
+            sta zpPtr2
+            pha
+            lda tmp+1
+            sta zpPtr2+1
+            pha
+            jsr pushOntoVarray
+lookDown
+            clc ; Look for a piece below
             lda #40
             adc zpPtr2
             sta zpPtr2
@@ -607,29 +659,148 @@ lookDown
             sta zpPtr2+1
             ldy #$00
             lda (zpPtr2), y
-            cmp #87
+            cmp #PILL_SIDE
             bne lookDownDone
-            clc
+
+            clc ; Now look for color
+            lda zpPtr2
+            sta zpPtr3
             lda #$D4
             adc zpPtr2+1
-            sta zpPtr2+1
-            lda (zpPtr2), y
-            sta CONNECTCNT
+            sta zpPtr3+1
+            lda (zpPtr3), y
+            and #$0f ; mask out the top part of the byte, it could be garbage
             cmp PRICOLOR
             bne lookDownDone
+
+            ; Trying out our array
+            lda zpPtr2 ; Store away low byte
+            pha
+            lda zpPtr2+1 ; Store away high byte onto stack
+            pha
+            jsr pushOntoVarray ; void (ret2, ret1, addy2, addy1)
             inc CONNECTCNT
             jmp lookDown ; loop until we've counted them all
-lookDownDone rts
+lookDownDone
+            jsr clearPiecesInArray ; only runs if there are more than 3 in array
+            rts
 
+
+; Push 16 bit value onto varray
+pushOntoVarray ; void (ret2, ret1, addy2, addy1)
+            lda varrayIndex
+            asl ; multiply * 2
+            tax ; copy to x
+            pla
+            sta ret1+1
+            pla
+            sta ret1
+            pla
+            sta varray+1, x
+            pla
+            sta varray, x
+            inc varrayIndex
+            ; Return to where we came from
+            lda ret1
+            pha
+            lda ret1+1
+            pha
+            rts
+
+pushOntoVarray2 ; void (ret2, ret1, addy2, addy1)
+            lda varrayIndex2
+            asl ; multiply * 2
+            tax ; copy to x
+            pla
+            sta ret1+1
+            pla
+            sta ret1
+            pla
+            sta varray2+1, x
+            pla
+            sta varray2, x
+            inc varrayIndex2
+            ; Return to where we came from
+            lda ret1
+            pha
+            lda ret1+1
+            pha
+            rts
+
+clearPiecesInArray
+            ; see if there are more than 3 values in here
+            lda varrayIndex
+            cmp #04
+            bcc finishedClearing ; >= 4
+            ldx #$00 ; varray indexing * 2
+            ldy #$00 ; zero page indexing, leave as 0
+            sty tmp
+clearingLoop
+; 1  2  3  4  5  6  7  8
+;01 23 45 67 89 01 23 45
+            lda varray, x
+            sta zpPtr4
+            lda varray+1, x
+            sta zpPtr4+1
+            inx
+            inx
+            inc tmp
+lda #86 ; clearing with this symbol
+            lda #86 ; X type cross out
+            sta (zpPtr4), y
+            jsr WaitFrame
+            jsr WaitFrame
+            lda #90 ; diamond
+            sta (zpPtr4), y
+            jsr WaitFrame
+            jsr WaitFrame
+            lda #' '
+            sta (zpPtr4), y
+            lda tmp
+            cmp varrayIndex
+            bne clearingLoop
+finishedClearing
+            rts
+
+
+; Print in 1024+1 the vertical count
 printConnectCount
-            lda #$01 ; Low byte location
-            sta zpPtr2
-            lda #$04 ; high byte of character location
-            sta zpPtr2+1
-            lda CONNECTCNT
-            ora #$30
-            ldy #$00
-            sta (zpPtr2), y
+    lda #$01 ; Low byte location
+    sta zpPtr2
+    lda #$04 ; high byte of character location for 1025
+    sta zpPtr2+1
+    lda varrayIndex
+    ldy #$00
+    cmp #$0A
+    bcc NumericOnly ; >= to 10 then print a letter
+HexAlpha
+    sta (zpPtr2), y
+    rts
+NumericOnly
+    ora #$30
+    sta (zpPtr2), y
+    rts
+
+
+
+
+
+
+; Zeros out the vertical clear array
+initClearArrays
+            ldx #17 ; 8 x 2 bytes is how large it can be
+            lda #$00
+            sta varrayIndex
+            sta varrayIndex2
+            sta harrayIndex
+            sta harrayIndex2
+initClearArrayLoop
+            sta varray, x
+            sta varray2, x
+            sta harray, x
+            sta harray2, x
+            dex
+            bne initClearArrayLoop ; check for x != 0
             rts
 
 
@@ -637,10 +808,60 @@ printConnectCount
 
 
 
+; Print V Array possitions on the left of the screen, there are 8 16 bit values
+; looks like index x isn't used for these subroutines so we can use it.
+; Array Value 0
+printArrayValues ; void () ; alters x, y, tmp, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6
+            ldx #$00 ; used for varray offset
+pavLoop
+            lda varray, x
+            pha
+            lda varray+1, x
+            pha
+            jsr bin2hex16bit ; TMP, TMP2, TMP3 (ret_2, ret_1, binNumber_high, binNumber_low) alters tmp, tmp2, tmp3, tmp4, tmp5
+            lda tmp2 ; store tmp2 away so that it doesn't get overwritten in the multiply later
+            sta tmp6
+            ; Get screen pos to print at
+            txa
+            tya
+            iny ; shift down the screen one
+            iny ; shift down another
+            tya
+            lsr ; divide index by two
+            pha
+            lda #40
+            pha
+            jsr eightBitMul ; tmp1, tmp4 = (return_2, return_1, num1, num2) ; alter x, tmp1, tmp2, tmp4
+            ; Shift it in a couple pos from the left
+            inc tmp1
+            inc tmp1
+            inc tmp1
+            inc tmp1
+            lda tmp4 ; add 1024 to high byte
+            ora #$04
+            sta tmp4
+            lda tmp ; result of the bin2 hex
+            pha
+            lda tmp1 ; One row down low byte
+            pha
+            lda tmp4 ; high byte pos
+            pha
+            jsr print8BitDecNumber ; void (ret_2, ret_1, pos_high, pos_low, number); Store away return address
 
-
-
-
+            dec tmp1 ; left 2 characters to be printed
+            dec tmp1
+            lda tmp6
+            pha
+            lda tmp1 ; One row down
+            pha
+            lda tmp4
+            pha
+            jsr print8BitDecNumber ; void (ret_2, ret_1, pos_high, pos_low, number); Store away return address
+            inx
+            inx
+            cpx #16 ; actually looking for 16, but we're incrementing right before by 2, so 18
+            bne pavLoop
+            rts
 
 
 
@@ -681,9 +902,3 @@ cpy #9
 bne DrawBottom
 dgbDone rts
 
-
-get_random_number
-            lda $d012 ; load current screen raster value
-            eor $dc04 ; xor against value in $dc04
-            sbc $dc05 ; then subtract value in $dc05
-            rts

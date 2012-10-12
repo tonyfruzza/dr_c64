@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		EA286E83160BE51300C4A9B2 /* drc64.prg */ = {isa = PBXFileReference; lastKnownFileType = file; path = drc64.prg; sourceTree = "<group>"; };
+		EA286E85160BE57E00C4A9B2 /* example.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.prg; path = ../../ISOs/example.prg; sourceTree = "<group>"; };
+		EA286E86160C24F600C4A9B2 /* lightspeed.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = lightspeed.s; sourceTree = "<group>"; };
+		EA286E88160C486D00C4A9B2 /* flicker.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = flicker.prg; path = ../../ISOs/flicker.prg; sourceTree = "<group>"; };
+		EA8D86DC162696C40003415E /* subroutines.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = subroutines.s; sourceTree = "<group>"; };
+		EAA29EAA16110FA200C87D7F /* number.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = number.s; sourceTree = "<group>"; };
+		EAA2A0A11620115800C87D7F /* joytest.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = joytest.s; sourceTree = "<group>"; };
 		EAB47DD0155219BF00516343 /* baseGame.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = baseGame.s; sourceTree = "<group>"; };
 		EABC8DE215CA2145006F2067 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		EAE21A1115A3BB9600DCE4B2 /* Notes.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = Notes.s; sourceTree = "<group>"; };
@@ -19,8 +26,12 @@
 			children = (
 				EABC8DE215CA2145006F2067 /* Makefile */,
 				EAB47DD0155219BF00516343 /* baseGame.s */,
+				EA8D86DC162696C40003415E /* subroutines.s */,
 				EAE21A1115A3BB9600DCE4B2 /* Notes.s */,
+				EAA29EAA16110FA200C87D7F /* number.s */,
 				EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */,
+				EA286E86160C24F600C4A9B2 /* lightspeed.s */,
+				EAA2A0A11620115800C87D7F /* joytest.s */,
 				EAB47DD11552219800516343 /* Target */,
 			);
 			sourceTree = "<group>";
@@ -28,6 +39,9 @@
 		EAB47DD11552219800516343 /* Target */ = {
 			isa = PBXGroup;
 			children = (
+				EA286E83160BE51300C4A9B2 /* drc64.prg */,
+				EA286E85160BE57E00C4A9B2 /* example.prg */,
+				EA286E88160C486D00C4A9B2 /* flicker.prg */,
 			);
 			name = Target;
 			sourceTree = "<group>";
