@@ -67,22 +67,20 @@ ORIENTATION .byte $00 ; 0 = 12, 1 = 1, 2 = 21, 3 = 2
                       ;             2              1
 PRICOLOR    .byte $00
 SECCOLOR    .byte $00
+CMPCOLOR    .byte $00 ; tmp for comparing variable colors
 CONNECTCNT  .byte $00
 colors      .byte COLOR_RED, COLOR_RED, COLOR_YELLOW, COLOR_BLUE
 P1_SCORE    .byte $00, $00, $00, $00
 varray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 varrayIndex .byte $00
-varray2     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-varrayIndex2 .byte $00
 harray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 harrayIndex .byte $00
-harray2     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-harrayIndex2 .byte $00
 
 RET1        .byte $00, $00
+ret2        .byte $00, $00
 RETX        .byte $00
 RETY        .byte $00
-TMP         .byte $00
+TMP         .byte $00, $00
 TMP1        .byte $00
 TMP2        .byte $00
 TMP3        .byte $00
@@ -94,19 +92,17 @@ TMP7        .byte $00
 init
             jsr ClearScreen
             jsr DrawGameBoarder
-            jsr initClearArrays
             ldy #$00  ; set to 1024 our screen pos
             sty SCREEN_BG_COLOR
             lda COLOR_DARK_GREY
             sta SCREEN_BOARDER
-
+            jmp firstPieceToDrop
 DropNew
-            ; Testing Counting connections
-;            lda piece1
-;            pha
-;            lda piece1+1
-;            pha
-;            jsr lookForConnect4c ; varray (return>, return<, piece>, piece<)
+            lda piece1
+            pha
+            lda piece1+1
+            pha
+            jsr lookForConnect4c ; varray (return>, return<, piece>, piece<)
 
             lda piece2
             pha
@@ -115,6 +111,7 @@ DropNew
             jsr lookForConnect4c
 
             jsr printConnectCount
+firstPieceToDrop
 
             ldy #$13 ; Start Offset low byte location
             sty piece1
@@ -186,7 +183,6 @@ WaitFrame
 WaitStep2   lda $d012
             cmp #$F8
             bne WaitStep2
-            ;jmp MoveDownOne
             ldx DRAWCOUNT
             inx
             stx DRAWCOUNT
@@ -208,36 +204,25 @@ rotate
         sta (piece2), y
         lda ORIENTATION
         beq rotateUnder
-        cmp #$01
-        beq rotateToLeft
-        cmp #$02
-        beq rotateToTop
-        cmp #$03
-        beq rotateToRight
+        jmp rotateToLeft
 rotateUnder
+        ; put piece1 where piece2 was, then move piece 1 down one row
+        ; Pieces will be vertical after this move
         inc ORIENTATION
         lda piece1
-        sta zpPtr2
-        lda piece1+1
-        sta zpPtr2+1
-
-        lda zpPtr2
         sta piece2
-        lda zpPtr2+1
-        sta piece2+1
-
-        ; Subtract one row from zptr2
-        lda zpPtr2
+        sta zpPtr2
         sec
         sbc #40
         sta piece1
-        lda zpPtr2+1
-        sbc #$00
+        lda piece1+1
+        sta piece2+1
+        sta zpPtr2+1
+        sbc #00
         sta piece1+1
         jmp RotateFinished
 rotateToLeft
 ; Just put them back horizontally and swap the colors
-        inc ORIENTATION
 ; piece one is on top, return it to the bottom, and move
 ; piece2 to the right
 ; Piece2 is currently where we want 1 at
@@ -246,7 +231,6 @@ rotateToLeft
         sta piece1
         adc #$01
         sta piece2
-
         lda piece2+1
         sta piece1+1
         adc #$00
@@ -254,7 +238,6 @@ rotateToLeft
         jsr ColorSwap
         lda #$00
         sta ORIENTATION
-;        jmp RotateFinished
 RotateFinished
         jsr ChangeColor
         ; print the result
@@ -263,9 +246,6 @@ RotateFinished
         sta (piece1), y
         sta (piece2), y
         jmp MoveDone
-rotateToTop     jmp MoveDone
-rotateToRight   jmp MoveDone
-
 
 
 
@@ -274,7 +254,6 @@ MoveRightOne
         sta zpPtr2
         lda piece2+1
         sta zpPtr2+1
-
         jsr CheckCollisionRight_zpPtr2
         bne rightMoveDone
 
@@ -313,46 +292,46 @@ rightMoveDone
 
 
 MoveLeftOne
-                lda piece1
-                sta zpPtr2
-                lda piece1+1
-                sta zpPtr2+1
-                jsr CheckCollisionLeft_zpPtr2
-                bne leftMoveDone
+        lda piece1
+        sta zpPtr2
+        lda piece1+1
+        sta zpPtr2+1
+        jsr CheckCollisionLeft_zpPtr2
+        bne leftMoveDone
 
-                ; Clear the current pos
-                ldy #$00 ; offset from current char pos
-                lda #" "
-                sta (piece1), y
+        ; Clear the current pos
+        ldy #$00 ; offset from current char pos
+        lda #" "
+        sta (piece1), y
 
-                ; decrement the pointer value by one
-                sec
-                lda piece1
-                sbc #$01
-                sta piece1
-                lda piece1+1 ; subtract 0 and any borrow generated above
-                sbc #$00
-                sta piece1+1
-                lda #PILL_SIDE
-                sta (piece1), y
+        ; decrement the pointer value by one
+        sec
+        lda piece1
+        sbc #$01
+        sta piece1
+        lda piece1+1 ; subtract 0 and any borrow generated above
+        sbc #$00
+        sta piece1+1
+        lda #PILL_SIDE
+        sta (piece1), y
+        ; Second
+        lda #" "
+        sta (piece2), y
 
-; Second
-lda #" "
-sta (piece2), y
+        ; decrement the pointer value by one
+        sec
+        lda piece2
+        sbc #$01
+        sta piece2
+        lda piece2+1 ; subtract 0 and any borrow generated above
+        sbc #$00
+        sta piece2+1
+        lda #PILL_SIDE
+        sta (piece2), y
 
-; decrement the pointer value by one
-sec
-lda piece2
-sbc #$01
-sta piece2
-lda piece2+1 ; subtract 0 and any borrow generated above
-sbc #$00
-sta piece2+1
-lda #PILL_SIDE
-sta (piece2), y
-
-JSR ChangeColor
-leftMoveDone                jmp MoveDone
+        JSR ChangeColor
+leftMoveDone
+        jmp MoveDone
 
 
 
@@ -361,73 +340,68 @@ leftMoveDone                jmp MoveDone
 
 
 ZeroCountAndMoveDown
-                lda #$00
-                sta DRAWCOUNT
+            ldy #$00
+            sty DRAWCOUNT
 MoveDownOne
-; Clear
-ldy #$00
-lda #" "
-sta (piece1), y
-sta (piece2), y
+            ldy #$00
+            ; Clear
+            lda #" "
+            sta (piece1), y
+            sta (piece2), y
+            lda ORIENTATION
+            cmp #$01
+            beq checkSecondaryBottom
 
-lda ORIENTATION
-cmp #$01
-beq checkSecondaryBottom
+checkPrimaryBottom
+            ldy #$00 ; offset from current char pos
+            ; See if we can move down, is something there already??
 
-checkPrimaryBottom ldy #$00 ; offset from current char pos
-                ; See if we can move down, is something there already??
-
-                lda piece1 ; Copy piece into zpPtr2 for checking
-                sta zpPtr2
-                iny
-                lda piece1+1
-                sta zpPtr2+1
-                jsr CheckCollisionBelow_zpPtr2
-                bne DropNewPiece
-                ; Moving piece down first clear value then add 40 to main piece
-
+            lda piece1 ; Copy piece into zpPtr2 for checking
+            sta zpPtr2
+            iny
+            lda piece1+1
+            sta zpPtr2+1
+            jsr CheckCollisionBelow_zpPtr2
+            bne DropNewPiece
+            ; Moving piece down first clear value then add 40 to main piece
 checkSecondaryBottom
-                ldy #$00 ; offset from current char pos
-                ; See if we can move down, is something there already??
-
-                lda piece2, y ; Copy piece into zpPtr2 for checking
-                sta zpPtr2, y
-                iny
-                lda piece2, y
-                sta zpPtr2, y
-                jsr CheckCollisionBelow_zpPtr2
-                bne DropNewPiece
-                ; Moving piece down first clear value then add 40 to main piece
-
+            ldy #$00 ; offset from current char pos
+            ; See if we can move down, is something there already??
+            lda piece2, y ; Copy piece into zpPtr2 for checking
+            sta zpPtr2, y
+            iny
+            lda piece2, y
+            sta zpPtr2, y
+            jsr CheckCollisionBelow_zpPtr2
+            bne DropNewPiece
+            ; Moving piece down first clear value then add 40 to main piece
 movePrimaryDown ; increment the pointer value by 40, we should check to see that it didn't go over 2024
-                clc
-                lda #40
-                adc piece1
-                sta piece1
-                lda #$00 ; Add any roll over to the high byte
-                adc piece1+1
-                sta piece1+1
+            clc
+            lda #40
+            adc piece1
+            sta piece1
+            lda #$00 ; Add any roll over to the high byte
+            adc piece1+1
+            sta piece1+1
 moveSecondaryDown
-                clc
-                lda #40
-                adc piece2
-                sta piece2
-                lda #$00 ; Add any roll over to the high byte
-                adc piece2+1
-                sta piece2+1
-
-                JSR ChangeColor
-
+            clc
+            lda #40
+            adc piece2
+            sta piece2
+            lda #$00 ; Add any roll over to the high byte
+            adc piece2+1
+            sta piece2+1
+            JSR ChangeColor
 MoveComplete
-lda #PILL_SIDE
-sta (piece1), y
-sta (piece2), y
-jmp MoveDone
-DropNewPiece
-lda #PILL_SIDE
-sta (piece1), y
-sta (piece2), y
-jmp DropNew
+            lda #PILL_SIDE
+            sta (piece1), y
+            sta (piece2), y
+            jmp MoveDone
+            DropNewPiece
+            lda #PILL_SIDE
+            sta (piece1), y
+            sta (piece2), y
+            jmp DropNew
 
 
 CheckCollisionBelow_zpPtr2 ; Sets a = 1 if there will be collition below then rts
@@ -589,30 +563,118 @@ RestartGame jmp init
 
 
 
-
-
-
-
-
+flickerZpPtr2
+ldy #$00
+lda (zpPtr2), y
+sta tmp2
+tya
+sta (zpPtr2),y
+jsr WaitFrame
+jsr WaitFrame
+jsr WaitFrame
+jsr WaitFrame
+jsr WaitFrame
+lda tmp2
+sta (zpPtr2),y
+rts
 
 
 lookForConnect4c ; varray (return>, return<, piece>, piece<)
             pla
-            sta ret1+1
+            sta ret2+1
             pla
-            sta ret1
+            sta ret2
             pla
-            sta tmp+1
+            sta tmp+1 ; piece >
             pla
-            sta tmp
-            ; put back return address onto stack
-            lda ret1
-            pha
-            lda ret1+1
-            pha
-; clear out the arrays we're going to use
+            sta tmp   ; piece <
             jsr initClearArrays
-; Look for vertical blocks to clear on piece one
+
+; Get color of this possition and store it CMPCOLOR
+            clc
+            lda tmp+1
+            adc #$D4
+            sta zpPtr3+1
+            lda tmp
+            sta zpPtr3
+            ldy #$00
+            lda(zpPtr3),y
+            and #$0f
+            sta CMPCOLOR
+
+
+; Look for horizontal block to clear
+lookLeft
+
+cld ; Clear decimal flag
+            sec ; set carry for subtraction
+            lda tmp ; piece <
+            sbc #$01 ; look to the left
+            sta zpPtr2
+            lda tmp+1
+            sbc #$00 ; piece >
+            sta zpPtr2+1
+            ldy #$00 ; zp index offset
+            lda (zpPtr2), y
+            cmp #PILL_SIDE
+            bne lookLeftComplete
+            clc
+            lda zpPtr2 ; get color of piece to left to see if it matches
+            sta zpPtr3
+            lda #$D4
+            adc zpPtr2+1
+            sta zpPtr3+1
+            lda (zpPtr3),y
+            and #$0f
+            cmp CMPCOLOR
+            bne lookLeftComplete
+            ; Piece to left is the same color and type
+            lda zpPtr2
+            sta tmp
+            lda zpPtr2+1
+            sta tmp+1
+            jmp lookLeft
+lookLeftComplete
+            lda tmp
+            sta zpPtr2
+            pha
+            lda tmp+1
+            sta zpPtr2+1
+            pha
+            jsr pushOntoHarray
+lookRight
+            clc
+            lda #$01
+            adc zpPtr2
+            sta zpPtr2
+            lda #$00
+            tay ; init y index to 0
+            adc zpPtr2+1
+            sta zpPtr2+1
+            lda (zpPtr2), y
+            cmp #PILL_SIDE
+            bne lookRightDone
+            clc
+            lda zpPtr2
+            sta zpPtr3
+            lda #$D4
+            adc zpPtr2+1
+            sta zpPtr3+1
+            lda (zpPtr3),y
+            and #$0f
+            cmp CMPCOLOR
+            bne lookRightDone
+            lda zpPtr2
+            pha
+            lda zpPtr2+1
+            pha
+            jsr pushOntoHarray ; void (ret2, ret1, addy2, addy1)
+            inc CONNECTCNT
+            jmp lookRight ; loop until we've counted them all
+lookRightDone
+
+
+; Look for vertical blocks to clear
 lookUp ; start at the top and work my way down
             sec
             lda tmp ; piece
@@ -633,7 +695,7 @@ lookUp ; start at the top and work my way down
             sta zpPtr3+1
             lda (zpPtr3),y
             and #$0f
-            cmp PRICOLOR
+            cmp CMPCOLOR
             bne lookUpComplete
             ; Piece is the same color, and type
             lda zpPtr2
@@ -649,6 +711,7 @@ lookUpComplete
             sta zpPtr2+1
             pha
             jsr pushOntoVarray
+
 lookDown
             clc ; Look for a piece below
             lda #40
@@ -670,10 +733,9 @@ lookDown
             sta zpPtr3+1
             lda (zpPtr3), y
             and #$0f ; mask out the top part of the byte, it could be garbage
-            cmp PRICOLOR
+            cmp CMPCOLOR
             bne lookDownDone
-
-            ; Trying out our array
+            ; put this piece onto the array
             lda zpPtr2 ; Store away low byte
             pha
             lda zpPtr2+1 ; Store away high byte onto stack
@@ -682,7 +744,12 @@ lookDown
             inc CONNECTCNT
             jmp lookDown ; loop until we've counted them all
 lookDownDone
-            jsr clearPiecesInArray ; only runs if there are more than 3 in array
+            jsr clearPiecesInArray
+            ; put back return address onto stack
+            lda ret2
+            pha
+            lda ret2+1
+            pha
             rts
 
 
@@ -707,8 +774,8 @@ pushOntoVarray ; void (ret2, ret1, addy2, addy1)
             pha
             rts
 
-pushOntoVarray2 ; void (ret2, ret1, addy2, addy1)
-            lda varrayIndex2
+pushOntoHarray ; void (ret2, ret1, addy2, addy1)
+            lda harrayIndex
             asl ; multiply * 2
             tax ; copy to x
             pla
@@ -716,10 +783,10 @@ pushOntoVarray2 ; void (ret2, ret1, addy2, addy1)
             pla
             sta ret1
             pla
-            sta varray2+1, x
+            sta harray+1, x
             pla
-            sta varray2, x
-            inc varrayIndex2
+            sta harray, x
+            inc harrayIndex
             ; Return to where we came from
             lda ret1
             pha
@@ -727,11 +794,13 @@ pushOntoVarray2 ; void (ret2, ret1, addy2, addy1)
             pha
             rts
 
-clearPiecesInArray
+; Clears both vertical and horizontal entries in their respecitve
+; arrays if there are more than 4 entries in one of them.
+clearPiecesInArray ; void ()
             ; see if there are more than 3 values in here
             lda varrayIndex
             cmp #04
-            bcc finishedClearing ; >= 4
+            bcc finishedClearingV ; >= 4
             ldx #$00 ; varray indexing * 2
             ldy #$00 ; zero page indexing, leave as 0
             sty tmp
@@ -759,7 +828,38 @@ lda #86 ; clearing with this symbol
             lda tmp
             cmp varrayIndex
             bne clearingLoop
-finishedClearing
+finishedClearingV
+            ; Clear H array if we need to
+            lda harrayIndex
+            cmp #04
+            bcc finishedClearingH
+            ldx #$00 ; h array indexing * 2
+            ldy #$00 ; zero page indexing, leave as 0
+            sty tmp  ; h array indexing by 1
+hclearingLoop
+            lda harray, x
+            sta zpPtr4
+            lda harray+1, x
+            sta zpPtr4+1
+            inx
+            inx
+            inc tmp
+            ; paste
+            lda #86 ; clearing with this symbol
+            lda #86 ; X type cross out
+            sta (zpPtr4), y
+            jsr WaitFrame
+            jsr WaitFrame
+            lda #90 ; diamond
+            sta (zpPtr4), y
+            jsr WaitFrame
+            jsr WaitFrame
+            lda #' '
+            sta (zpPtr4), y
+            lda tmp
+            cmp harrayIndex
+            bne hclearingLoop
+finishedClearingH
             rts
 
 
@@ -791,16 +891,14 @@ initClearArrays
             ldx #17 ; 8 x 2 bytes is how large it can be
             lda #$00
             sta varrayIndex
-            sta varrayIndex2
             sta harrayIndex
-            sta harrayIndex2
 initClearArrayLoop
             sta varray, x
-            sta varray2, x
             sta harray, x
-            sta harray2, x
             dex
-            bne initClearArrayLoop ; check for x != 0
+            beq clearArraysDone ; check for x != 0
+            jmp initClearArrayLoop
+clearArraysDone
             rts
 
 
@@ -814,9 +912,9 @@ initClearArrayLoop
 printArrayValues ; void () ; alters x, y, tmp, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6
             ldx #$00 ; used for varray offset
 pavLoop
-            lda varray, x
+            lda harray, x
             pha
-            lda varray+1, x
+            lda harray+1, x
             pha
             jsr bin2hex16bit ; TMP, TMP2, TMP3 (ret_2, ret_1, binNumber_high, binNumber_low) alters tmp, tmp2, tmp3, tmp4, tmp5
             lda tmp2 ; store tmp2 away so that it doesn't get overwritten in the multiply later
@@ -862,6 +960,32 @@ pavLoop
             cpx #16 ; actually looking for 16, but we're incrementing right before by 2, so 18
             bne pavLoop
             rts
+
+; Quick drop blocks write up, gravity, kind of like Lumins effect
+; |          |
+; |          |
+; |          |
+; ' ' ' ' ' ''
+;luminsDrop
+;    ldx #$00
+;    ldy #$00
+
+;    lda #$04 ; start
+;    sta zpPtr1
+;    lda #231
+;    sta zpPtr1+1
+;dropOuterLoop
+;    ldy #$00 ; reset our y index for vertical offset
+;    cpx #7
+;    beq luminsDropDone
+;luminsInnerLoop
+;lda
+
+;    inx zpPtr1+1
+
+;luminsDropDone
+;rts
+
 
 
 

@@ -99,10 +99,9 @@ addOneMoreDec16
             lda TMP3
             adc #$00
             sta TMP3
-jmp addOneMoreDec16
-            bin2hex16bitDone
-            ; Set math type back to binary mode
-            cld
+            jmp addOneMoreDec16
+bin2hex16bitDone
+            cld ; Set math type back to binary mode
             ; Copy return address back to stack
             lda ret1
             pha
