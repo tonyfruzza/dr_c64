@@ -42,7 +42,6 @@ COLOR_L_GREY    .equ $0f
 DELAY           .equ $10
 PILL_SIDE       .equ 81 ; 'o'
 
-
 ; Zero Page Pointers for indirect indexing
 piece1          .equ $b0
 piece2          .equ $b2
@@ -63,14 +62,17 @@ ORGBOARDER  .byte $00
 ORGBGRND    .byte $00
 DRAWCOUNT   .byte $00 ; How many screen draws since last reset used as a timer
 WAITTIME    .byte $00 ; How many frames to wait till we start over
-ORIENTATION .byte $00 ; 0 = 12, 1 = 1, 2 = 21, 3 = 2
-                      ;             2              1
+ORIENTATION .byte $00 ; 0 = 12, 1 = 1
+                      ;             2
 PRICOLOR    .byte $00
 SECCOLOR    .byte $00
 CMPCOLOR    .byte $00 ; tmp for comparing variable colors
 CONNECTCNT  .byte $00
 colors      .byte COLOR_RED, COLOR_RED, COLOR_YELLOW, COLOR_BLUE
 P1_SCORE    .byte $00, $00, $00, $00
+START_POS   .byte $13, $04
+
+
 varray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 varrayIndex .byte $00
 harray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
@@ -98,6 +100,7 @@ init
             sta SCREEN_BOARDER
             jmp firstPieceToDrop
 DropNew
+
             lda piece1
             pha
             lda piece1+1
@@ -109,15 +112,17 @@ DropNew
             lda piece2+1
             pha
             jsr lookForConnect4c
+            jsr luminsDrop
+            bne DropNew ; A is set to count of how many dropped, loop until no drops
 
-            jsr printConnectCount
+;            jsr printConnectCount
 firstPieceToDrop
 
-            ldy #$13 ; Start Offset low byte location
+            ldy START_POS ; Start Offset low byte location
             sty piece1
             iny
             sty piece2
-            lda #$04 ; Start Offset high byte location
+            lda START_POS+1 ; Start Offset high byte location
             sta piece1+1
             sta piece2+1
 
@@ -136,8 +141,7 @@ firstPieceToDrop
             jsr NewColors ; Set their new random colors
 
 ; Inserted for debugging
-jsr printArrayValues
-
+;jsr printArrayValues
 ; end of debugging
 
 
@@ -165,7 +169,7 @@ GameLoop
 
 MoveLeftOneJump jmp MoveLeftOne
 MoveDownJump jmp ZeroCountAndMoveDown
-MoveDown     jmp MoveDownOne
+;MoveDown    ; jmp MoveDownOne
 SwapColors   jsr ColorSwap
 rotateJsr    jmp rotate
 MoveRightOneJump    jmp MoveRightOne
@@ -226,6 +230,21 @@ rotateToLeft
 ; piece one is on top, return it to the bottom, and move
 ; piece2 to the right
 ; Piece2 is currently where we want 1 at
+; We'll have to see if this is possible though since there needs to be space to the right of current piece2
+clc
+iny
+lda (piece2),y
+dey
+cmp #' '
+beq commitRotateToHorizontal
+dey
+lda (piece2),y
+iny
+cmp #' '
+bne RotateFinished ; can't move, between two piece or the right wall and a piece
+jsr MoveLeftOne
+;
+commitRotateToHorizontal
         clc
         lda piece2
         sta piece1
@@ -251,10 +270,10 @@ RotateFinished
 
 MoveRightOne
         lda piece2
-        sta zpPtr2
+        pha
         lda piece2+1
-        sta zpPtr2+1
-        jsr CheckCollisionRight_zpPtr2
+        pha
+        jsr CheckCollisionRight
         bne rightMoveDone
 
 ; Secondary piece
@@ -293,10 +312,10 @@ rightMoveDone
 
 MoveLeftOne
         lda piece1
-        sta zpPtr2
+        pha
         lda piece1+1
-        sta zpPtr2+1
-        jsr CheckCollisionLeft_zpPtr2
+        pha
+        jsr CheckCollisionLeft
         bne leftMoveDone
 
         ; Clear the current pos
@@ -353,26 +372,24 @@ MoveDownOne
             beq checkSecondaryBottom
 
 checkPrimaryBottom
-            ldy #$00 ; offset from current char pos
             ; See if we can move down, is something there already??
-
             lda piece1 ; Copy piece into zpPtr2 for checking
             sta zpPtr2
-            iny
+            pha
             lda piece1+1
+            pha
             sta zpPtr2+1
-            jsr CheckCollisionBelow_zpPtr2
+
+            jsr CheckCollisionBelow
             bne DropNewPiece
             ; Moving piece down first clear value then add 40 to main piece
 checkSecondaryBottom
-            ldy #$00 ; offset from current char pos
             ; See if we can move down, is something there already??
-            lda piece2, y ; Copy piece into zpPtr2 for checking
-            sta zpPtr2, y
-            iny
-            lda piece2, y
-            sta zpPtr2, y
-            jsr CheckCollisionBelow_zpPtr2
+            lda piece2 ; Copy piece into zpPtr2 for checking
+            pha
+            lda piece2+1
+            pha
+            jsr CheckCollisionBelow
             bne DropNewPiece
             ; Moving piece down first clear value then add 40 to main piece
 movePrimaryDown ; increment the pointer value by 40, we should check to see that it didn't go over 2024
@@ -404,84 +421,85 @@ MoveComplete
             jmp DropNew
 
 
-CheckCollisionBelow_zpPtr2 ; Sets a = 1 if there will be collition below then rts
-                lda zpPtr2 ; Make a copy of the current possition
-                sta zpPtr3 ; into zpPtr3
-                lda zpPtr2+1
+CheckCollisionBelow ; Sets a = (ret1>, ret1<, pos>, pos<)
+                pla
+                sta ret1+1
+                pla
+                sta ret1
+                pla
                 sta zpPtr3+1
-
-                ; Look below to see what's there, is it a space?
+                pla
                 clc
-                lda #40
-                adc zpPtr3
+                adc #40
                 sta zpPtr3
+                lda ret1
+                pha
+                lda ret1+1
+                pha
+                ; Look below to see what's there, is it a space?
                 lda #$00 ; Add any roll over to the high byte
+                tay
                 adc zpPtr3+1
                 sta zpPtr3+1
-            
-                ldy #$00
                 lda (zpPtr3), y
                 cmp #" "
                 beq noCollitionDetected
                 bne collitionDetected
 collitionDetected
-lda #"1"
-sta 1024
                 lda #$01
                 rts
 noCollitionDetected
-lda #"0"
-sta 1024
                 lda #$00
                 rts
 
 ; function CheckCollisionLeft_zpPtr2
-CheckCollisionLeft_zpPtr2 ; Sets a = 1 if there will be collition below then rts
-            lda zpPtr2 ; Make a copy of the current possition
-            sta zpPtr3 ; into zpPtr3
-            lda zpPtr2+1
+CheckCollisionLeft ; a = (ret1>, ret1<, pos>, pos<)
+            pla
+            sta ret1+1
+            pla
+            sta ret1
+            pla
             sta zpPtr3+1
-
-            ; Look below to see what's there, is it a space?
+            pla
             sec
-            lda zpPtr3
             sbc #$01
             sta zpPtr3
-            lda zpPtr3+1
-            sbc #$00
-            sta zpPtr3+1
-            ldy #$00
+            lda #$00
+            tay
+            sbc zpPtr3+1
+            lda ret1
+            pha
+            lda ret1+1
+            pha
             lda (zpPtr3), y
             cmp #" "
             beq noCollitionDetectedLeft
-            bne collitionDetectedLeft
-noCollitionDetectedLeft
-            lda #"0"
-            sta 1024
-            lda #$00
-            rts
 collitionDetectedLeft
-            lda #"1"
-            sta 1024
             lda #$01
+            rts
+noCollitionDetectedLeft
+            lda #$00
             rts
 
-; function CheckCollisionLeft_zpPtr2
-CheckCollisionRight_zpPtr2 ; Sets a = 1 if there will be collition below then rts
+
+CheckCollisionRight ; a = (ret1>, ret1<, pos>, pos<)
+            pla
+            sta ret1+1
+            pla
+            sta ret1
+            pla
+            sta zpPtr3+1
+            pla
+            sta zpPtr3
             ldy #$01
-            lda (zpPtr2), y
+            lda (zpPtr3), y
             cmp #" "
             beq noCollitionDetectedRight
-            bne collitionDetectedRight
-noCollitionDetectedRight
-            lda #"0"
-            sta 1024
-            lda #$00
-            rts
 collitionDetectedRight
-            lda #"1"
-            sta 1024
             lda #$01
+            rts
+noCollitionDetectedRight
+            lda #$00
             rts
 
 
@@ -814,7 +832,6 @@ clearingLoop
             inx
             inx
             inc tmp
-lda #86 ; clearing with this symbol
             lda #86 ; X type cross out
             sta (zpPtr4), y
             jsr WaitFrame
@@ -962,29 +979,139 @@ pavLoop
             rts
 
 ; Quick drop blocks write up, gravity, kind of like Lumins effect
-; |          |
-; |          |
-; |          |
-; ' ' ' ' ' ''
-;luminsDrop
-;    ldx #$00
-;    ldy #$00
+luminsDrop
+    ldx #$00 ; column offset (screen x) index 0 - 7
+    ldy #$00 ; zp index, do not change
+    sty tmp  ; used as screen y offset, 0 - 15
+    sty tmp1 ; used to keep track if anything dropped, shared with dropDownIfYouCan
+    sty tmp2 ; used as screen x index 0 - 7
+    sty tmp3 ; Total of number of drops, retun register as A
 
-;    lda #$04 ; start
-;    sta zpPtr1
-;    lda #231
-;    sta zpPtr1+1
-;dropOuterLoop
-;    ldy #$00 ; reset our y index for vertical offset
-;    cpx #7
-;    beq luminsDropDone
-;luminsInnerLoop
-;lda
+    lda #$0F
+    sta zpPtr1
+    lda #$04 ; start
+    sta zpPtr1+1
 
-;    inx zpPtr1+1
+dropOuterLoop
+lda tmp2
+    cmp #8
+    beq luminsDropDone
 
-;luminsDropDone
-;rts
+    ; Move one right
+    clc
+    lda zpPtr1
+    adc #$01
+    sta zpPtr1
+    sta zpPtr2
+    lda #$00
+    sta tmp ; reset inner loop index
+    adc zpPtr1+1
+    sta zpPtr1+1
+    sta zpPtr2+1
+dropInnerLoop
+    lda tmp
+    cmp #15
+    beq dropInnerLoopComplete
+    clc
+    lda zpPtr2
+    adc #40
+    sta zpPtr2
+    lda #$00
+    adc zpPtr2+1
+    sta zpPtr2+1
+    lda (zpPtr2),y
+    cmp #PILL_SIDE
+    bne nextRow
+
+    lda zpPtr2
+    pha
+    lda zpPtr2+1
+    pha
+    jsr dropDownIfYouCan
+nextRow
+    inc tmp
+    jmp dropInnerLoop
+dropInnerLoopComplete
+    inc tmp2
+    jmp dropOuterLoop
+luminsDropDone
+    lda tmp1
+    bne luminsDrop ; if there were any dropped this last time, see if there were any left
+lda tmp3
+    rts
+
+
+
+dropDownIfYouCan ; void (ret2, ret1, pos+1, pos)
+        stx RETX
+        sty RETY
+        pla
+        sta ret1+1
+        pla
+        sta ret1
+        pla
+        sta zpPtr3+1
+        pla
+        sta zpPtr3
+        ; Look below and store it into zpPtr4
+        clc
+        adc #40
+        sta zpPtr4
+        lda zpPtr3+1
+        adc #$00
+        tya
+        sta zpPtr4+1
+        lda (zpPtr4), y
+        cmp #' '
+        bne noDrop
+        lda (zpPtr3),y
+        sta (zpPtr4),y
+        ; now transfer color from zpPtr3 to zpPtr4
+        lda #' '
+        sta (zpPtr3),y ; clear piece that was dropped
+        clc
+        lda zpPtr3+1
+        adc #$d4
+        sta zpPtr3+1
+        clc
+        lda zpPtr4+1
+        adc #$d4
+        sta zpPtr4+1
+        lda (zpPtr3),y ; load old color
+        and #$0f
+        sta (zpPtr4),y ; store color
+        inc tmp1 ; shared value for knowing if there was a drop
+        inc tmp3 ; shared value for knowing total of drops
+jsr WaitFrame
+jsr WaitFrame
+jsr WaitFrame
+jsr WaitFrame
+jsr WaitFrame
+
+noDrop
+        ldy RETY
+        ldx RETX
+        lda ret1
+        pha
+        lda ret1+1
+        pha
+        rts
+
+
+
+
+;            
+clc
+lda tmp+1
+adc #$D4
+sta zpPtr3+1
+lda tmp
+sta zpPtr3
+ldy #$00
+lda(zpPtr3),y
+and #$0f
+sta CMPCOLOR
+
 
 
 
