@@ -167,7 +167,8 @@ GameLoop
         jsr WaitFrame
         jmp GameLoop
 
-MoveLeftOneJump jmp MoveLeftOne
+MoveLeftOneJump jsr MoveLeftOne
+jmp MoveDone
 MoveDownJump jmp ZeroCountAndMoveDown
 ;MoveDown    ; jmp MoveDownOne
 SwapColors   jsr ColorSwap
@@ -231,19 +232,26 @@ rotateToLeft
 ; piece2 to the right
 ; Piece2 is currently where we want 1 at
 ; We'll have to see if this is possible though since there needs to be space to the right of current piece2
-clc
-iny
-lda (piece2),y
-dey
-cmp #' '
-beq commitRotateToHorizontal
-dey
-lda (piece2),y
-iny
-cmp #' '
-bne RotateFinished ; can't move, between two piece or the right wall and a piece
-jsr MoveLeftOne
-;
+
+; If there is collision to right, but none to left then shift to the left
+        lda piece2
+        pha
+        lda piece2+1
+        pha
+        jsr CheckCollisionRight ; Is there room to the right?
+        beq commitRotateToHorizontal ; We're okay just rotate as normal
+
+        lda piece2
+        pha
+        lda piece2+1
+        pha
+        jsr CheckCollisionLeft ; Is there room to the left?
+        bne RotateFinished ; there was no room
+
+        jsr MoveLeftOne
+        lda #' '
+        sta (piece1),y
+        sta (piece1),y
 commitRotateToHorizontal
         clc
         lda piece2
@@ -275,6 +283,7 @@ MoveRightOne
         pha
         jsr CheckCollisionRight
         bne rightMoveDone
+
 
 ; Secondary piece
         ldy #$00 ; offset from current char pos
@@ -311,6 +320,15 @@ rightMoveDone
 
 
 MoveLeftOne
+        lda ORIENTATION
+        beq MoveLeftHorizontalOnly
+        lda piece2
+        pha
+        lda piece2+1
+        pha
+        jsr CheckCollisionLeft
+        bne leftMoveDone
+MoveLeftHorizontalOnly
         lda piece1
         pha
         lda piece1+1
@@ -351,7 +369,8 @@ MoveLeftOne
 
         JSR ChangeColor
 leftMoveDone
-        jmp MoveDone
+        rts
+
 
 
 
@@ -423,35 +442,35 @@ MoveComplete
 
 
 CheckCollisionBelow ; Sets a = (ret1>, ret1<, pos>, pos<)
-                pla
-                sta ret1+1
-                pla
-                sta ret1
-                pla
-                sta zpPtr3+1
-                pla
-                clc
-                adc #40
-                sta zpPtr3
-                lda ret1
-                pha
-                lda ret1+1
-                pha
-                ; Look below to see what's there, is it a space?
-                lda #$00 ; Add any roll over to the high byte
-                tay
-                adc zpPtr3+1
-                sta zpPtr3+1
-                lda (zpPtr3), y
-                cmp #" "
-                beq noCollitionDetected
-                bne collitionDetected
+            pla
+            sta ret1+1
+            pla
+            sta ret1
+            pla
+            sta zpPtr3+1
+            pla
+            clc
+            adc #40
+            sta zpPtr3
+            lda ret1
+            pha
+            lda ret1+1
+            pha
+            ; Look below to see what's there, is it a space?
+            lda #$00 ; Add any roll over to the high byte
+            tay
+            adc zpPtr3+1
+            sta zpPtr3+1
+            lda (zpPtr3), y
+            cmp #" "
+            beq noCollitionDetected
+            bne collitionDetected
 collitionDetected
-                lda #$01
-                rts
+            lda #$01
+            rts
 noCollitionDetected
-                lda #$00
-                rts
+            lda #$00
+            rts
 
 CheckCollisionLeft ; a = (ret1>, ret1<, pos>, pos<)
             pla
