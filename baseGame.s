@@ -316,7 +316,7 @@ MoveLeftOne
         lda piece1+1
         pha
         jsr CheckCollisionLeft
-        bne leftMoveDone
+        bne leftMoveDone ; ? 1
 
         ; Clear the current pos
         ldy #$00 ; offset from current char pos
@@ -325,6 +325,7 @@ MoveLeftOne
 
         ; decrement the pointer value by one
         sec
+        CLD
         lda piece1
         sbc #$01
         sta piece1
@@ -452,27 +453,33 @@ noCollitionDetected
                 lda #$00
                 rts
 
-; function CheckCollisionLeft_zpPtr2
 CheckCollisionLeft ; a = (ret1>, ret1<, pos>, pos<)
             pla
             sta ret1+1
             pla
             sta ret1
+
             pla
             sta zpPtr3+1
             pla
+            sta zpPtr3
+
             sec
+            lda zpPtr3
             sbc #$01
             sta zpPtr3
-            lda #$00
-            tay
-            sbc zpPtr3+1
+            lda zpPtr3+1
+            sbc #$00
+            sta zpPtr3+1
+; Push back return onto stack
             lda ret1
             pha
             lda ret1+1
             pha
+            ldy #$00
             lda (zpPtr3), y
-            cmp #" "
+            sta tmp4
+            cmp #' '
             beq noCollitionDetectedLeft
 collitionDetectedLeft
             lda #$01
@@ -491,6 +498,10 @@ CheckCollisionRight ; a = (ret1>, ret1<, pos>, pos<)
             sta zpPtr3+1
             pla
             sta zpPtr3
+            lda ret1
+            pha
+            lda ret1+1
+            pha
             ldy #$01
             lda (zpPtr3), y
             cmp #" "
