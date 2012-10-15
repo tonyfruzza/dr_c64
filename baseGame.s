@@ -101,20 +101,11 @@ init
             jmp firstPieceToDrop
 DropNew
 
-            lda piece1
-            pha
-            lda piece1+1
-            pha
-            jsr lookForConnect4c ; varray (return>, return<, piece>, piece<)
-
-            lda piece2
-            pha
-            lda piece2+1
-            pha
-            jsr lookForConnect4c
-; Loop through every piece to see if they can be cleared
 
 
+            ; Loop through every piece to see if they can be cleared
+            jsr luminsDrop
+            jsr lookForAnyConnect4s
             jsr luminsDrop
             bne DropNew ; A is set to count of how many dropped, loop until no drops
 ;            jsr printConnectCount
@@ -1047,16 +1038,9 @@ connectsOuterLoop
         sta zpPtr1+1
         sta zpPtr4+1
 anyConnectInnerLoop
-        lda tmp1
-        cmp #15
+        lda tmp1  ; y offset
+        cmp #16
         beq anyConnectInnerLoopDone
-        clc
-        lda zpPtr4
-        adc #40
-        sta zpPtr4
-        lda #$00
-        adc zpPtr4+1
-        sta zpPtr4+1
         lda (zpPtr4),y
         cmp #PILL_SIDE
         bne nextConnectAnyRow
@@ -1065,9 +1049,25 @@ anyConnectInnerLoop
         lda zpPtr4+1
         pha
         jsr lookForConnect4c
+        ; debug
+;        lda #$00
+;        sta (zpPtr4),y
+;        jsr WaitFrame
+;        jsr WaitFrame
+;        jsr WaitFrame
+;        lda #PILL_SIDE
+;        sta (zpPtr4),y
+        ; end debug
 nextConnectAnyRow
         inc tmp1
-        jmp dropInnerLoop
+        clc
+        lda zpPtr4
+        adc #40
+        sta zpPtr4
+        lda #$00
+        adc zpPtr4+1
+        sta zpPtr4+1
+        jmp anyConnectInnerLoop
 anyConnectInnerLoopDone
         inc tmp2
         jmp connectsOuterLoop
