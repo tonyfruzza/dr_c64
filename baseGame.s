@@ -112,9 +112,11 @@ DropNew
             lda piece2+1
             pha
             jsr lookForConnect4c
+; Loop through every piece to see if they can be cleared
+
+
             jsr luminsDrop
             bne DropNew ; A is set to count of how many dropped, loop until no drops
-
 ;            jsr printConnectCount
 firstPieceToDrop
 
@@ -163,20 +165,21 @@ GameLoop
         beq Return
         cmp #" "
         beq rotateJsr
-        MoveDone
+MoveDone
         jsr WaitFrame
         jmp GameLoop
 
-MoveLeftOneJump jsr MoveLeftOne
-jmp MoveDone
+MoveLeftOneJump
+             jsr MoveLeftOne
+             jmp MoveDone
 MoveDownJump jmp ZeroCountAndMoveDown
-;MoveDown    ; jmp MoveDownOne
 SwapColors   jsr ColorSwap
 rotateJsr    jmp rotate
-MoveRightOneJump    jmp MoveRightOne
-
-                jmp GameLoop
-EndGame      jmp printMsg
+MoveRightOneJump
+            jmp MoveRightOne
+            jmp GameLoop
+EndGame
+            jmp printMsg
 
 
 WaitFrame
@@ -277,6 +280,15 @@ RotateFinished
 
 
 MoveRightOne
+        lda ORIENTATION
+        beq MoveRightHorizontalOnly
+        lda piece1
+        pha
+        lda piece1+1
+        pha
+        jsr CheckCollisionRight
+        bne rightMoveDone
+MoveRightHorizontalOnly
         lda piece2
         pha
         lda piece2+1
@@ -1008,22 +1020,79 @@ pavLoop
             bne pavLoop
             rts
 
+
+;
+; Loop through the entire playing field and find connect 4's
+;
+lookForAnyConnect4s
+        ldy #$00
+        sty TMP1 ; used as a screen y offset, 0 - 15
+        sty tmp2 ; used as a screen x offset, 0 - 7
+        lda #$0f ; star <
+        sta zpPtr1
+        lda #$04 ; start >
+        sta zpPtr1+1
+connectsOuterLoop
+        lda tmp2 ; what's the current x offset?
+        cmp #8
+        beq anyConnectDone
+        clc
+        lda zpPtr1
+        adc #$01
+        sta zpPtr1
+        sta zpPtr4
+        lda #$00
+        sta tmp1 ; reset inner loop
+        adc zpPtr1+1
+        sta zpPtr1+1
+        sta zpPtr4+1
+anyConnectInnerLoop
+        lda tmp1
+        cmp #15
+        beq anyConnectInnerLoopDone
+        clc
+        lda zpPtr4
+        adc #40
+        sta zpPtr4
+        lda #$00
+        adc zpPtr4+1
+        sta zpPtr4+1
+        lda (zpPtr4),y
+        cmp #PILL_SIDE
+        bne nextConnectAnyRow
+        lda zpPtr4
+        pha
+        lda zpPtr4+1
+        pha
+        jsr lookForConnect4c
+nextConnectAnyRow
+        inc tmp1
+        jmp dropInnerLoop
+anyConnectInnerLoopDone
+        inc tmp2
+        jmp connectsOuterLoop
+anyConnectDone
+        rts
+
+
 ; Quick drop blocks write up, gravity, kind of like Lumins effect
+; a will be greater than 0 if it did some drops
 luminsDrop
-    ldx #$00 ; column offset (screen x) index 0 - 7
+    lda #$00
+    sta tmp3 ; to be returned as the count of drops that occured
+luminsDropContinue ; a = void()
     ldy #$00 ; zp index, do not change
     sty tmp  ; used as screen y offset, 0 - 15
     sty tmp1 ; used to keep track if anything dropped, shared with dropDownIfYouCan
     sty tmp2 ; used as screen x index 0 - 7
-    sty tmp3 ; Total of number of drops, retun register as A
 
-    lda #$0F
+    lda #$0F ; low start position
     sta zpPtr1
     lda #$04 ; start
     sta zpPtr1+1
 
 dropOuterLoop
-lda tmp2
+    lda tmp2
     cmp #8
     beq luminsDropDone
 
@@ -1066,8 +1135,8 @@ dropInnerLoopComplete
     jmp dropOuterLoop
 luminsDropDone
     lda tmp1
-    bne luminsDrop ; if there were any dropped this last time, see if there were any left
-lda tmp3
+    bne luminsDropContinue ; if there were any dropped this last time, see if there were any left
+    lda tmp3
     rts
 
 
@@ -1075,6 +1144,7 @@ lda tmp3
 dropDownIfYouCan ; void (ret2, ret1, pos+1, pos)
         stx RETX
         sty RETY
+        ldy #$00
         pla
         sta ret1+1
         pla
@@ -1089,7 +1159,6 @@ dropDownIfYouCan ; void (ret2, ret1, pos+1, pos)
         sta zpPtr4
         lda zpPtr3+1
         adc #$00
-        tya
         sta zpPtr4+1
         lda (zpPtr4), y
         cmp #' '
@@ -1112,12 +1181,13 @@ dropDownIfYouCan ; void (ret2, ret1, pos+1, pos)
         sta (zpPtr4),y ; store color
         inc tmp1 ; shared value for knowing if there was a drop
         inc tmp3 ; shared value for knowing total of drops
-jsr WaitFrame
-jsr WaitFrame
-jsr WaitFrame
-jsr WaitFrame
-jsr WaitFrame
 
+        ; How much time should we put inbetween the drop pieces?
+        jsr WaitFrame
+        jsr WaitFrame
+        jsr WaitFrame
+        jsr WaitFrame
+        jsr WaitFrame
 noDrop
         ldy RETY
         ldx RETX
