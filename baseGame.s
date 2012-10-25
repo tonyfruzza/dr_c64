@@ -81,6 +81,8 @@ ORIENTATION .byte $00 ; 0 = 12, 1 = 1
                       ;             2
 PRICOLOR    .byte $00
 SECCOLOR    .byte $00
+NextPriC    .byte $00
+NextSecC    .byte $00
 CMPCOLOR    .byte $00 ; tmp for comparing variable colors
 CONNECTCNT  .byte $00
 colors      .byte COLOR_RED, COLOR_BLUE, COLOR_YELLOW, COLOR_BLUE
@@ -123,14 +125,13 @@ clears
             jmp firstPieceToDrop
 
 DropNew
-            lda #$00
-            sta LAST_MOMENT_MOVE
             ; TODO read input before commiting to drop
             jsr disableKeyboardRepeat
             ; Loop through every piece to see if they can be cleared
-            jsr luminsDrop
             jsr lookForAnyConnect4s
+            jsr FieldSearch
             jsr luminsDrop
+
             bne DropNew ; A is set to count of how many dropped, loop until no drops
 ;            jsr printConnectCount
 firstPieceToDrop
@@ -431,7 +432,7 @@ leftMoveDone
 
 ZeroCountAndMoveDown
             ldy #$00
-sty refreshCount
+            sty refreshCount
 MoveDownOne
             ldy #$00
             lda (piece1),y ; load and store the pill piece types
@@ -500,12 +501,17 @@ DropNewPiece
             pla
             pla
 ;
+
             lda LAST_MOMENT_MOVE
+            cmp #0
             beq LastMoveBeforeCommit ; if it's set to zero then do a drop with delay
-            dec LAST_MOMENT_MOVE
-            jmp DropNewPiece
+            ; LAST_MOVE was set to 1
+            lda #0
+            sta LAST_MOMENT_MOVE
+            jmp DropNew
 LastMoveBeforeCommit
-            inc LAST_MOMENT_MOVE
+            lda #1
+            sta LAST_MOMENT_MOVE
             jmp GameLoop
 
 
@@ -1025,14 +1031,9 @@ cl_SideManipulationComplete
             sta zpPtr4
             lda cpia_pieceTmp+1
             sta zpPtr4+1
+
             ; Animation for clearning of pieces, one piece at a time
             lda #PILL_CLEAR_1
-            sta (zpPtr4), y
-            jsr WaitEventFrame
-            lda #PILL_CLEAR_2
-            sta (zpPtr4), y
-            jsr WaitEventFrame
-            lda #' '
             sta (zpPtr4), y
             dey ; set it back to 0
             lda tmp
@@ -1112,18 +1113,7 @@ clh_SideManipulationComplete
             sta zpPtr4
             lda cpia_pieceTmp+1
             sta zpPtr4+1
-
             lda #PILL_CLEAR_1
-            sta (zpPtr4), y
-;            jsr WaitFrame
-;            jsr WaitFrame
-jsr WaitEventFrame
-            lda #PILL_CLEAR_2
-            sta (zpPtr4), y
-jsr WaitEventFrame
-;            jsr WaitFrame
-;            jsr WaitFrame
-            lda #' '
             sta (zpPtr4), y
             lda tmp
             cmp harrayIndex
@@ -1237,20 +1227,29 @@ anyConnectDone
 ; Quick drop blocks write up, gravity, kind of like Lumines effect
 ; a will be greater than 0 if it did some drops
 ; This subroutine just scans the playing field and hands off to something else
-; do the actual dropping
+; to do the actual dropping
 luminsDrop
     lda #$00
     sta tmp3 ; to be returned as the count of drops that occured
 luminsDropContinue ; a = void()
-    ldy #$00 ; zp index, do not change
+    ldy #$0f ; zp index, do not change
     sty tmp  ; used as screen y offset, 0 - 15
+ldy #$00
     sty tmp1 ; used to keep track if anything dropped, shared with dropDownIfYouCan
     sty tmp2 ; used as screen x index 0 - 7
 
-    lda #$0F ; low start position
-    sta zpPtr1
-    lda #$04 ; start
-    sta zpPtr1+1
+; This is the top left pos
+;    lda #$0F ; low start position
+;    sta zpPtr1
+;    lda #$04 ; start
+;    sta zpPtr1+1
+
+; This the bottom left pos
+lda #$67 ; low start position
+sta zpPtr1
+lda #$06 ; start
+sta zpPtr1+1
+
 
 dropOuterLoop
     lda tmp2
@@ -1263,22 +1262,24 @@ dropOuterLoop
     adc #$01
     sta zpPtr1
     sta zpPtr2
-    lda #$00
-    sta tmp ; reset inner loop index
+lda #$00
     adc zpPtr1+1
     sta zpPtr1+1
     sta zpPtr2+1
+    lda #$0f
+    sta tmp ; reset inner loop index
+
 dropInnerLoop
     lda tmp
-    cmp #15
     beq dropInnerLoopComplete
-    clc
+    sec
     lda zpPtr2
-    adc #40
+    sbc #40
     sta zpPtr2
-    lda #$00
-    adc zpPtr2+1
+    lda zpPtr2+1
+    sbc #$00
     sta zpPtr2+1
+
     lda (zpPtr2),y
     cmp #PILL_SIDE
     beq drop_piece
@@ -1308,12 +1309,17 @@ drop_piece
     pha
     jsr dropDownIfYouCan
 nextRow
-    inc tmp
+    dec tmp
     jmp dropInnerLoop
 dropInnerLoopComplete
     inc tmp2
     jmp dropOuterLoop
 luminsDropDone
+jsr WaitEventFrame
+jsr WaitEventFrame
+jsr WaitEventFrame
+jsr WaitEventFrame
+
     lda tmp1
     bne reDropCloseBranch ; if there were any dropped this last time, see if there were any left
     lda tmp3
@@ -1376,9 +1382,6 @@ sta (zpPtr3),y
 
 ldy ddviyc_y
 inc tmp3
-
-jsr WaitEventFrame
-jsr WaitEventFrame
 
 ddviyc_noDrop
 ldy ddviyc_y
@@ -1443,12 +1446,9 @@ ddhiyc_start
         and #$0f
         ldy #41
         sta (zpPtr3),y
-jsr WaitEventFrame
-;        jsr WaitFrame
-;        jsr WaitFrame
-;        jsr WaitFrame
 ddhiyc_Drop
         inc tmp3
+        inc tmp1
 ;        lda #$01
         ldy ddhiyc_y
         rts
@@ -1503,9 +1503,6 @@ startDropDownIfYouCan
         sta (zpPtr4),y ; store color
         inc tmp1 ; shared value for knowing if there was a drop
         inc tmp3 ; shared value for knowing total of drops
-
-        ; How much time should we put inbetween the drop pieces?
-        jsr WaitEventFrame
 noDrop
         ldy localYTmp
         ldx localXTmp
@@ -1645,6 +1642,100 @@ dgbDone
 lda #WALL_BR
 sta (zpPtr2),y
         rts
+
+
+
+
+
+
+
+;
+;
+;
+;
+FieldSearch
+    jmp fs_start
+    fs_outLoopIdx   .byte $00
+    fs_innerLoopIdx .byte $0f
+    fs_didWorkThisLoop  .byte $00
+    fs_didWorkReturn    .byte $00
+fs_start
+    lda #$00
+    sta fs_didWorkReturn ; to be returned as the count of drops that occured
+fs_Continue ; a = void()
+    lda #$0f
+    sta fs_innerLoopIdx  ; used as screen y offset, 0 - 15
+    ldy #$00
+    sty fs_didWorkThisLoop      ; used to keep track if anything dropped, shared with dropDownIfYouCan
+    sty fs_outLoopIdx   ; used as screen x index 0 - 7
+
+    ; This the bottom left pos
+    lda #$8f ; low start position
+    sta zpPtr1
+    lda #$06 ; start
+    sta zpPtr1+1
+
+fs_dropOuterLoop
+    lda fs_outLoopIdx
+    cmp #8
+    beq fs_done
+
+    ; Move one right
+    clc
+    lda zpPtr1
+    adc #$01
+    sta zpPtr1
+    sta zpPtr2
+    lda #$00
+    adc zpPtr1+1
+    sta zpPtr1+1
+    sta zpPtr2+1
+    lda #$0f
+    sta fs_innerLoopIdx ; reset inner loop index
+
+fs_dropInnerLoop
+    lda fs_innerLoopIdx
+    beq fs_dropInnerLoopComplete
+    sec
+    lda zpPtr2
+    sbc #40
+    sta zpPtr2
+    lda zpPtr2+1
+    sbc #$00
+    sta zpPtr2+1
+    lda (zpPtr2),y
+
+    cmp #PILL_CLEAR_1
+    bne fs_nextCharType
+    inc fs_didWorkThisLoop
+; This is where we'd sleep before
+    lda #PILL_CLEAR_2
+    sta (zpPtr2),y
+jmp fs_nextRow
+
+fs_nextCharType
+    cmp #PILL_CLEAR_2
+    bne fs_nextRow
+    inc fs_didWorkReturn
+    lda #' '
+    sta (zpPtr2),y
+fs_nextRow
+    dec fs_innerLoopIdx
+    jmp fs_dropInnerLoop
+fs_dropInnerLoopComplete
+    inc fs_outLoopIdx
+    jmp fs_dropOuterLoop
+fs_done
+    lda fs_didWorkThisLoop
+    beq fs_reallyDone
+fs_doMoreWork
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+    jmp fs_Continue ; if there were any dropped this last time, see if there were any left
+fs_reallyDone
+    lda fs_didWorkReturn
+rts
 
 
 
