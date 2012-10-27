@@ -40,10 +40,11 @@ COLOR_GREY      .equ $0c
 COLOR_L_GREEN   .equ $0d
 COLOR_L_BLUE    .equ $0e
 COLOR_L_GREY    .equ $0f
-DELAY           .equ $20
+DELAY           .equ $10
 PILL_SIDE       .equ 81 ; 'o'
 VIRUS_ONE       .equ 83
 VIRUS_TWO       .equ 84
+VIRUS_THREE     .equ 85
 
 
 PILL_LEFT       .equ 107
@@ -89,6 +90,7 @@ colors      .byte COLOR_RED, COLOR_BLUE, COLOR_YELLOW, COLOR_BLUE
 P1_SCORE    .byte $00, $00, $00, $00
 START_POS   .byte $13, $04
 LAST_MOMENT_MOVE    .byte $00
+VIRUS_CHAR_LIST .byte VIRUS_ONE, VIRUS_TWO, VIRUS_THREE
 
 
 varray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
@@ -112,8 +114,9 @@ pSideTmp1   .byte $00
 pSideTmp2   .byte $00
 
 init
-            jsr initRefreshCounter
+
             jsr MoveCharMap
+            jsr initRefreshCounter
 
 clears
             jsr ClearScreen
@@ -122,6 +125,8 @@ clears
             sty SCREEN_BG_COLOR
             lda COLOR_DARK_GREY
             sta SCREEN_BOARDER
+;jsr test1
+;jsr test2
             jmp firstPieceToDrop
 
 DropNew
@@ -134,6 +139,8 @@ DropNew
 
             bne DropNew ; A is set to count of how many dropped, loop until no drops
 ;            jsr printConnectCount
+            lda #00
+            sta refreshCount ; refreshCount is at an unknown # after the drops, reset it
 firstPieceToDrop
             ldy START_POS ; Start Offset low byte location
             sty piece1
@@ -163,6 +170,10 @@ GameLoop
     lda refreshCount
     cmp #DELAY
     bcs MoveDownForced
+jsr updateJoyPos
+
+
+    
     JSR GETIN ; get a key input
     cmp #'d'
     bne nextKey1
@@ -190,7 +201,7 @@ MoveDone
 
 
 MoveDownForced
-    jsr cycleAnimatedViruses
+;    jsr cycleAnimatedViruses
     jsr ZeroCountAndMoveDown
     jmp GameLoop
 
@@ -681,6 +692,7 @@ printLoop   lda ENDMSG, y
             iny
             jmp printLoop
 printComplete
+; Pause between end of game and restart
             jsr WaitEventFrame
             jsr WaitEventFrame
             jsr WaitEventFrame
@@ -743,6 +755,10 @@ lookLeft
             beq ll_piece
             cmp #VIRUS_ONE
             beq ll_piece
+            cmp #VIRUS_TWO
+            beq ll_piece
+            cmp #VIRUS_THREE
+            beq ll_piece
             jmp lookLeftComplete
             ll_piece
             clc
@@ -791,6 +807,11 @@ lookRight
             beq lr_piece
             cmp #VIRUS_ONE
             beq lr_piece
+cmp #VIRUS_TWO
+beq lr_piece
+cmp #VIRUS_THREE
+beq lr_piece
+
             jmp lookRightDone
             lr_piece
             clc
@@ -836,6 +857,11 @@ lookUp ; start at the top and work my way down
             beq lu_piece
             cmp #VIRUS_ONE
             beq lu_piece
+cmp #VIRUS_TWO
+beq lu_piece
+cmp #VIRUS_THREE
+beq lu_piece
+
             jmp lookUpComplete
             lu_piece
             clc
@@ -886,6 +912,11 @@ lookDown
             beq ld_piece
             cmp #VIRUS_ONE
             beq ld_piece
+cmp #VIRUS_TWO
+beq ld_piece
+cmp #VIRUS_THREE
+beq ld_piece
+
             jmp lookDownDone
 ld_piece
             clc ; Now look for color
@@ -1315,10 +1346,9 @@ dropInnerLoopComplete
     inc tmp2
     jmp dropOuterLoop
 luminsDropDone
-jsr WaitEventFrame
-jsr WaitEventFrame
-jsr WaitEventFrame
-jsr WaitEventFrame
+    ; Time between drops
+    jsr WaitEventFrame
+    jsr WaitEventFrame
 
     lda tmp1
     bne reDropCloseBranch ; if there were any dropped this last time, see if there were any left
@@ -1540,9 +1570,9 @@ printRandomVirus ; a = return>, return<, pos>, pos<
     and #1
     beq prv_done
 
-jsr get_random_number
-and #1
-beq prv_done
+    jsr get_random_number
+    and #1
+    beq prv_done
 
 
 
@@ -1551,8 +1581,11 @@ beq prv_done
     and #3
     tax
 
-;ldy #00 ; zp indexing
-    lda #VIRUS_ONE
+    cmp #0
+    beq dontDecX
+    dex
+dontDecX
+    lda VIRUS_CHAR_LIST, x ; One virus per color
     sta (zpPtr3), y
 
     clc
@@ -1560,10 +1593,6 @@ beq prv_done
     adc #$D4
     sta zpPtr3+1
 
-cpx #0
-beq dontDecX
-dex
-dontDecX
     lda colors,x
     sta (zpPtr3),y
 
@@ -1663,7 +1692,7 @@ fs_start
     lda #$00
     sta fs_didWorkReturn ; to be returned as the count of drops that occured
 fs_Continue ; a = void()
-    lda #$0f
+    lda #$10 ; #0f wasn't enough
     sta fs_innerLoopIdx  ; used as screen y offset, 0 - 15
     ldy #$00
     sty fs_didWorkThisLoop      ; used to keep track if anything dropped, shared with dropDownIfYouCan
@@ -1690,7 +1719,7 @@ fs_dropOuterLoop
     adc zpPtr1+1
     sta zpPtr1+1
     sta zpPtr2+1
-    lda #$0f
+    lda #$10 ; $0f wasn't enough
     sta fs_innerLoopIdx ; reset inner loop index
 
 fs_dropInnerLoop
@@ -1729,9 +1758,7 @@ fs_done
     lda fs_didWorkThisLoop
     beq fs_reallyDone
 fs_doMoreWork
-    jsr WaitEventFrame
-    jsr WaitEventFrame
-    jsr WaitEventFrame
+    jsr WaitEventFrame ; Wait between clearing animation
     jmp fs_Continue ; if there were any dropped this last time, see if there were any left
 fs_reallyDone
     lda fs_didWorkReturn

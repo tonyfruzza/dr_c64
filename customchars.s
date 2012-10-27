@@ -1,7 +1,3 @@
-;.org $0801
-;Tells BASIC to run SYS 2064 to start our program
-;.byte $0C,$08,$0A,$00,$9E,' ','2','0','6','4',$00,$00,$00,$00,$00
-
 ; 4 possible video memory locations, switchable by the first 2
 ; bits of 56576 (CIA) (0, 1, 2, 3). The other bits are for something else, so keep those
 
@@ -13,12 +9,13 @@
 ;PILL_TOP    .equ 114
 ;PILL_BOTTOM .equ 113
 
-CHARBITMAP  .equ 53248 ; - 57343 from ROM
-NEWCHARMAP  .equ 12288 ; $3000 new place for Charset
+ROMCHARBITMAP   .equ 53248 ; - 57343 from ROM
+NEWCHARMAP      .equ 12288 ; $3000 new place for Charset
 
 MoveCharMap
     ; Entry point
     jmp mcm_start
+    ; Define some custom character data
     PILL_L_DEF  .byte 126, 194, 190, 254, 254, 254, 126, 0
     PILL_R_DEF  .byte 252, 134, 254, 254, 254, 254, 252, 0
     PILL_T_DEF  .byte 124, 222, 190, 190, 190, 190, 254, 0
@@ -30,15 +27,30 @@ MoveCharMap
     WALL_BRT    .byte 194, 2, 2, 2, 4, 248, 0 , 0
     CLEAR_ONE   .byte 124, 254, 238, 198, 238, 254, 124, 0
     CLEAR_TWO   .byte 124, 198, 130, 130, 130, 198, 124, 0
+
     BKGRD_CHAR  .byte 240, 240, 240, 240, 15, 15, 15, 15
+    BKGRD_CHAR2 .byte 135, 120, 120, 120, 120, 135, 135, 135
+    BKGRD_CHAR3 .byte 195, 195, 60, 60, 60, 60, 195, 195
+    BKGRD_CHAR4 .byte 225, 225, 225, 30, 30, 30, 30, 225
+
+
+
     V1_AN1      .byte 68, 56, 214, 146, 254, 214, 68, 0
+    V1_AN2      .byte 198, 56, 214, 146, 254, 214, 130, 0
+    V1_AN3      .byte 130, 124, 146, 186, 254, 214, 68, 0
+
     V2_AN1      .byte 170, 124, 68, 238, 186, 198, 124, 0
+    V2_AN2      .byte 170, 124, 68, 238, 254, 130, 124, 0
+    V2_AN3      .byte 170, 124, 68, 238, 254, 198, 186, 0
+
 
     V3_AN1      .byte 68, 56, 124, 238, 254, 198, 56, 0
     V3_AN2      .byte 136, 56, 124, 222, 254, 198, 56, 0
     V3_AN3      .byte 34, 56, 124, 246, 254, 198, 56, 0
+    ; End of custom character data
 
     PILL_STATE  .byte $00
+    BKGRD_STATE .byte $00
 mcm_start
 
 ; 8 bytes to each char
@@ -60,12 +72,12 @@ CharCopyInit
     ldx #00
     ldy #00
 CharCopyLoop
-    lda CHARBITMAP,x
+    lda ROMCHARBITMAP,x
     sta NEWCHARMAP,x
     inx
     bne CharCopyLoop
 CharCopyLoop2
-    lda CHARBITMAP+256,x
+    lda ROMCHARBITMAP+256,x
     sta NEWCHARMAP+256,x
     inx
     bne CharCopyLoop2
@@ -80,12 +92,7 @@ CharCopyLoop2
     ora #1
     sta 56334
 
-; Tell VIC where to get charmap from
-lda 53272
-and #240
-clc
-adc #12
-sta 53272
+
 
 
 ; Do Pill parts
@@ -121,21 +128,25 @@ PillMakerLoop
     lda WALL_BOTTOM, x
     sta NEWCHARMAP+544, x ; 8 * 68
 
-lda WALL_BLFT, x
-sta NEWCHARMAP+592, x; 8 * 74
+    lda WALL_BLFT, x
+    sta NEWCHARMAP+592, x; 8 * 74
 
-lda WALL_BRT, x
-sta NEWCHARMAP+600, x; 8 * 75
-
-;lda V1_AN1, x
-;sta NEWCHARMAP+664,x ; 8 * 83
-
-lda V2_AN1, x
-sta NEWCHARMAP+664,x ; 8 * 83
+    lda WALL_BRT, x
+    sta NEWCHARMAP+600, x; 8 * 75
 
 
-;lda V2_AN1, x
-;sta NEWCHARMAP+672,x ; 8 * 84
+
+
+    lda V1_AN1, x
+    sta NEWCHARMAP+664,x ; 8 * 83
+
+    lda V2_AN1, x
+    sta NEWCHARMAP+672,x ; 8 * 84
+
+    lda V3_AN1, x
+    sta NEWCHARMAP+680,x ; 8 * 85
+
+
 
 
 
@@ -143,40 +154,127 @@ sta NEWCHARMAP+664,x ; 8 * 83
     cpx #8
     bne PillMakerLoop
 
+    ; Tell VIC where to get charmap from
+    lda 53272
+    and #240
+    clc
+    adc #12
+    sta 53272
+
     rts
 
 
 
-cycleAnimatedViruses
+cycleBackgroundAnimation
     ldx #0
+    lda BKGRD_STATE
+    cmp #0
+    beq bg_state1_loop
+    cmp #1
+    beq bg_state2_loop
+    cmp #2
+    beq bg_state3_loop
+    cmp #3
+    beq bg_state4_loop
 
+
+bg_state1_loop
+    lda BKGRD_CHAR, x
+    sta NEWCHARMAP+1016, x
+    inx
+    cpx #8
+    bne bg_state1_loop
+    jmp cba_done
+
+bg_state2_loop
+    lda BKGRD_CHAR2, x
+    sta NEWCHARMAP+1016, x
+    inx
+    cpx #8
+    bne bg_state2_loop
+    jmp cba_done
+
+
+bg_state3_loop
+    lda BKGRD_CHAR3, x
+    sta NEWCHARMAP+1016, x
+    inx
+    cpx #8
+    bne bg_state3_loop
+    jmp cba_done
+
+
+bg_state4_loop
+    lda #$ff
+    sta BKGRD_STATE ; last cycle, so have it overflow back to 0 after this
+    lda BKGRD_CHAR4, x
+    sta NEWCHARMAP+1016, x
+    inx
+    cpx #8
+    bne bg_state4_loop
+    jmp cba_done
+
+
+cba_done
+    inc BKGRD_STATE
+    rts
+
+
+
+; Animates the viruses in the field by cycling through
+; their 3 animation states
+cycleAnimatedViruses
+
+    ldx #0 ; Init our x index
     lda PILL_STATE
-    bne cav_next2
+    cmp #0
+    beq newPillLoop1
+    cmp #1
+    beq newPillLoop2
+    cmp #2
+    beq newPillLoop3
+    cmp #3
+    beq newPillLoop2AndReset
+
+
+    newPillLoop2AndReset
+    lda #$FF ; Reset PILL_STATE as it will roll over to 0 at the end
+    sta PILL_STATE
+    jmp newPillLoop2
+
 newPillLoop1
+    lda V1_AN1, x
+    sta NEWCHARMAP+664, x ; 8 * 83
+    lda V2_AN1, x
+    sta NEWCHARMAP+672, x ; 8 * 84
     lda V3_AN1, x
-    sta NEWCHARMAP+664, x
+    sta NEWCHARMAP+680, x ; 8 * 85
     inx
     cpx #8
     bne newPillLoop1
     jmp cav_done
 
-cav_next2
-    lda PILL_STATE
-    cmp #1
-    bne cav_next3
 newPillLoop2
+    lda V1_AN2, x
+    sta NEWCHARMAP+664, x ; 8 * 83
+    lda V2_AN2, x
+    sta NEWCHARMAP+672, x ; 8 * 84
     lda V3_AN2, x
-    sta NEWCHARMAP+664, x
+    sta NEWCHARMAP+680, x ; 8 * 85
+
     inx
     cpx #8
     bne newPillLoop2
     jmp cav_done
-cav_next3
-    lda #0
-    sta PILL_STATE
+
 newPillLoop3
+    lda V1_AN3, x
+    sta NEWCHARMAP+664, x ; 8 * 83
+    lda V2_AN3, x
+    sta NEWCHARMAP+672, x ; 8 * 84
     lda V3_AN3, x
-    sta NEWCHARMAP+664, x
+    sta NEWCHARMAP+680, x ; 8 * 85
+
     inx
     cpx #8
     bne newPillLoop3
