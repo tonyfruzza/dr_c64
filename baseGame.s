@@ -170,7 +170,7 @@ GameLoop
     lda refreshCount
     cmp #DELAY
     bcs MoveDownForced
-jsr updateJoyPos
+    jsr updateJoyPos
 
 
     
