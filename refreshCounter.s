@@ -53,8 +53,6 @@ rNoReset
     stx l_repeatTime
 lNoReset
     inc d_repeatTime
-    inc rotate_repeatTime
-
     lda refreshTimer3
     cmp #DELAY
     bne noRefreshTimer3Work

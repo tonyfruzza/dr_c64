@@ -329,18 +329,42 @@ rotateUnder
         ; Pieces will be vertical after this move
 
 ; Is there something above that would get in the way of this rotate?
-; Check and eject if there is
-        sec
-        lda piece1
-        sbc #40
-        sta zpPtr2
-        lda piece1+1
-        sbc #0
-        sta zpPtr2+1
-        lda (zpPtr2), y
-        cmp #' '
-        bne RotateFinished
+; If there is nothing below then we can rotate it down, rather than up as usual
+; but we have to manually move it down
+    sec
+    lda piece1
+    sbc #40
+    sta zpPtr2
+    lda piece1+1
+    sbc #0
+    sta zpPtr2+1
+    lda (zpPtr2), y
+    cmp #' '
+    beq rotateHasRoom
+    ; Okay, no room above, but what's below?
+    clc
+    lda piece1
+    adc #40
+    sta zpPtr2
+    lda piece1+1
+    adc #0
+    sta zpPtr2+1
+    lda (zpPtr2),y
+    cmp #' '
+    bne RotateFinished ; No room above or below, eject!
+    ; put the piece2 under piece1 and inc ORIENTATION
+    clc
+    lda piece1
+    adc #40
+    sta piece2
+    lda piece1+1
+    adc #0
+    sta piece2+1
+    inc ORIENTATION
+    jmp RotateFinished
+
 ; Clear to rotate
+rotateHasRoom
         inc ORIENTATION
         lda piece1
         sta piece2
@@ -1699,7 +1723,7 @@ noDrop
         pha
         rts
 
-
+; Do not overwrite zpPtr2
 ; Given a screen position place virus of randomly of random color
 printRandomVirus ; a = return>, return<, pos>, pos<
     sty RETY
@@ -1731,9 +1755,6 @@ printRandomVirus ; a = return>, return<, pos>, pos<
     and #1
     beq prv_done
 
-
-
-
     txa ; load back in the random number
     and #3
     tax
@@ -1762,6 +1783,12 @@ prv_done
     ldy RETY
     lda #0
     rts
+
+
+; do not overwrite zpPtr2 or zpPtr3
+; Return 1 if there are already too many with that color near by
+areThereTooManyVirusesOfThatColorNearBy ; a = return>, return<, pos>, pos<, color
+
 
 
 

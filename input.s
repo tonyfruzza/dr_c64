@@ -11,7 +11,7 @@ r_repeatTime    .byte LR_FIRST_MOVE_R_TIME
 l_firstPress    .byte $00
 r_firstPress    .byte $00
 d_repeatTime    .byte DOWN_REPEAT_TIME
-rotate_repeatTime   .byte ROTATE_REPEAT_TIME
+rotate_repeatTime   .byte $00
 
 
 
@@ -95,15 +95,15 @@ nextJoy4
     txa
     and #16 ; Button push
     bne ButtonNotPressed
+
     lda rotate_repeatTime
-    cmp #ROTATE_REPEAT_TIME
-    bcc finishJoy
-    sty rotate_repeatTime
+    bne finishJoy
     jsr rotate
+inc rotate_repeatTime
     jmp finishJoy
 ButtonNotPressed
-    lda #ROTATE_REPEAT_TIME
-    sta rotate_repeatTime
+;    lda #ROTATE_REPEAT_TIME
+    sty rotate_repeatTime
 finishJoy
     rts
 
@@ -117,6 +117,5 @@ resetInputMovement
     lda #0
     sta l_firstPress
     sta r_firstPress
-    lda #ROTATE_REPEAT_TIME
     sta rotate_repeatTime
     rts

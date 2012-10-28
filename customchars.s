@@ -28,7 +28,7 @@ MoveCharMap
     WALL_BRT    .byte 194, 2, 2, 2, 4, 248, 0 , 0
     WALL_TLFT   .byte 0, 0, 127, 96, 80, 72, 68, 67
     WALL_TRT    .byte 0, 0, 254, 6, 10, 18, 34, 194
-    WALL_TOP    .byte 0, 0, 255, 0, 0, 0, 0, 255
+    WALL_TOP    .byte 0, 0, 255, 0, 0, 0, 255, 0
     CLEAR_ONE   .byte 124, 254, 238, 198, 238, 254, 124, 0
     CLEAR_TWO   .byte 124, 198, 130, 130, 130, 198, 124, 0
 
