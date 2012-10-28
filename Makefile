@@ -1,5 +1,5 @@
 all:
-	cat baseGame.s subroutines.s customchars.s refreshCounter.s testScenarios.s input.s > baseGameCombine.s
+	cat baseGame.s subroutines.s customchars.s refreshCounter.s testScenarios.s input.s drawBox.s layout.s > baseGameCombine.s
 	/usr/local/bin/mac2c64 -r baseGameCombine.s
 	mv baseGameCombine.rw drc64.prg
 	@./createLabels.sh baseGameCombine.s

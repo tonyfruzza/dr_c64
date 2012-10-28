@@ -14,13 +14,16 @@ d_repeatTime    .byte DOWN_REPEAT_TIME
 rotate_repeatTime   .byte ROTATE_REPEAT_TIME
 
 
+
+
 updateJoyPos
     ldy #0 ; for clearing times if need be
     ldx JOY1 ; cache JOY1 value in x
-    txa
-    and #1 ; Up
-    bne nextJoy1 ; if no match, then skip to nextJoy1
+;    txa
+;    and #1 ; Up
+;    bne nextJoy1 ; if no match, then skip to nextJoy1
     ; do something for up?
+
 nextJoy1
     txa ; transfer
     and #2 ; Down
@@ -59,10 +62,6 @@ LeftNotPressed
     lda #LR_FIRST_MOVE_R_TIME
     sta l_repeatTime
     sty l_firstPress ; Reset first press to 0
-;
-;
-;
-
 
 nextJoy3 ; Right
     ldy #0
@@ -91,18 +90,33 @@ RightNotPressed
     sta r_repeatTime ; allow the key to be pressed again immediately after being picked up
     sty r_firstPress
 
-
-;
-
 nextJoy4
     ldy #0
     txa
     and #16 ; Button push
-    bne finishJoy
+    bne ButtonNotPressed
     lda rotate_repeatTime
     cmp #ROTATE_REPEAT_TIME
     bcc finishJoy
     sty rotate_repeatTime
     jsr rotate
+    jmp finishJoy
+ButtonNotPressed
+    lda #ROTATE_REPEAT_TIME
+    sta rotate_repeatTime
 finishJoy
+    rts
+
+
+
+; This will make sure all is reset back to the init state
+resetInputMovement
+    lda #LR_FIRST_MOVE_R_TIME
+    sta l_repeatTime
+    sta r_repeatTime
+    lda #0
+    sta l_firstPress
+    sta r_firstPress
+    lda #ROTATE_REPEAT_TIME
+    sta rotate_repeatTime
     rts

@@ -40,7 +40,7 @@ COLOR_GREY      .equ $0c
 COLOR_L_GREEN   .equ $0d
 COLOR_L_BLUE    .equ $0e
 COLOR_L_GREY    .equ $0f
-DELAY           .equ $10
+DELAY           .equ 37
 PILL_SIDE       .equ 81 ; 'o'
 VIRUS_ONE       .equ 83
 VIRUS_TWO       .equ 84
@@ -58,6 +58,9 @@ WALL_BR         .equ 75
 PILL_CLEAR_1    .equ 86
 PILL_CLEAR_2    .equ 90
 
+OnePGameFieldLocLow   .equ $D7
+OnePGameFieldLocHigh  .equ $04
+
 
 ; Zero Page Pointers for indirect indexing
 piece1          .equ $b0
@@ -68,30 +71,33 @@ zpPtr2          .equ $b4
 zpPtr3          .equ $b6
 zpPtr4          .equ $b8
 
-
+piece1_next     .equ $bc
+piece2_next     .equ $be
 
 
 jmp init
 
 ; Some global vars
 ENDMSG      .byte 5,14,4,0
+MSG_NEXT    .byte 14,5,24,20,0
+MSG_VIRUS   .byte 22,9,18,21,19,0
+MSG_SCORE   .byte 19, 3, 15, 18, 5, 0
 ORGBOARDER  .byte $00
 ORGBGRND    .byte $00
-WAITTIME    .byte $00 ; How many frames to wait till we start over
 ORIENTATION .byte $00 ; 0 = 12, 1 = 1
                       ;             2
 PRICOLOR    .byte $00
 SECCOLOR    .byte $00
 NextPriC    .byte $00
 NextSecC    .byte $00
+
 CMPCOLOR    .byte $00 ; tmp for comparing variable colors
 CONNECTCNT  .byte $00
 colors      .byte COLOR_RED, COLOR_BLUE, COLOR_YELLOW, COLOR_BLUE
-P1_SCORE    .byte $00, $00, $00, $00
-START_POS   .byte $13, $04
+
+START_POS   .byte $13, $04 ; gets overwritten
 LAST_MOMENT_MOVE    .byte $00
 VIRUS_CHAR_LIST .byte VIRUS_ONE, VIRUS_TWO, VIRUS_THREE
-
 
 varray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 varrayIndex .byte $00
@@ -107,63 +113,186 @@ TMP1        .byte $00
 TMP2        .byte $00
 TMP3        .byte $00
 TMP4        .byte $00
-TMP5        .byte $00
-TMP6        .byte $00
-TMP7        .byte $00
 pSideTmp1   .byte $00
 pSideTmp2   .byte $00
+p1VirusCount    .byte $00
+
+p1VirusCountBinLast .byte $00
+p1VirusCountBinNew  .byte $00
+
+P1_SCORE    .byte $00, $00, $00, $00
+VIRUS_MUL_1 .byte $64, $00 ; 100
 
 init
 
-            jsr MoveCharMap
-            jsr initRefreshCounter
+    ; Set up the position of the "next" pill colors
+    lda #$7E
+    sta piece1_next
+    lda #$04
+    sta piece1_next+1
+
+    lda #$7F
+    sta piece2_next
+    lda #$04
+    sta piece2_next+1
+
+    jsr NewColors ; need to run this twice the first time
+
+    jsr MoveCharMap
+    jsr initRefreshCounter
+    ; Init START_POS for where pill drops from, 4 to the right of left boarder
+    clc
+    lda #OnePGameFieldLocLow
+    adc #4
+    sta START_POS
+    lda #OnePGameFieldLocHigh
+    adc #0
+    sta START_POS+1
 
 clears
-            jsr ClearScreen
-            jsr DrawGameBoarder
-            ldy #$00
-            sty SCREEN_BG_COLOR
-            lda COLOR_DARK_GREY
-            sta SCREEN_BOARDER
+    ; Programatically create game layout
+    jsr ClearScreen
+    jsr DrawGameBoarder
+
+
+
+
+    lda #5 ; width
+    pha
+    lda #2 ; height
+    pha
+
+    lda #$2c
+    pha
+    lda #$04
+    pha
+    jsr DrawBoarderBox
+
+
+    ; Do the screen text for the first time
+    ;printMsgSub ; void (ret>, ret<, txt>, txt<, pos>, pos<)
+    lda #<MSG_NEXT
+    pha
+    lda #>MSG_NEXT
+    pha
+
+    lda #$55
+    pha
+    lda #$04
+    pha
+    jsr printMsgSub
+
+    ; Draw the "next" pills
+    ldy #$00
+
+    lda #PILL_LEFT
+    sta (piece1_next),y
+    lda #PILL_RIGHT
+    sta (piece2_next),y
+
+
+    ; Virus count box and and message
+    lda #8 ; Width
+    pha
+    lda #2 ; Height
+    pha
+    lda #$1b
+    pha
+    lda #$05
+    pha
+    jsr DrawBoarderBox
+
+
+    lda #<MSG_VIRUS
+    pha
+    lda #>MSG_VIRUS
+    pha
+
+    lda #$45
+    pha
+    lda #$05
+    pha
+    jsr printMsgSub
+
+; Score box and message
+lda #10 ; Width
+pha
+lda #2 ; Height
+pha
+lda #$43
+pha
+lda #$04
+pha
+jsr DrawBoarderBox
+
+
+lda #<MSG_SCORE
+pha
+lda #>MSG_SCORE
+pha
+
+lda #$6e
+pha
+lda #$04
+pha
+jsr printMsgSub
+
+
+
+ldy #$00
+    sty SCREEN_BG_COLOR
+    lda COLOR_DARK_GREY
+    sta SCREEN_BOARDER
 ;jsr test1
 ;jsr test2
-            jmp firstPieceToDrop
+
+    jsr FieldSearch ; Tally up the virus count, so it can be printed
+    jsr UpdateVirusCount
+    jsr printCurrentScore
+    lda p1VirusCountBinNew
+    sta p1VirusCountBinLast
+
+    jmp firstPieceToDrop
 
 DropNew
-            ; TODO read input before commiting to drop
-            jsr disableKeyboardRepeat
-            ; Loop through every piece to see if they can be cleared
-            jsr lookForAnyConnect4s
-            jsr FieldSearch
-            jsr luminsDrop
+    ; TODO read input before commiting to drop
+;            jsr disableKeyboardRepeat
+    ; Loop through every piece to see if they can be cleared
+    jsr lookForAnyConnect4s
+    jsr FieldSearch
+    jsr UpdateVirusCount
+    jsr updateScore
+    lda p1VirusCount
+    beq EndGame
+    jsr luminsDrop
 
-            bne DropNew ; A is set to count of how many dropped, loop until no drops
-;            jsr printConnectCount
-            lda #00
-            sta refreshCount ; refreshCount is at an unknown # after the drops, reset it
+    bne DropNew ; A is set to count of how many dropped, loop until no drops
+    lda #00
+    sta refreshCount ; refreshCount is at an unknown # after the drops, reset it
+    jsr resetInputMovement
 firstPieceToDrop
-            ldy START_POS ; Start Offset low byte location
-            sty piece1
-            iny
-            sty piece2
-            lda START_POS+1 ; Start Offset high byte location
-            sta piece1+1
-            sta piece2+1
+    ldy START_POS ; Start Offset low byte location
+    sty piece1
+    iny
+    sty piece2
+    lda START_POS+1 ; Start Offset high byte location
+    sta piece1+1
+    sta piece2+1
 
-            ldy #$00
-            sty ORIENTATION ; reset to 0
-            sty CONNECTCNT ; reset to 0
-            lda (piece1), y ; See if there is a piece in the way at the top
-            cmp #" "
-            bne EndGame
-            lda (piece2), y ; See if there is a piece in the way at the top
-            cmp #" "
-            bne EndGame
-            lda #PILL_LEFT ; 'o'
-            sta (piece1), y ; print new pieces
-            lda #PILL_RIGHT
-            sta (piece2), y
-            jsr NewColors ; Set their new random colors
+    ldy #$00
+    sty ORIENTATION ; reset to 0
+    sty CONNECTCNT ; reset to 0
+    lda (piece1), y ; See if there is a piece in the way at the top
+    cmp #" "
+    bne EndGame
+    lda (piece2), y ; See if there is a piece in the way at the top
+    cmp #" "
+    bne EndGame
+    lda #PILL_LEFT ; 'o'
+    sta (piece1), y ; print new pieces
+    lda #PILL_RIGHT
+    sta (piece2), y
+    jsr NewColors ; Set their new random colors
 
 ;the main game loop
 GameLoop
@@ -171,37 +300,10 @@ GameLoop
     cmp #DELAY
     bcs MoveDownForced
     jsr updateJoyPos
-
-
-    
-    JSR GETIN ; get a key input
-    cmp #'d'
-    bne nextKey1
-    jsr enableKeyboardRepeat
-    jsr MoveRightOne
-nextKey1
-    cmp #'a' ; Left
-    bne nextKey2
-    jsr enableKeyboardRepeat
-    jsr MoveLeftOne
-nextKey2
-    cmp #'s'
-    bne nextKey3
-    jsr enableKeyboardRepeat
-    jsr MoveDownOne
-nextKey3
-    cmp #" "
-    bne nextKey4
-    jsr rotate
-nextKey4
-    cmp #"q"
-    beq EndGame
-MoveDone
     jmp GameLoop
 
 
 MoveDownForced
-;    jsr cycleAnimatedViruses
     jsr ZeroCountAndMoveDown
     jmp GameLoop
 
@@ -305,7 +407,7 @@ commitRotateToHorizontal
         lda #$00
         sta ORIENTATION
 RotateFinished
-        jsr ChangeColor
+        jsr RepaintCurrentColor
         ; print the result
         ldy #$00
 lda ORIENTATION
@@ -373,7 +475,7 @@ MoveRightHorizontalOnly
         sta piece1+1
         lda pSideTmp1
         sta (piece1), y
-        JSR ChangeColor
+        JSR RepaintCurrentColor
 rightMoveDone
         rts
 
@@ -433,7 +535,7 @@ MoveLeftHorizontalOnly
         lda pSideTmp2
         sta (piece2), y
 
-        JSR ChangeColor
+        JSR RepaintCurrentColor
 leftMoveDone
         rts
 
@@ -495,7 +597,7 @@ moveSecondaryDown
             lda #$00 ; Add any roll over to the high byte
             adc piece2+1
             sta piece2+1
-            JSR ChangeColor
+            JSR RepaintCurrentColor
 MoveComplete
             lda pSideTmp1
             sta (piece1), y
@@ -624,51 +726,112 @@ noCollitionDetectedRight
 
 
 
-
-
 NewColors
-            jsr get_random_number
-            and #3
-            tay
-            lda colors, y
-            sta PRICOLOR
-            jsr get_random_number
-            and #3
-tay
-beq dontDecY
-dey
-dontDecY
-            lda colors, y
-            sta SECCOLOR
-ChangeColor ldy #00
-            lda piece1
-            sta zpPtr2
-            lda piece1+1
-            sta zpPtr2+1
-            lda #$D4
-            clc
-            adc zpPtr2+1
-            sta zpPtr2+1
+jmp nc_start
+    theNewColor1    .byte $00
+    theNewColor2    .byte $00
+nc_start
+    jsr get_random_number
+    and #3
+    tay
+    lda colors, y
+    sta theNewColor1
+    jsr get_random_number
+    and #3
+    tay
+    beq dontDecY
+    dey
+    dontDecY
+    lda colors, y
+    sta theNewColor2
+ChangeColor
+    ldy #00
+    lda piece1_next
+    sta zpPtr2
+    lda piece1_next+1
+    sta zpPtr2+1
+    lda #$D4
+    clc
+    adc zpPtr2+1
+    sta zpPtr2+1
 
-            lda PRICOLOR
-            sta (zpPtr2), y
-            lda piece2
-            sta zpPtr2
-            lda piece2+1
-            sta zpPtr2+1
-            lda #$D4
-            clc
-            adc zpPtr2+1
-            sta zpPtr2+1
-            lda SECCOLOR
-            sta (zpPtr2), y
-            RTS
+    ; Cache current color
+    lda (zpPtr2),y
+    and #$0f
+    sta NextPriC
+
+    lda theNewColor1
+    sta (zpPtr2), y
+    lda piece2_next
+    sta zpPtr2
+    lda piece2_next+1
+    sta zpPtr2+1
+    lda #$D4
+    clc
+    adc zpPtr2+1
+    sta zpPtr2+1
+    ; cahce current color
+    lda (zpPtr2),y
+    and #$0f
+    sta NextSecC
+    lda theNewColor2
+    sta (zpPtr2), y
+SwapInOldColor
+    lda piece1
+    sta zpPtr2
+    lda piece1+1
+    clc
+    adc #$D4
+    sta zpPtr2+1
+
+    lda NextPriC
+    sta (zpPtr2),y
+    sta PRICOLOR
+
+    lda piece2
+    sta zpPtr2
+    lda piece2+1
+    clc
+    adc #$D4
+    sta zpPtr2+1
+    lda NextSecC
+    sta (zpPtr2),y
+    sta SECCOLOR
+    rts
+
+RepaintCurrentColor
+    ldy #00
+    lda piece1
+    sta zpPtr2
+    lda piece1+1
+    sta zpPtr2+1
+    lda #$D4
+    clc
+    adc zpPtr2+1
+    sta zpPtr2+1
+
+    lda PRICOLOR
+    sta (zpPtr2), y
+    lda piece2
+    sta zpPtr2
+    lda piece2+1
+    sta zpPtr2+1
+    lda #$D4
+    clc
+    adc zpPtr2+1
+    sta zpPtr2+1
+    lda SECCOLOR
+    sta (zpPtr2), y
+    rts
+
+;
+
 
 ColorSwap   lda PRICOLOR
             ldx SECCOLOR
             sta SECCOLOR
             stx PRICOLOR
-            jsr ChangeColor
+            jsr RepaintCurrentColor
             rts
 
 ; Print Message subrutine
@@ -693,6 +856,10 @@ printLoop   lda ENDMSG, y
             jmp printLoop
 printComplete
 ; Pause between end of game and restart
+            jsr WaitEventFrame
+            jsr WaitEventFrame
+            jsr WaitEventFrame
+            jsr WaitEventFrame
             jsr WaitEventFrame
             jsr WaitEventFrame
             jsr WaitEventFrame
@@ -807,10 +974,10 @@ lookRight
             beq lr_piece
             cmp #VIRUS_ONE
             beq lr_piece
-cmp #VIRUS_TWO
-beq lr_piece
-cmp #VIRUS_THREE
-beq lr_piece
+            cmp #VIRUS_TWO
+            beq lr_piece
+            cmp #VIRUS_THREE
+            beq lr_piece
 
             jmp lookRightDone
             lr_piece
@@ -857,10 +1024,10 @@ lookUp ; start at the top and work my way down
             beq lu_piece
             cmp #VIRUS_ONE
             beq lu_piece
-cmp #VIRUS_TWO
-beq lu_piece
-cmp #VIRUS_THREE
-beq lu_piece
+            cmp #VIRUS_TWO
+            beq lu_piece
+            cmp #VIRUS_THREE
+            beq lu_piece
 
             jmp lookUpComplete
             lu_piece
@@ -890,107 +1057,107 @@ lookUpComplete
             jsr pushOntoVarray
 
 lookDown
-            clc ; Look for a piece below
-            lda #40
-            adc zpPtr2
-            sta zpPtr2
-            lda #$00
-            adc zpPtr2+1
-            sta zpPtr2+1
-            ldy #$00
-            lda (zpPtr2), y
+    clc ; Look for a piece below
+    lda #40
+    adc zpPtr2
+    sta zpPtr2
+    lda #$00
+    adc zpPtr2+1
+    sta zpPtr2+1
+    ldy #$00
+    lda (zpPtr2), y
 
-            cmp #PILL_SIDE
-            beq ld_piece
-            cmp #PILL_LEFT
-            beq ld_piece
-            cmp #PILL_RIGHT
-            beq ld_piece
-            cmp #PILL_TOP
-            beq ld_piece
-            cmp #PILL_BOTTOM
-            beq ld_piece
-            cmp #VIRUS_ONE
-            beq ld_piece
-cmp #VIRUS_TWO
-beq ld_piece
-cmp #VIRUS_THREE
-beq ld_piece
+    cmp #PILL_SIDE
+    beq ld_piece
+    cmp #PILL_LEFT
+    beq ld_piece
+    cmp #PILL_RIGHT
+    beq ld_piece
+    cmp #PILL_TOP
+    beq ld_piece
+    cmp #PILL_BOTTOM
+    beq ld_piece
+    cmp #VIRUS_ONE
+    beq ld_piece
+    cmp #VIRUS_TWO
+    beq ld_piece
+    cmp #VIRUS_THREE
+    beq ld_piece
 
-            jmp lookDownDone
+    jmp lookDownDone
 ld_piece
-            clc ; Now look for color
-            lda zpPtr2
-            sta zpPtr3
-            lda #$D4
-            adc zpPtr2+1
-            sta zpPtr3+1
-            lda (zpPtr3), y
-            and #$0f ; mask out the top part of the byte, it could be garbage
-            cmp CMPCOLOR
-            bne lookDownDone
-            ; put this piece onto the array
-            lda zpPtr2 ; Store away low byte
-            pha
-            lda zpPtr2+1 ; Store away high byte onto stack
-            pha
-            jsr pushOntoVarray ; void (ret2, ret1, addy2, addy1)
-            inc CONNECTCNT
-            jmp lookDown ; loop until we've counted them all
+    clc ; Now look for color
+    lda zpPtr2
+    sta zpPtr3
+    lda #$D4
+    adc zpPtr2+1
+    sta zpPtr3+1
+    lda (zpPtr3), y
+    and #$0f ; mask out the top part of the byte, it could be garbage
+    cmp CMPCOLOR
+    bne lookDownDone
+    ; put this piece onto the array
+    lda zpPtr2 ; Store away low byte
+    pha
+    lda zpPtr2+1 ; Store away high byte onto stack
+    pha
+    jsr pushOntoVarray ; void (ret2, ret1, addy2, addy1)
+    inc CONNECTCNT
+    jmp lookDown ; loop until we've counted them all
 lookDownDone
-            jsr clearPiecesInArray
-            ; put back return address onto stack
-            ldy lfc4_y
-            lda lfc4_ret
-            pha
-            lda lfc4_ret+1
-            pha
-            rts
+    jsr clearPiecesInArray
+    ; put back return address onto stack
+    ldy lfc4_y
+    lda lfc4_ret
+    pha
+    lda lfc4_ret+1
+    pha
+    rts
 
 
 ; Push 16 bit value onto varray
 pushOntoVarray ; void (ret2, ret1, addy2, addy1)
-            lda varrayIndex
-            asl ; multiply * 2
-            tax ; copy to x
-            pla
-            sta ret1+1
-            pla
-            sta ret1
-            pla
-            sta varray+1, x
-            pla
-            sta varray, x
-            inc varrayIndex
-            ; Return to where we came from
-            lda ret1
-            pha
-            lda ret1+1
-            pha
-            rts
+    lda varrayIndex
+    asl ; multiply * 2
+    tax ; copy to x
+    pla
+    sta ret1+1
+    pla
+    sta ret1
+    pla
+    sta varray+1, x
+    pla
+    sta varray, x
+    inc varrayIndex
+    ; Return to where we came from
+    lda ret1
+    pha
+    lda ret1+1
+    pha
+    rts
 
 pushOntoHarray ; void (ret2, ret1, addy2, addy1)
-            lda harrayIndex
-            asl ; multiply * 2
-            tax ; copy to x
-            pla
-            sta ret1+1
-            pla
-            sta ret1
-            pla
-            sta harray+1, x
-            pla
-            sta harray, x
-            inc harrayIndex
-            ; Return to where we came from
-            lda ret1
-            pha
-            lda ret1+1
-            pha
-            rts
+    lda harrayIndex
+    asl ; multiply * 2
+    tax ; copy to x
+    pla
+    sta ret1+1
+    pla
+    sta ret1
+    pla
+    sta harray+1, x
+    pla
+    sta harray, x
+    inc harrayIndex
+    ; Return to where we came from
+    lda ret1
+    pha
+    lda ret1+1
+    pha
+    rts
 
 finishedClearingVJmp ; closer jump to the bcc right below
-            jmp finishedClearingV
+    jmp finishedClearingV
 ; Clears both vertical and horizontal entries in their respecitve
 ; arrays if there are more than 4 entries in one of them.
 clearPiecesInArray ; void ()
@@ -1153,23 +1320,6 @@ finishedClearingH
             rts
 
 
-; Print in 1024+1 the vertical count
-printConnectCount
-    lda #$01 ; Low byte location
-    sta zpPtr2
-    lda #$04 ; high byte of character location for 1025
-    sta zpPtr2+1
-    lda varrayIndex
-    ldy #$00
-    cmp #$0A
-    bcc NumericOnly ; >= to 10 then print a letter
-HexAlpha
-    sta (zpPtr2), y
-    rts
-NumericOnly
-    ora #$30
-    sta (zpPtr2), y
-    rts
 
 
 
@@ -1197,9 +1347,11 @@ lookForAnyConnect4s
         ldy #$00
         sty TMP1 ; used as a screen y offset, 0 - 15
         sty tmp2 ; used as a screen x offset, 0 - 7
-        lda #$0f ; start <
+        lda #OnePGameFieldLocLow ; start <
+;        lda #$0f
         sta zpPtr1
-        lda #$04 ; start >
+        lda #OnePGameFieldLocHigh ; start >
+;        lda #$04
         sta zpPtr1+1
 connectsOuterLoop
         lda tmp2 ; what's the current x offset?
@@ -1275,12 +1427,17 @@ ldy #$00
 ;    lda #$04 ; start
 ;    sta zpPtr1+1
 
-; This the bottom left pos
-lda #$67 ; low start position
-sta zpPtr1
-lda #$06 ; start
-sta zpPtr1+1
+; This the bottom left pos (in the boarder), to get there start at the top left
+; then add $0258
+; Originally was:  $0667 - $040f
 
+clc
+lda #OnePGameFieldLocLow
+adc #$58
+sta zpPtr1
+lda #OnePGameFieldLocHigh
+adc #$02
+sta zpPtr1+1
 
 dropOuterLoop
     lda tmp2
@@ -1293,7 +1450,7 @@ dropOuterLoop
     adc #$01
     sta zpPtr1
     sta zpPtr2
-lda #$00
+    lda #$00
     adc zpPtr1+1
     sta zpPtr1+1
     sta zpPtr2+1
@@ -1606,71 +1763,7 @@ prv_done
     lda #0
     rts
 
-; Draw game board using char 230 as the boarder
-; We'll start at the top left +3, draw down 16, 8 accross
-DrawGameBoarder
-        ldx #$00 ; Our counter
-        stx TMP1 ; used to count how many viruses we've printed
 
-        lda #$0F ; Low byte start location
-        sta zpPtr2
-        lda #$04 ; High byte start location
-        sta zpPtr2+1
-
-dgbLoop
-        ldy #00
-        lda #WALL_SIDES
-        sta (zpPtr2), y
-        ldy #9
-        sta (zpPtr2), y
-
-        ; Draw centers
-        ldy #01
-clearGameField
-        lda #' '
-        sta (zpPtr2),y
-
-cpx #7; >= 5
-        bcc noVirusRowsYet
-
-        doRandomVirus
-        lda zpPtr2
-        pha
-        lda zpPtr2+1
-        pha
-        jsr printRandomVirus
-;
-noVirusRowsYet
-        iny
-        cpy #9
-        bne clearGameField
-        ; Next line down
-        clc
-        lda zpPtr2
-        adc #40
-        sta zpPtr2
-        lda zpPtr2+1
-        adc #0
-        sta zpPtr2+1
-
-        inx
-        cpx #16
-        bne dgbLoop
-ldy #00
-lda #WALL_BL
-sta (zpPtr2),y
-        ; then finish off the bottom line
-iny
-DrawBottom
-        lda #WALL_B
-        sta (zpPtr2), y
-        iny
-        cpy #9
-        bne DrawBottom
-dgbDone
-lda #WALL_BR
-sta (zpPtr2),y
-        rts
 
 
 
@@ -1697,12 +1790,19 @@ fs_Continue ; a = void()
     ldy #$00
     sty fs_didWorkThisLoop      ; used to keep track if anything dropped, shared with dropDownIfYouCan
     sty fs_outLoopIdx   ; used as screen x index 0 - 7
+    sty p1VirusCount ; reset our virus count for player one
+    sty p1VirusCountBinNew
 
-    ; This the bottom left pos
-    lda #$8f ; low start position
-    sta zpPtr1
-    lda #$06 ; start
-    sta zpPtr1+1
+
+; Bottom left pos is +$0280 from top left game field
+; In bottom left wall corner
+clc
+lda #OnePGameFieldLocLow
+adc #$80
+sta zpPtr1
+lda #OnePGameFieldLocHigh
+adc #$02
+sta zpPtr1+1
 
 fs_dropOuterLoop
     lda fs_outLoopIdx
@@ -1734,13 +1834,31 @@ fs_dropInnerLoop
     sta zpPtr2+1
     lda (zpPtr2),y
 
+    ; Look for viruses for total
+    cmp #VIRUS_ONE
+    beq itIsAVirus
+    cmp #VIRUS_TWO
+    beq itIsAVirus
+    cmp #VIRUS_THREE
+    bne notAVirus
+itIsAVirus
+    ; It is a virus
+    sed ; go into decimal mode
+    clc
+    lda #1
+    adc p1VirusCount
+    sta p1VirusCount
+    cld ; back to binary math
+    inc p1VirusCountBinNew
+    lda (zpPtr2),y ; reload in what we are comparing
+notAVirus
     cmp #PILL_CLEAR_1
     bne fs_nextCharType
     inc fs_didWorkThisLoop
 ; This is where we'd sleep before
     lda #PILL_CLEAR_2
     sta (zpPtr2),y
-jmp fs_nextRow
+    jmp fs_nextRow
 
 fs_nextCharType
     cmp #PILL_CLEAR_2
@@ -1764,7 +1882,117 @@ fs_reallyDone
     lda fs_didWorkReturn
 rts
 
+UpdateVirusCount
+    ldy #0
+    lda #$6f
+    sta zpPtr2
+    lda #$05
+    sta zpPtr2+1
+    ldx p1VirusCount
+    txa
+    and #$f0
+    lsr ; Shift over 4 times
+    lsr
+    lsr
+    lsr
+    ora #$30
+    sta (zpPtr2),y
+    iny
+    txa
+    and #$0f
+    ora #$30
+    sta (zpPtr2),y
+    rts
+
+updateScore ; score is made up of 4 bytes of decimal numbers
+    ; See if there is any difference between the last virus count and the new one
+    lda p1VirusCountBinLast
+    cmp p1VirusCountBinNew
+    beq scoreUpdateComplete
+    sec
+    sbc p1VirusCountBinNew
+    tax ; x contains the difference
+
+    ; Make the new count the current one now
+    lda p1VirusCountBinNew
+    sta p1VirusCountBinLast
+
+; Add the points up
+    sed
+scoreLoop
+    cpx #0
+    beq printCurrentScore
+    clc
+    lda #1
+    adc P1_SCORE
+    sta P1_SCORE
+    dex
+    jmp scoreLoop
 
 
+printCurrentScore
+cld
+    ; We only want to print to the million so the top byte of the 4th byte isn't read
+    ; Pos?
+    lda #$95
+    sta zpPtr2
+    lda #$04
+    sta zpPtr2+1
+
+    ldy #0 ; offset
+    lda P1_SCORE+3
+    and #$0f
+    ora #$30
+    sta (zpPtr2),y
+    iny
+
+    ldx P1_SCORE+2
+    txa
+    and #$f0
+    lsr ; Shift over 4 times
+    lsr
+    lsr
+    lsr
+    ora #$30
+    sta (zpPtr2),y
+    iny
+    txa
+    and #$0f
+    ora #$30
+    sta (zpPtr2),y
+    iny
+
+    ldx P1_SCORE+1
+    txa
+    and #$f0
+    lsr ; Shift over 4 times
+    lsr
+    lsr
+    lsr
+    ora #$30
+    sta (zpPtr2),y
+    iny
+    txa
+    and #$0f
+    ora #$30
+    sta (zpPtr2),y
+    iny
+
+    ldx P1_SCORE
+    txa
+    and #$f0
+    lsr ; Shift over 4 times
+    lsr
+    lsr
+    lsr
+    ora #$30
+    sta (zpPtr2),y
+    iny
+    txa
+    and #$0f
+    ora #$30
+    sta (zpPtr2),y
+scoreUpdateComplete
+    rts
 
 

@@ -11,27 +11,52 @@
 		EA286E85160BE57E00C4A9B2 /* example.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.prg; path = ../../ISOs/example.prg; sourceTree = "<group>"; };
 		EA286E86160C24F600C4A9B2 /* lightspeed.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = lightspeed.s; sourceTree = "<group>"; };
 		EA286E88160C486D00C4A9B2 /* flicker.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = flicker.prg; path = ../../ISOs/flicker.prg; sourceTree = "<group>"; };
+		EA8B35BC1639598400C1059B /* testScenarios.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = testScenarios.s; sourceTree = "<group>"; };
+		EA8B35EB163A971000C1059B /* input.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = input.s; sourceTree = "<group>"; };
 		EA8D86DC162696C40003415E /* subroutines.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = subroutines.s; sourceTree = "<group>"; };
+		EA8D871C163177730003415E /* customchars.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = customchars.s; sourceTree = "<group>"; };
+		EA8D873E1634AFCD0003415E /* interrupt.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = interrupt.s; sourceTree = "<group>"; };
+		EA8D873F1634E60D0003415E /* refreshCounter.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = refreshCounter.s; sourceTree = "<group>"; };
+		EA8D874016352AAF0003415E /* unused.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = unused.s; sourceTree = "<group>"; };
+		EA8D87431635D1AE0003415E /* arkanoid.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = arkanoid.prg; path = "../../Downloads/Arkanoid.Imagine+3.TCS/arkanoid.prg"; sourceTree = "<group>"; };
 		EAA29EAA16110FA200C87D7F /* number.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = number.s; sourceTree = "<group>"; };
 		EAA2A0A11620115800C87D7F /* joytest.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = joytest.s; sourceTree = "<group>"; };
 		EAB47DD0155219BF00516343 /* baseGame.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = baseGame.s; sourceTree = "<group>"; };
 		EABC8DE215CA2145006F2067 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		EAD8212F163BCAD3007DFD49 /* drawBox.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = drawBox.s; sourceTree = "<group>"; };
+		EAD82131163CB59F007DFD49 /* layout.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = layout.s; sourceTree = "<group>"; };
 		EAE21A1115A3BB9600DCE4B2 /* Notes.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = Notes.s; sourceTree = "<group>"; };
 		EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = SimpleAddition.s; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		EAB47DC31552197000516343 = {
+		EA8D86F6162FE6CB0003415E /* experiements */ = {
 			isa = PBXGroup;
 			children = (
-				EABC8DE215CA2145006F2067 /* Makefile */,
-				EAB47DD0155219BF00516343 /* baseGame.s */,
-				EA8D86DC162696C40003415E /* subroutines.s */,
+				EA8D874016352AAF0003415E /* unused.s */,
+				EA8D873E1634AFCD0003415E /* interrupt.s */,
 				EAE21A1115A3BB9600DCE4B2 /* Notes.s */,
 				EAA29EAA16110FA200C87D7F /* number.s */,
 				EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */,
 				EA286E86160C24F600C4A9B2 /* lightspeed.s */,
 				EAA2A0A11620115800C87D7F /* joytest.s */,
+			);
+			name = experiements;
+			sourceTree = "<group>";
+		};
+		EAB47DC31552197000516343 = {
+			isa = PBXGroup;
+			children = (
+				EABC8DE215CA2145006F2067 /* Makefile */,
+				EAB47DD0155219BF00516343 /* baseGame.s */,
+				EAD82131163CB59F007DFD49 /* layout.s */,
+				EA8B35EB163A971000C1059B /* input.s */,
+				EA8B35BC1639598400C1059B /* testScenarios.s */,
+				EA8D873F1634E60D0003415E /* refreshCounter.s */,
+				EA8D871C163177730003415E /* customchars.s */,
+				EA8D86DC162696C40003415E /* subroutines.s */,
+				EAD8212F163BCAD3007DFD49 /* drawBox.s */,
+				EA8D86F6162FE6CB0003415E /* experiements */,
 				EAB47DD11552219800516343 /* Target */,
 			);
 			sourceTree = "<group>";
@@ -42,6 +67,7 @@
 				EA286E83160BE51300C4A9B2 /* drc64.prg */,
 				EA286E85160BE57E00C4A9B2 /* example.prg */,
 				EA286E88160C486D00C4A9B2 /* flicker.prg */,
+				EA8D87431635D1AE0003415E /* arkanoid.prg */,
 			);
 			name = Target;
 			sourceTree = "<group>";

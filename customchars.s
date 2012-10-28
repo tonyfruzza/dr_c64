@@ -21,10 +21,14 @@ MoveCharMap
     PILL_T_DEF  .byte 124, 222, 190, 190, 190, 190, 254, 0
     PILL_B_DEF  .byte 254, 190, 190, 190, 190, 254, 124, 0
     PILL_S_DEF  .byte 124, 198, 190, 254, 254, 254, 124, 0
+
     LEFT_WALL   .byte 66, 66, 66, 66, 66, 66, 66, 66
     WALL_BOTTOM .byte 255, 0 , 0, 0, 0, 255, 0, 0
     WALL_BLFT   .byte 67, 64, 64, 64, 32, 31, 0, 0
     WALL_BRT    .byte 194, 2, 2, 2, 4, 248, 0 , 0
+    WALL_TLFT   .byte 0, 0, 127, 96, 80, 72, 68, 67
+    WALL_TRT    .byte 0, 0, 254, 6, 10, 18, 34, 194
+    WALL_TOP    .byte 0, 0, 255, 0, 0, 0, 0, 255
     CLEAR_ONE   .byte 124, 254, 238, 198, 238, 254, 124, 0
     CLEAR_TWO   .byte 124, 198, 130, 130, 130, 198, 124, 0
 
@@ -115,6 +119,15 @@ PillMakerLoop
 
     lda LEFT_WALL, x
     sta NEWCHARMAP+816, x ; 8 * 102
+
+    lda WALL_TRT, x
+    sta NEWCHARMAP+584, x ; 8 * 73
+
+    lda WALL_TLFT, x
+    sta NEWCHARMAP+880, x ; 8 * 110
+
+    lda WALL_TOP, x
+    sta NEWCHARMAP+896, x ; 8 * 112
 
     lda CLEAR_ONE, x
     sta NEWCHARMAP+688, x ; 8 * 86
