@@ -70,3 +70,45 @@ test2 ; Test to see that two veritically stacked pieces will drop okay together
     sta (zpPtr2),y
     rts
 
+test3 ; replicate issue I took a picture of
+    ldy #0
+
+    lda #OnePGameFieldLocLow
+    clc
+    adc #$e2
+    sta zpPtr2
+
+    lda #OnePGameFieldLocHigh
+    adc #$01
+    sta zpPtr2+1
+
+    lda #PILL_SIDE
+    sta (zpPtr2),y
+
+    iny
+    lda #PILL_SIDE
+    sta (zpPtr2),y
+
+
+    ldy #40
+    lda #PILL_SIDE
+    sta (zpPtr2),y
+    iny
+    lda #PILL_SIDE
+    sta (zpPtr2),y
+
+
+    ldy #80
+lda #VIRUS_TWO
+    sta (zpPtr2),y
+iny
+
+    lda #PILL_SIDE
+    sta (zpPtr2),y
+
+    ldy #121
+    lda #VIRUS_ONE
+    sta (zpPtr2),y
+    rts
+
+

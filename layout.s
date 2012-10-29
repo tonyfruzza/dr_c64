@@ -49,6 +49,7 @@ dgbLoop
     bcc noVirusRowsYet
 
 doRandomVirus
+;jmp noVirusRowsYet ; if you don't want any viruses put this line in
     lda zpPtr2
     pha
     lda zpPtr2+1

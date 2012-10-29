@@ -246,6 +246,7 @@ ldy #$00
     sta SCREEN_BOARDER
 ;jsr test1
 ;jsr test2
+;jsr test3
 
     jsr FieldSearch ; Tally up the virus count, so it can be printed
     jsr UpdateVirusCount
@@ -1398,6 +1399,12 @@ anyConnectInnerLoop
         beq anyConnectInnerLoopDone
         lda (zpPtr4),y
         ; Tried writing this as a subroutine, it's corrupting the stack though :-(
+        cmp #VIRUS_ONE
+        beq lfac4_piece
+        cmp #VIRUS_TWO
+        beq lfac4_piece
+        cmp #VIRUS_THREE
+        beq lfac4_piece
         cmp #PILL_SIDE
         beq lfac4_piece
         cmp #PILL_LEFT
