@@ -111,4 +111,26 @@ iny
     sta (zpPtr2),y
     rts
 
+test4 ; not doing well at clearing more than 2 viruses at a time with scoring
+    lda #OnePGameFieldLocLow
+    clc
+    adc #$e2
+    sta zpPtr2
 
+    lda #OnePGameFieldLocHigh
+    adc #$01
+    sta zpPtr2+1
+    lda #PILL_SIDE
+    sta (zpPtr2),y
+
+    lda #VIRUS_ONE
+    iny
+       sta (zpPtr2),y
+    iny
+   sta (zpPtr2),y
+    iny
+   sta (zpPtr2),y
+iny
+iny
+sta (zpPtr2),y
+    rts

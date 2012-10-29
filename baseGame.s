@@ -119,11 +119,14 @@ TMP4        .byte $00
 pSideTmp1   .byte $00
 pSideTmp2   .byte $00
 p1VirusCount    .byte $00
+p1VirusClearedInOneTurn  .byte $00
 
 p1VirusCountBinLast .byte $00
 p1VirusCountBinNew  .byte $00
 
-P1_SCORE    .byte $00, $00, $00, $00
+;P1_SCORE    .byte $00, $00, $00, $00
+P1_SCORE    .byte 0,0,0,0,0,0,0,0,0,0 ; 
+P1_SCORE_B  .byte $00, $00, $00, $00 ; Binary value of current score
 VIRUS_MUL_1 .byte $64, $00 ; 100
 
 init
@@ -247,12 +250,19 @@ ldy #$00
 ;jsr test1
 ;jsr test2
 ;jsr test3
+;jsr test4
+;jsr test5
 
     jsr FieldSearch ; Tally up the virus count, so it can be printed
-    jsr UpdateVirusCount
     jsr printCurrentScore
+;    jsr UpdateVirusCount
+    jsr printCurrentScore
+
     lda p1VirusCountBinNew
     sta p1VirusCountBinLast
+
+;jsr bin2hex16b
+;jsr convertP1ScoreToDecimal
 
     jmp firstPieceToDrop
 
@@ -263,7 +273,6 @@ DropNew
     jsr lookForAnyConnect4s
     jsr FieldSearch
     jsr UpdateVirusCount
-    jsr updateScore
     lda p1VirusCount
     beq EndGame ; disable for debugging
     jsr doDrop
@@ -273,6 +282,10 @@ DropNew
     sta refreshCount ; refreshCount is at an unknown # after the drops, reset it
     jsr resetInputMovement
 firstPieceToDrop
+jsr FieldSearch
+jsr UpdateVirusCount
+
+    jsr updateScore
     ldy START_POS ; Start Offset low byte location
     sty piece1
     iny
@@ -1648,11 +1661,22 @@ UpdateVirusCount
     sta (zpPtr2),y
     rts
 
-updateScore ; score is made up of 4 bytes of decimal numbers
+
+; score is made up of 4 bytes of decimal numbers
+updateScore
     ; See if there is any difference between the last virus count and the new one
     lda p1VirusCountBinLast
     cmp p1VirusCountBinNew
-    beq scoreUpdateComplete
+    bne us_continue ; There was something cleared
+;    ldx #1
+;    lda #0
+;    tax
+;    sta scoreMultiplierTmp
+;    sta scoreMultiplierTmp+1
+;    sta scoreMultiplierTmp+2
+;    sta scoreMultiplierTmp+3
+    jmp printCurrentScoreWithNoChange
+us_continue
     sec
     sbc p1VirusCountBinNew
     tax ; x contains the difference
@@ -1661,82 +1685,116 @@ updateScore ; score is made up of 4 bytes of decimal numbers
     lda p1VirusCountBinNew
     sta p1VirusCountBinLast
 
-; Add the points up
-    sed
+    ; Add the points up
 scoreLoop
-    cpx #0
-    beq printCurrentScore
+    lda VIRUS_MUL_1
+    sta scoreMultiplierTmp
+    lda VIRUS_MUL_1+1
+    sta scoreMultiplierTmp+1
+    lda #0
+    sta scoreMultiplierTmp+2
+    sta scoreMultiplierTmp+3
+    stx tmp ; store how many times to shift to the left
+
+multiplierLoop
+    dec tmp
+    beq multiplierDone
+
+lda #0
+sta carryWasSet
     clc
+    asl scoreMultiplierTmp
+    bcc firstNoCarry
     lda #1
-    adc P1_SCORE
-    sta P1_SCORE
+    sta carryWasSet
+firstNoCarry
+    clc
+    asl scoreMultiplierTmp+1
+    lda carryWasSet
+    ora scoreMultiplierTmp+1
+    sta scoreMultiplierTmp+1
+    lda #0
+    sta carryWasSet
+    bcc secondNoCarry
+    lda #1
+    sta carryWasSet
+secondNoCarry
+    clc
+    asl scoreMultiplierTmp+2
+    lda carryWasSet
+    ora scoreMultiplierTmp+2
+    sta scoreMultiplierTmp+2
+    lda #0
+    sta carryWasSet
+    bcc thirdNoCarry
+    lda #1
+    sta carryWasSet
+thirdNoCarry
+    clc
+    asl scoreMultiplierTmp+2
+    lda carryWasSet
+    ora scoreMultiplierTmp+2
+    sta scoreMultiplierTmp+2
+
+    jmp multiplierLoop
+
+
+multiplierDone
+    clc
+    lda P1_SCORE_B
+    adc scoreMultiplierTmp
+    sta P1_SCORE_B
+    sta P1_SCORE_B_COPY
+
+    lda P1_SCORE_B+1
+    adc scoreMultiplierTmp+1
+    sta P1_SCORE_B+1
+    sta P1_SCORE_B_COPY+1
+
+    lda P1_SCORE_B+2
+    adc scoreMultiplierTmp+2
+    sta P1_SCORE_B+2
+    sta P1_SCORE_B_COPY+2
+
+    lda P1_SCORE_B+3
+    adc scoreMultiplierTmp+3
+    sta P1_SCORE_B+3
+    sta P1_SCORE_B_COPY+3
+
     dex
+    beq printCurrentScore
     jmp scoreLoop
 
 
+printCurrentScoreWithNoChange
+    lda P1_SCORE_B
+    sta P1_SCORE_B_COPY
+    lda P1_SCORE_B+1
+    sta P1_SCORE_B_COPY+1
+    lda P1_SCORE_B+2
+    sta P1_SCORE_B_COPY+2
+    lda P1_SCORE_B+3
+    sta P1_SCORE_B_COPY+3
 printCurrentScore
-cld
-    ; We only want to print to the million so the top byte of the 4th byte isn't read
-    ; Pos?
-    lda #$95
+    jsr convertP1ScoreToDecimal
+    ldy #$00
+    lda #$94
     sta zpPtr2
     lda #$04
     sta zpPtr2+1
 
-    ldy #0 ; offset
-    lda P1_SCORE+3
-    and #$0f
+    ldx #8
+l2
+    lda P1_SCORE,x
     ora #$30
     sta (zpPtr2),y
     iny
-
-    ldx P1_SCORE+2
-    txa
-    and #$f0
-    lsr ; Shift over 4 times
-    lsr
-    lsr
-    lsr
-    ora #$30
-    sta (zpPtr2),y
-    iny
-    txa
-    and #$0f
-    ora #$30
-    sta (zpPtr2),y
-    iny
-
-    ldx P1_SCORE+1
-    txa
-    and #$f0
-    lsr ; Shift over 4 times
-    lsr
-    lsr
-    lsr
-    ora #$30
-    sta (zpPtr2),y
-    iny
-    txa
-    and #$0f
-    ora #$30
-    sta (zpPtr2),y
-    iny
-
-    ldx P1_SCORE
-    txa
-    and #$f0
-    lsr ; Shift over 4 times
-    lsr
-    lsr
-    lsr
-    ora #$30
-    sta (zpPtr2),y
-    iny
-    txa
-    and #$0f
-    ora #$30
-    sta (zpPtr2),y
+    dex
+    bpl l2
 scoreUpdateComplete
     rts
+
+scoreMultiplierTmp .byte $00, $00, $00, $00
+carryWasSet            .byte $00
 
 
