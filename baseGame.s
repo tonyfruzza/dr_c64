@@ -98,6 +98,9 @@ colors      .byte COLOR_RED, COLOR_BLUE, COLOR_YELLOW, COLOR_BLUE
 START_POS   .byte $13, $04 ; gets overwritten
 LAST_MOMENT_MOVE    .byte $00
 VIRUS_CHAR_LIST .byte VIRUS_ONE, VIRUS_TWO, VIRUS_THREE
+vOneCount   .byte $00
+vTwoCount   .byte $00
+vThreeCount .byte $00
 
 varray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 varrayIndex .byte $00
@@ -153,8 +156,6 @@ clears
     ; Programatically create game layout
     jsr ClearScreen
     jsr DrawGameBoarder
-
-
 
 
     lda #5 ; width
@@ -263,8 +264,8 @@ DropNew
     jsr UpdateVirusCount
     jsr updateScore
     lda p1VirusCount
-    beq EndGame
-    jsr luminsDrop
+    beq EndGame ; disable for debugging
+    jsr doDrop
 
     bne DropNew ; A is set to count of how many dropped, loop until no drops
     lda #00
@@ -1431,297 +1432,6 @@ anyConnectDone
         rts
 
 
-; Quick drop blocks write up, gravity, kind of like Lumines effect
-; a will be greater than 0 if it did some drops
-; This subroutine just scans the playing field and hands off to something else
-; to do the actual dropping
-luminsDrop
-    lda #$00
-    sta tmp3 ; to be returned as the count of drops that occured
-luminsDropContinue ; a = void()
-    ldy #$0f ; zp index, do not change
-    sty tmp  ; used as screen y offset, 0 - 15
-ldy #$00
-    sty tmp1 ; used to keep track if anything dropped, shared with dropDownIfYouCan
-    sty tmp2 ; used as screen x index 0 - 7
-
-; This is the top left pos
-;    lda #$0F ; low start position
-;    sta zpPtr1
-;    lda #$04 ; start
-;    sta zpPtr1+1
-
-; This the bottom left pos (in the boarder), to get there start at the top left
-; then add $0258
-; Originally was:  $0667 - $040f
-
-clc
-lda #OnePGameFieldLocLow
-adc #$58
-sta zpPtr1
-lda #OnePGameFieldLocHigh
-adc #$02
-sta zpPtr1+1
-
-dropOuterLoop
-    lda tmp2
-    cmp #8
-    beq luminsDropDone
-
-    ; Move one right
-    clc
-    lda zpPtr1
-    adc #$01
-    sta zpPtr1
-    sta zpPtr2
-    lda #$00
-    adc zpPtr1+1
-    sta zpPtr1+1
-    sta zpPtr2+1
-    lda #$0f
-    sta tmp ; reset inner loop index
-
-dropInnerLoop
-    lda tmp
-    beq dropInnerLoopComplete
-    sec
-    lda zpPtr2
-    sbc #40
-    sta zpPtr2
-    lda zpPtr2+1
-    sbc #$00
-    sta zpPtr2+1
-
-    lda (zpPtr2),y
-    cmp #PILL_SIDE
-    beq drop_piece
-    cmp #PILL_LEFT ; Should we drop both pieces down as a group?
-    beq drop_2pieces
-    cmp #PILL_TOP ; should we drop both pieces down as a group vertically?
-    beq drop_2piecesVertically
-    jmp nextRow ; default
-drop_2piecesVertically
-    lda zpPtr2
-    pha
-    lda zpPtr2+1
-    pha
-    jsr dropDoubleVerticalIfYouCan
-    jmp nextRow
-drop_2pieces
-    lda zpPtr2
-    pha
-    lda zpPtr2+1
-    pha
-    jsr dropDoubleHorizontalIfYouCan
-    jmp nextRow
-drop_piece
-    lda zpPtr2
-    pha
-    lda zpPtr2+1
-    pha
-    jsr dropDownIfYouCan
-nextRow
-    dec tmp
-    jmp dropInnerLoop
-dropInnerLoopComplete
-    inc tmp2
-    jmp dropOuterLoop
-luminsDropDone
-    ; Time between drops
-    jsr WaitEventFrame
-    jsr WaitEventFrame
-
-    lda tmp1
-    bne reDropCloseBranch ; if there were any dropped this last time, see if there were any left
-    lda tmp3
-    rts
-reDropCloseBranch
-    jmp luminsDropContinue
-
-
-; Given the top joined piece, can we drop it?
-dropDoubleVerticalIfYouCan
-        jmp ddviyc_start
-        ddviyc_y    .byte $00
-        ddviyc_ret  .byte $00, $00
-ddviyc_start
-sty ddviyc_y
-pla
-sta ddviyc_ret+1
-pla
-sta ddviyc_ret
-pla
-sta zpPtr3+1
-pla
-sta zpPtr3
-; push return back onto stack
-lda ddviyc_ret
-pha
-lda ddviyc_ret+1
-pha
-; what's 2 below
-ldy #80
-lda (zpPtr3),y
-cmp #' '
-bne ddviyc_noDrop
-; Okay we can drop, erase the top piece
-ldy #0
-; Still have #' ' in register a
-sta (zpPtr3),y
-lda #PILL_TOP
-ldy #40
-sta (zpPtr3),y
-ldy #80
-lda #PILL_BOTTOM
-sta (zpPtr3),y
-; now copy colors on over to new possitions
-
-clc
-lda zpPtr3+1
-adc #$d4
-sta zpPtr3+1
-ldy #40
-lda (zpPtr3),y
-and #$0f
-ldy #80
-sta (zpPtr3),y
-ldy #0
-lda (zpPtr3),y
-and #$0f
-ldy #40
-sta (zpPtr3),y
-
-ldy ddviyc_y
-inc tmp3
-
-ddviyc_noDrop
-ldy ddviyc_y
-rts
-
-; Given the left piece, can we drop it?
-; Joined pieces only drop if there are two clear spaces below
-dropDoubleHorizontalIfYouCan ; inc tmp3  (ret2, ret1, pos+1, pos)
-        jmp ddhiyc_start
-        ddhiyc_y    .byte $00
-        ddhiyc_ret  .byte $00, $00
-ddhiyc_start
-        sty ddhiyc_y
-        pla
-        sta ddhiyc_ret+1
-        pla
-        sta ddhiyc_ret
-        pla
-        sta zpPtr3+1
-        pla
-        sta zpPtr3
-        ; push return back onto stack
-        lda ddhiyc_ret
-        pha
-        lda ddhiyc_ret+1
-        pha
-
-        ; What's below?
-        ldy #40
-        lda (zpPtr3), y ; What's below?
-        cmp #" "
-        bne ddhiyc_noDrop
-        iny
-        lda (zpPtr3),y ; +41
-        cmp #" "
-        bne ddhiyc_noDrop
-        ; Piece dropped so remove the old piece
-        ldy #$00
-        lda #' '
-        sta (zpPtr3),y
-        iny ; #1
-        sta (zpPtr3),y
-        ; Piece can be dropped, let's copy it over to the new spot
-        ldy #40
-        lda #PILL_LEFT
-        sta (zpPtr3),y
-        iny ; #41
-        lda #PILL_RIGHT
-        sta (zpPtr3),y
-        ; now load colors to copy on over
-        clc
-        lda zpPtr3+1
-        adc #$d4
-        sta zpPtr3+1
-        ldy #$00
-        lda (zpPtr3),y
-        and #$0f
-        ldy #40
-        sta (zpPtr3),y
-        ldy #1
-        lda (zpPtr3),y
-        and #$0f
-        ldy #41
-        sta (zpPtr3),y
-ddhiyc_Drop
-        inc tmp3
-        inc tmp1
-;        lda #$01
-        ldy ddhiyc_y
-        rts
-ddhiyc_noDrop
-;        lda #$00
-        ldy ddhiyc_y
-        rts
-
-
-dropDownIfYouCan ; void (ret2, ret1, pos+1, pos)
-        jmp startDropDownIfYouCan
-        localXTmp   .byte $00
-        localYTmp   .byte $00
-        ddiyc_ret   .byte $00, $00
-startDropDownIfYouCan
-        stx localXTmp
-        sty localYTmp
-        ldy #$00
-        pla
-        sta ddiyc_ret+1
-        pla
-        sta ddiyc_ret
-        pla
-        sta zpPtr3+1
-        pla
-        sta zpPtr3
-        ; Look below and store it into zpPtr4
-        clc
-        adc #40
-        sta zpPtr4
-        lda zpPtr3+1
-        adc #$00
-        sta zpPtr4+1
-        lda (zpPtr4), y
-        cmp #' '
-        bne noDrop
-        lda (zpPtr3),y
-        sta (zpPtr4),y
-        ; now transfer color from zpPtr3 to zpPtr4
-        lda #' '
-        sta (zpPtr3),y ; clear piece that was dropped
-        clc
-        lda zpPtr3+1
-        adc #$d4
-        sta zpPtr3+1
-        clc
-        lda zpPtr4+1
-        adc #$d4
-        sta zpPtr4+1
-        lda (zpPtr3),y ; load old color
-        and #$0f
-        sta (zpPtr4),y ; store color
-        inc tmp1 ; shared value for knowing if there was a drop
-        inc tmp3 ; shared value for knowing total of drops
-noDrop
-        ldy localYTmp
-        ldx localXTmp
-        lda ddiyc_ret
-        pha
-        lda ddiyc_ret+1
-        pha
-        rts
 
 ; Do not overwrite zpPtr2
 ; Given a screen position place virus of randomly of random color

@@ -11,13 +11,14 @@
 
 
 test1 ; Test to see that horizontal drops are joined together
-    ldy #$00
-    lda #$10
+;    ldy #$00
+
+    lda #$d8
     sta zpPtr2
     lda #$04
     sta zpPtr2+1
 
-ldy #6
+    ldy #6
     lda #PILL_LEFT
     sta (zpPtr2),y
     lda #PILL_RIGHT
@@ -45,7 +46,7 @@ ldy #6
 
 test2 ; Test to see that two veritically stacked pieces will drop okay together
     ldy #$00
-    lda #$10
+    lda #$D8
     sta zpPtr2
     lda #$04
     sta zpPtr2+1
