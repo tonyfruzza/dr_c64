@@ -82,3 +82,76 @@ P1_SCORE_B_COPY .byte $00, $00, $00, $00
 ;result  .byte 0,0,0,0,0,0,0,0,0,0
 
 
+
+eightBitMul ; tmp1, tmp4 = (return_2, return_1, num1, num2) ; alter tmp1, tmp2, tmp4
+stx RETX ; stash a copy of reg x
+pla
+sta ret1+1
+pla
+sta ret1
+pla
+sta tmp2
+pla
+sta tmp1
+lda #$00
+ldx #8
+lsr tmp1 ; FPL?
+M1
+bcc M2
+clc
+adc tmp2 ; S?
+M2
+ror
+ror tmp1 ; FPL?
+dex
+bne M1
+sta tmp4 ; high byte (PH)
+; Copy return address back to stack
+lda ret1
+pha
+lda ret1+1
+pha
+ldx RETX ; return x's value back
+rts ; and return
+
+
+
+; Function to convert binary 8 bit value to a hex decimal number
+; that can be printed numerically within 2 digits
+bin2hex8bit ; TMP, TMP2 (ret_2, ret_1, binNumber)
+    lda #$00
+    sta TMP ; init to 0
+    sta TMP2 ; init to 0
+
+    pla
+    sta RET1+1
+    pla
+    sta RET1
+
+    pla
+    tax ; place the binary number into X
+    beq itsZero
+
+    sed ; change to decimal mode
+addOneMoreDec
+    lda TMP
+    clc ; clear any previous carry bits
+    adc #$01 ; Add one decimal number for every value in X
+    sta TMP
+    lda TMP2
+    adc #$00
+    sta TMP2
+    dex
+    bne addOneMoreDec
+    ; set math type back to binary
+    cld
+    ; Copy return address back to stack
+itsZero
+    lda ret1
+    pha
+    lda ret1+1
+    pha
+    rts ; and return
+
+
+

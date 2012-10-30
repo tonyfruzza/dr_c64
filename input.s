@@ -1,9 +1,9 @@
 ; take input from user for gameplay
 
 JOY1            .equ 56321 ; Joystick flag byte
-LR_MOVE_REPEAT_TIME     .equ 6
-LR_FIRST_MOVE_R_TIME    .equ 12
-DOWN_REPEAT_TIME    .equ 3
+LR_MOVE_REPEAT_TIME     .equ 5
+LR_FIRST_MOVE_R_TIME    .equ 10
+DOWN_REPEAT_TIME    .equ 2
 
 l_repeatTime    .byte LR_FIRST_MOVE_R_TIME
 r_repeatTime    .byte LR_FIRST_MOVE_R_TIME
@@ -11,8 +11,6 @@ l_firstPress    .byte $00
 r_firstPress    .byte $00
 d_repeatTime    .byte DOWN_REPEAT_TIME
 rotate_repeatTime   .byte $00 ; Actually there is no repeat, so using this byte to track if button is being held down
-
-
 
 
 updateJoyPos

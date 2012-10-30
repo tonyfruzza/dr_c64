@@ -40,7 +40,8 @@ COLOR_GREY      .equ $0c
 COLOR_L_GREEN   .equ $0d
 COLOR_L_BLUE    .equ $0e
 COLOR_L_GREY    .equ $0f
-DELAY           .equ 37
+;DELAY           .equ 37
+delay_slow      .equ 37
 PILL_SIDE       .equ 81 ; 'o'
 VIRUS_ONE       .equ 83
 VIRUS_TWO       .equ 84
@@ -82,6 +83,7 @@ ENDMSG      .byte 5,14,4,0
 MSG_NEXT    .byte 14,5,24,20,0
 MSG_VIRUS   .byte 22,9,18,21,19,0
 MSG_SCORE   .byte 19, 3, 15, 18, 5, 0
+MSG_LEVEL   .byte 12,5,22,5,12,0
 ORGBOARDER  .byte $00
 ORGBGRND    .byte $00
 ORIENTATION .byte $00 ; 0 = 12, 1 = 1
@@ -116,6 +118,9 @@ TMP1        .byte $00
 TMP2        .byte $00
 TMP3        .byte $00
 TMP4        .byte $00
+currentLvl  .byte 0
+p1PiecesDroppedThisLvl  .byte 0
+DELAY       .byte 37
 pSideTmp1   .byte $00
 pSideTmp2   .byte $00
 p1VirusCount    .byte $00
@@ -131,18 +136,6 @@ VIRUS_MUL_1 .byte $64, $00 ; 100
 
 init
 
-    ; Set up the position of the "next" pill colors
-    lda #$7E
-    sta piece1_next
-    lda #$04
-    sta piece1_next+1
-
-    lda #$7F
-    sta piece2_next
-    lda #$04
-    sta piece2_next+1
-
-    jsr NewColors ; need to run this twice the first time
 
     jsr MoveCharMap
     jsr initRefreshCounter
@@ -159,91 +152,14 @@ clears
     ; Programatically create game layout
     jsr ClearScreen
     jsr DrawGameBoarder
+    jsr printSinglePlayerNextPieceBox
+    jsr printSinglePlayerScoreBox
+    jsr printSinglePlayerVirusCountBox
+    jsr printSinglePlayerLevelBox
+    jsr putVirusesOnTheField
 
 
-    lda #5 ; width
-    pha
-    lda #2 ; height
-    pha
-
-    lda #$2c
-    pha
-    lda #$04
-    pha
-    jsr DrawBoarderBox
-
-
-    ; Do the screen text for the first time
-    ;printMsgSub ; void (ret>, ret<, txt>, txt<, pos>, pos<)
-    lda #<MSG_NEXT
-    pha
-    lda #>MSG_NEXT
-    pha
-
-    lda #$55
-    pha
-    lda #$04
-    pha
-    jsr printMsgSub
-
-    ; Draw the "next" pills
     ldy #$00
-
-    lda #PILL_LEFT
-    sta (piece1_next),y
-    lda #PILL_RIGHT
-    sta (piece2_next),y
-
-
-    ; Virus count box and and message
-    lda #8 ; Width
-    pha
-    lda #2 ; Height
-    pha
-    lda #$1b
-    pha
-    lda #$05
-    pha
-    jsr DrawBoarderBox
-
-
-    lda #<MSG_VIRUS
-    pha
-    lda #>MSG_VIRUS
-    pha
-
-    lda #$45
-    pha
-    lda #$05
-    pha
-    jsr printMsgSub
-
-; Score box and message
-lda #10 ; Width
-pha
-lda #2 ; Height
-pha
-lda #$43
-pha
-lda #$04
-pha
-jsr DrawBoarderBox
-
-
-lda #<MSG_SCORE
-pha
-lda #>MSG_SCORE
-pha
-
-lda #$6e
-pha
-lda #$04
-pha
-jsr printMsgSub
-
-
-
-ldy #$00
     sty SCREEN_BG_COLOR
     lda COLOR_DARK_GREY
     sta SCREEN_BOARDER
@@ -255,35 +171,37 @@ ldy #$00
 
     jsr FieldSearch ; Tally up the virus count, so it can be printed
     jsr printCurrentScore
-;    jsr UpdateVirusCount
     jsr printCurrentScore
 
     lda p1VirusCountBinNew
     sta p1VirusCountBinLast
 
-;jsr bin2hex16b
-;jsr convertP1ScoreToDecimal
-
+    ; Reset drop speed for the game, or this level
+    lda #delay_slow
+    sta DELAY
     jmp firstPieceToDrop
-
 DropNew
-    ; TODO read input before commiting to drop
-;            jsr disableKeyboardRepeat
     ; Loop through every piece to see if they can be cleared
     jsr lookForAnyConnect4s
     jsr FieldSearch
     jsr UpdateVirusCount
     lda p1VirusCount
-    beq EndGame ; disable for debugging
+    beq NextLevel ; disable for debugging
     jsr doDrop
-
     bne DropNew ; A is set to count of how many dropped, loop until no drops
-    lda #00
-    sta refreshCount ; refreshCount is at an unknown # after the drops, reset it
-    jsr resetInputMovement
+
+    ; Look to see if we should make the pieces drop quicker
+    inc p1PiecesDroppedThisLvl
+    lda p1PiecesDroppedThisLvl
+    cmp #10
+    bne firstPieceToDrop
+    dec DELAY
+    lda #0
+    sta p1PiecesDroppedThisLvl
+
 firstPieceToDrop
-jsr FieldSearch
-jsr UpdateVirusCount
+    jsr FieldSearch
+    jsr UpdateVirusCount
 
     jsr updateScore
     ldy START_POS ; Start Offset low byte location
@@ -309,10 +227,15 @@ jsr UpdateVirusCount
     sta (piece2), y
     jsr NewColors ; Set their new random colors
 
+    lda #00
+    sta refreshCount ; refreshCount is at an unknown # after the drops, reset it
+    jsr resetInputMovement
+
+
 ;the main game loop
 GameLoop
     lda refreshCount
-    cmp #DELAY
+    cmp DELAY
     bcs MoveDownForced
     jsr updateJoyPos
     jmp GameLoop
@@ -321,8 +244,16 @@ GameLoop
 MoveDownForced
     jsr ZeroCountAndMoveDown
     jmp GameLoop
-
+NextLevel
+    inc currentLvl
+    jmp printMsg
 EndGame
+    lda #0
+    sta P1_SCORE_B
+    sta P1_SCORE_B+1
+    sta P1_SCORE_B+2
+    sta P1_SCORE_B+3
+    sta currentLvl
     jmp printMsg
 
 
@@ -1452,86 +1383,6 @@ anyConnectDone
         rts
 
 
-
-; Do not overwrite zpPtr2
-; Given a screen position place virus of randomly of random color
-printRandomVirus ; a = return>, return<, pos>, pos<
-    sty RETY
-    stx RETX
-    pla
-    sta ret1+1
-    pla
-    sta ret1
-    pla
-    sta zpPtr3+1
-    pla
-    sta zpPtr3
-
-    lda ret1
-    pha
-    lda ret1+1
-    pha
-
-    jsr get_random_number
-    tax ; stash the whole random number
-    and #3
-    beq prv_done
-
-    jsr get_random_number
-    and #1
-    beq prv_done
-
-    jsr get_random_number
-    and #1
-    beq prv_done
-
-    txa ; load back in the random number
-    and #3
-    tax
-
-    cmp #0
-    beq dontDecX
-    dex
-dontDecX
-    lda VIRUS_CHAR_LIST, x ; One virus per color
-    sta (zpPtr3), y
-
-    clc
-    lda zpPtr3+1
-    adc #$D4
-    sta zpPtr3+1
-
-    lda colors,x
-    sta (zpPtr3),y
-
-    ldx RETX
-    ldy RETY
-    lda #1 ; Let the caller know we printed a virus
-    rts
-prv_done
-    ldx RETX
-    ldy RETY
-    lda #0
-    rts
-
-
-; do not overwrite zpPtr2 or zpPtr3
-; Return 1 if there are already too many with that color near by
-areThereTooManyVirusesOfThatColorNearBy ; a = return>, return<, pos>, pos<, color
-
-
-
-
-
-
-
-
-
-
-;
-;
-;
-;
 FieldSearch
     jmp fs_start
     fs_outLoopIdx   .byte $00

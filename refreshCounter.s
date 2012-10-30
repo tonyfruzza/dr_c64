@@ -54,7 +54,7 @@ rNoReset
 lNoReset
     inc d_repeatTime
     lda refreshTimer3
-    cmp #DELAY
+    cmp DELAY
     bne noRefreshTimer3Work
     jsr cycleAnimatedViruses
     lda #0
