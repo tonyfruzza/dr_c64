@@ -8,16 +8,25 @@
 ClearScreen ; void ()
     stx retx
     LDX #$00
-    lda #127
+
+
 
 Clearing
+    lda #127
     STA SCREENMEM, X
     STA SCREENMEM + $100, x
     STA SCREENMEM + $200, x
     STA SCREENMEM + $300, x
+    lda #COLOR_L_GREY
+    sta COLORMEM, x
+    sta COLORMEM + $100, x
+    sta COLORMEM + $200, x
+    sta COLORMEM + $300, x
     INX
     BNE Clearing;
     ldx retx
+
+
     RTS
 
 colorScreenWithCheckers

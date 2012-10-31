@@ -21,6 +21,7 @@
 		EA8D87431635D1AE0003415E /* arkanoid.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = arkanoid.prg; path = "../../Downloads/Arkanoid.Imagine+3.TCS/arkanoid.prg"; sourceTree = "<group>"; };
 		EA8DD136163D3ED400D3D0E5 /* drops.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = drops.s; sourceTree = "<group>"; };
 		EA8DD138163EA5C000D3D0E5 /* virusLevels.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = virusLevels.s; sourceTree = "<group>"; };
+		EA8DD13916412F0300D3D0E5 /* lvlSelect.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lvlSelect.s; sourceTree = "<group>"; };
 		EAA29EAA16110FA200C87D7F /* number.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = number.s; sourceTree = "<group>"; };
 		EAA2A0A11620115800C87D7F /* joytest.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = joytest.s; sourceTree = "<group>"; };
 		EAB47DD0155219BF00516343 /* baseGame.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = baseGame.s; sourceTree = "<group>"; };
@@ -52,6 +53,7 @@
 				EABC8DE215CA2145006F2067 /* Makefile */,
 				EAB47DD0155219BF00516343 /* baseGame.s */,
 				EA8DD138163EA5C000D3D0E5 /* virusLevels.s */,
+				EA8DD13916412F0300D3D0E5 /* lvlSelect.s */,
 				EA8DD136163D3ED400D3D0E5 /* drops.s */,
 				EAD82131163CB59F007DFD49 /* layout.s */,
 				EA8B35EB163A971000C1059B /* input.s */,

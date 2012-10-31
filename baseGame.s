@@ -7,6 +7,7 @@ CHROUT  .equ $FFD2
 GETIN   .equ $FFE4
 STOP    .equ $FFE1 ; Check for run stop, sets Z flag, then exit
 SCREENMEM   .equ 1024 ; Start of character screen map, color map is + $D400
+COLORMEM    .equ $D800
 VMEM    .equ $D000
 
 ; VICE Monitor Label File Loading: load_labels "/Users/Tony/Development/DrC64/labels.txt"
@@ -118,7 +119,7 @@ TMP1        .byte $00
 TMP2        .byte $00
 TMP3        .byte $00
 TMP4        .byte $00
-currentLvl  .byte 0
+currentLvl  .byte 2
 p1PiecesDroppedThisLvl  .byte 0
 DELAY       .byte 37
 pSideTmp1   .byte $00
@@ -148,7 +149,13 @@ init
     adc #0
     sta START_POS+1
 
+    ldy #0
+    sty SCREEN_BG_COLOR
+    lda COLOR_DARK_GREY
+    sta SCREEN_BOARDER
+
 clears
+    jsr printLevelSelectScreen
     ; Programatically create game layout
     jsr ClearScreen
 ;jsr colorScreenWithCheckers
@@ -161,9 +168,6 @@ clears
 
 
     ldy #$00
-    sty SCREEN_BG_COLOR
-    lda COLOR_DARK_GREY
-    sta SCREEN_BOARDER
 ;jsr test1
 ;jsr test2
 ;jsr test3

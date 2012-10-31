@@ -2,7 +2,9 @@ last_virus_used     .byte $00 ; keep track betwen 0 - 2
 created_viruses     .byte $00
 viruses_to_print    .byte $00
 
-
+;                     1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21
+lvlHeightMap    .byte 5, 5, 4, 4, 3,  3,  3,  2,  1,  1,  0
+tmpLvlDivVal    .byte $00
 putVirusesOnTheField ;
     lda currentLvl
     clc
@@ -26,7 +28,7 @@ printLevelWorth
     clc
     lda #OnePGameFieldLocLow ; Low byte start location
 ;    adc #161
-    adc #121
+    adc #121 ; This gives 3 rows of free space
     sta zpPtr2
     lda #OnePGameFieldLocHigh ; High byte start location
     adc #0
@@ -34,12 +36,45 @@ printLevelWorth
 
     jsr get_random_number
     and #15
-    tax
-    dex
-    dex
-    dex
+    sta tmp2
+    dec tmp2
+    dec tmp2
+    dec tmp2
+;    tax
 ;    dex
-    stx tmp2
+;    dex
+;    dex
+
+    lda currentLvl
+    lsr
+    sta tmpLvlDivVal ; used as a map index for lvlHeightMap
+    tax
+    lda lvlHeightMap, x
+    sta tmpLvlDivVal
+correctVirusHeightForLvl
+    lda tmpLvlDivVal
+    beq correctVirusHeightForLvlDone
+    dec tmpLvlDivVal
+    dec tmp2
+    clc
+    lda zpPtr2
+    adc #40
+    sta zpPtr2
+    lda zpPtr2+1
+    adc #0
+    sta zpPtr2+1
+    jmp correctVirusHeightForLvl
+correctVirusHeightForLvlDone
+
+; dex for every line lower than FieldLoc + #121
+; lvls 0-4 give 5 more line
+; lvls 5-9 give 4 more lines
+; lvls 10-14 give 3 more lines
+; lvls 14-17 give 2 more lines
+; lvls 18-19 give 1 more lines
+; lvls 20-21 give no extra space than the 3
+
+;    stx tmp2
 
 goDownLinesLoop
     lda tmp
@@ -79,7 +114,10 @@ useVirus
     pha ; pos>
     jsr isThisGoodPlaceForVirusType
     cmp #0
-    beq printLevelWorth ; Too crowded
+;    beq printLevelWorth ; Too crowded
+    bne notTooCrowded
+    jmp printLevelWorth
+notTooCrowded
 
     lda VIRUS_CHAR_LIST, x
     sta (zpPtr2),y

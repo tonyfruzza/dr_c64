@@ -13,6 +13,17 @@ d_repeatTime    .byte DOWN_REPEAT_TIME
 rotate_repeatTime   .byte $00 ; Actually there is no repeat, so using this byte to track if button is being held down
 
 
+; This will make sure all is reset back to the init state
+resetInputMovement
+    lda #LR_FIRST_MOVE_R_TIME
+    sta l_repeatTime
+    sta r_repeatTime
+    lda #0
+    sta l_firstPress
+    sta r_firstPress
+    sta rotate_repeatTime
+    rts
+
 updateJoyPos
     ldy #0 ; for clearing times if need be
     ldx JOY1 ; cache JOY1 value in x
@@ -105,14 +116,84 @@ finishJoy
     rts
 
 
+getJoystickInputForLevel ; returns 1 if button pressed to accept
+    ldx JOY1 ; cache JOY1 value in x
+; Left
+    ldy #0
+    txa
+    and #4
+    bne gjifl_LeftNotPressed
+lda currentLvl
+beq gjifl_nextJoy3
 
-; This will make sure all is reset back to the init state
-resetInputMovement
+
+    lda l_firstPress   ; 0 is true in this case
+    cmp #2
+    bcc gjifl_LeftFirstPress ; < 2 then
+
+
+    lda l_repeatTime
+lsr
+    cmp #LR_MOVE_REPEAT_TIME
+    bcc gjifl_nextJoy3
+    jmp gjifl_LeftNotFirstMove
+gjifl_LeftFirstPress
+    lda l_repeatTime
+    cmp #LR_FIRST_MOVE_R_TIME
+    bcc gjifl_nextJoy3 ; Less than LR_FIRST_MOVE?
+    inc l_firstPress
+gjifl_LeftNotFirstMove
+    sty l_repeatTime ; Reset repeat time back to 0
+dec currentLvl
+    ;jsr MoveLeftOne
+    jmp gjifl_nextJoy3
+gjifl_LeftNotPressed
     lda #LR_FIRST_MOVE_R_TIME
     sta l_repeatTime
-    sta r_repeatTime
-    lda #0
-    sta l_firstPress
-    sta r_firstPress
-    sta rotate_repeatTime
+    sty l_firstPress ; Reset first press to 0
+
+gjifl_nextJoy3 ; Right
+    ldy #0
+    txa
+    and #8
+    bne gjifl_RightNotPressed
+lda currentLvl
+cmp #21
+beq gjifl_nextJoy4
+
+
+    lda r_firstPress
+    cmp #2
+    bcc gjifl_RightFirstPress ; < 2 then
+    lda r_repeatTime
+lsr
+    cmp #LR_MOVE_REPEAT_TIME
+    bcc gjifl_nextJoy4
+    jmp gjifl_RightNotFirstMove
+gjifl_RightFirstPress
+    lda r_repeatTime
+    cmp #LR_FIRST_MOVE_R_TIME
+    bcc gjifl_nextJoy4
+    inc r_firstPress
+gjifl_RightNotFirstMove
+    sty r_repeatTime
+inc currentLvl
+    ;;jsr MoveRightOne
+    jmp gjifl_nextJoy4
+gjifl_RightNotPressed
+    lda #LR_FIRST_MOVE_R_TIME
+    sta r_repeatTime ; allow the key to be pressed again immediately after being picked up
+    sty r_firstPress
+
+gjifl_nextJoy4
+    ldy #0
+    txa
+    and #16 ; Button push
+    bne gjifl_ButtonNotPressed
+    lda #1
     rts
+gjifl_ButtonNotPressed
+    sty rotate_repeatTime
+    lda #0
+    rts
+
