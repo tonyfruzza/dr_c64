@@ -151,6 +151,7 @@ init
 clears
     ; Programatically create game layout
     jsr ClearScreen
+;jsr colorScreenWithCheckers
     jsr DrawGameBoarder
     jsr printSinglePlayerNextPieceBox
     jsr printSinglePlayerScoreBox
@@ -167,7 +168,7 @@ clears
 ;jsr test2
 ;jsr test3
 ;jsr test4
-;jsr test5
+;jsr test6
 
     jsr FieldSearch ; Tally up the virus count, so it can be printed
     jsr printCurrentScore
@@ -245,6 +246,7 @@ MoveDownForced
     jsr ZeroCountAndMoveDown
     jmp GameLoop
 NextLevel
+    jsr updateScore
     inc currentLvl
     jmp printMsg
 EndGame
@@ -253,6 +255,7 @@ EndGame
     sta P1_SCORE_B+1
     sta P1_SCORE_B+2
     sta P1_SCORE_B+3
+;    lda #21 ; testing
     sta currentLvl
     jmp printMsg
 
@@ -896,6 +899,8 @@ lookLeft
             beq ll_piece
             cmp #VIRUS_THREE
             beq ll_piece
+            cmp #PILL_CLEAR_1
+            beq ll_piece
             jmp lookLeftComplete
             ll_piece
             clc
@@ -948,6 +953,9 @@ lookRight
             beq lr_piece
             cmp #VIRUS_THREE
             beq lr_piece
+            cmp #PILL_CLEAR_1
+            beq lr_piece
+
 
             jmp lookRightDone
             lr_piece
@@ -998,6 +1006,9 @@ lookUp ; start at the top and work my way down
             beq lu_piece
             cmp #VIRUS_THREE
             beq lu_piece
+            cmp #PILL_CLEAR_1
+            beq lu_piece
+
 
             jmp lookUpComplete
             lu_piece
@@ -1053,6 +1064,9 @@ lookDown
     beq ld_piece
     cmp #VIRUS_THREE
     beq ld_piece
+    cmp #PILL_CLEAR_1
+    beq ld_piece
+
 
     jmp lookDownDone
 ld_piece
@@ -1359,6 +1373,8 @@ anyConnectInnerLoop
         beq lfac4_piece
         cmp #PILL_BOTTOM
         beq lfac4_piece
+        cmp #PILL_CLEAR_1
+        beq lfac4_piece
         jmp nextConnectAnyRow
 lfac4_piece
         lda zpPtr4
@@ -1427,7 +1443,7 @@ fs_dropOuterLoop
     adc zpPtr1+1
     sta zpPtr1+1
     sta zpPtr2+1
-    lda #$10 ; $0f wasn't enough
+    lda #$11 ; $0f wasn't enough
     sta fs_innerLoopIdx ; reset inner loop index
 
 fs_dropInnerLoop

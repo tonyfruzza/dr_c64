@@ -101,7 +101,7 @@ dbbDone
 
 ;
 ; Print Message subrutine string ending in 0
-printMsgSub ; void (ret>, ret<, txt>, txt<, pos>, pos<)
+printMsgSub ; void (ret>, ret<, color, txt>, txt<, pos>, pos<)
     pla
     sta ret1+1
     pla
@@ -112,10 +112,15 @@ printMsgSub ; void (ret>, ret<, txt>, txt<, pos>, pos<)
     pla
     sta zpPtr2
 
+;    pla
+;    txa ; stash color here
+
     pla
     sta zpPtr1+1 ; txt data
+;    sta tmp+1
     pla
     sta zpPtr1
+;    sta tmp
 
     lda ret1
     pha

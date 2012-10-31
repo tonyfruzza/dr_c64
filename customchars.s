@@ -33,6 +33,7 @@ MoveCharMap
     CLEAR_TWO   .byte 124, 198, 130, 130, 130, 198, 124, 0
 
     BKGRD_CHAR  .byte 240, 240, 240, 240, 15, 15, 15, 15
+;    BKGRD_CHAR  .byte 0, 0, 0, 0, 0, 0, 0, 0
     BKGRD_CHAR2 .byte 135, 120, 120, 120, 120, 135, 135, 135
     BKGRD_CHAR3 .byte 195, 195, 60, 60, 60, 60, 195, 195
     BKGRD_CHAR4 .byte 225, 225, 225, 30, 30, 30, 30, 225

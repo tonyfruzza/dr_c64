@@ -130,7 +130,58 @@ test4 ; not doing well at clearing more than 2 viruses at a time with scoring
    sta (zpPtr2),y
     iny
    sta (zpPtr2),y
-iny
-iny
-sta (zpPtr2),y
+    iny
+    iny
+    sta (zpPtr2),y
     rts
+
+test5 ; clearing a + sign of stuff
+    lda #OnePGameFieldLocLow
+    clc
+    adc #$a4
+    sta zpPtr2
+
+    lda #OnePGameFieldLocHigh
+    adc #$00
+    sta zpPtr2+1
+
+    lda #VIRUS_ONE
+    sta (zpPtr2),y
+
+ldy #40
+lda #VIRUS_ONE
+sta (zpPtr2),y
+ldy #78
+lda #VIRUS_ONE
+sta (zpPtr2),y
+iny
+lda #VIRUS_ONE
+sta (zpPtr2),y
+iny
+lda #VIRUS_ONE
+sta (zpPtr2),y
+iny
+lda #VIRUS_ONE
+sta (zpPtr2),y
+ldy #120
+lda #VIRUS_ONE
+sta (zpPtr2),y
+ldy #160
+lda #VIRUS_ONE
+sta (zpPtr2),y
+rts
+
+test6 ; Not clearing half way clears that end up at the top of the screen
+lda #OnePGameFieldLocLow
+sec
+sbc #39
+sta zpPtr2
+
+lda #OnePGameFieldLocHigh
+sbc #$00
+sta zpPtr2+1
+
+lda #PILL_CLEAR_1
+sta (zpPtr2),y
+rts
+

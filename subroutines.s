@@ -6,18 +6,74 @@
 ; get_random_number     ; a ()
 
 ClearScreen ; void ()
-            stx retx
-            LDX #$00
-lda #127
-;            LDA #" " ; Space
-            Clearing    STA SCREENMEM, X
-            STA SCREENMEM + $100, x
-            STA SCREENMEM + $200, x
-            STA SCREENMEM + $300, x
-            INX
-            BNE Clearing;
-            ldx retx
-            RTS
+    stx retx
+    LDX #$00
+    lda #127
+
+Clearing
+    STA SCREENMEM, X
+    STA SCREENMEM + $100, x
+    STA SCREENMEM + $200, x
+    STA SCREENMEM + $300, x
+    INX
+    BNE Clearing;
+    ldx retx
+    RTS
+
+colorScreenWithCheckers
+    lda #0
+    sta tmp1
+    lda #$c0
+    sta zpPtr1
+    lda #$07
+    sta zpPtr1+1
+
+    clc
+    lda zpPtr1+1
+    adc #$d4
+    sta zpPtr1+1
+
+    ldx #24
+    ldy #40
+rowClearLoop
+    lda #COLOR_YELLOW
+    sta (zpPtr1),y
+    dey
+    beq next_cswc_Row
+    dey
+    beq next_cswc_Row
+    jmp rowClearLoop
+next_cswc_Row
+    dex
+    beq cswc_done
+    ldy #40
+    sec
+    lda zpPtr1
+    sbc #40
+    sta zpPtr1
+    lda zpPtr1+1
+    sbc #0
+    sta zpPtr1+1
+
+;    lda #1
+;    eor tmp1
+;    sta tmp1
+lda tmp1
+eor #1
+sta tmp1
+
+
+    tya
+    sec
+    sbc #1
+    tay
+
+    jmp rowClearLoop
+cswc_done
+rts
+
+
+
 
 get_random_number ; reg a ()
             lda $d012 ; load current screen raster value
@@ -41,7 +97,6 @@ disableKeyboardRepeat
 ; converts 10 digits (32 bit values have max. 10 decimal digits)
 ; Using a byte per digit hrm...
 convertP1ScoreToDecimal
-
 ldx #0
 l3
 jsr div10
