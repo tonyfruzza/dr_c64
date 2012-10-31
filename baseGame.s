@@ -191,6 +191,7 @@ DropNew
     ; Loop through every piece to see if they can be cleared
     jsr lookForAnyConnect4s
     jsr FieldSearch
+    jsr ClearTopLine
     jsr UpdateVirusCount
     lda p1VirusCount
     beq NextLevel ; disable for debugging

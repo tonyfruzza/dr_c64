@@ -1,13 +1,9 @@
 ;OnePGameFieldLocLow   .equ $0f
 ;OnePGameFieldLocHigh  .equ $04
 
-; Draw game board using char 230 as the boarder
-DrawGameBoarder
-    lda #$00 ; Our counter
-    tax
-    tay
-    sta TMP1 ; used to count how many viruses we've printed
 
+
+ClearTopLine
     sec
     lda #OnePGameFieldLocLow ; Low byte start location
     sbc #40
@@ -22,9 +18,20 @@ ClearTopLineLoop
     sta (zpPtr2),y
     iny
     cpy #10
-    beq dgb_start
+    beq ctl_done
     jmp ClearTopLineLoop
+ctl_done
+    rts
 
+
+; Draw game board using char 230 as the boarder
+DrawGameBoarder
+    lda #$00 ; Our counter
+    tax
+    tay
+    sta TMP1 ; used to count how many viruses we've printed
+
+    jsr ClearTopLine
 dgb_start
     ldy #$00
 
