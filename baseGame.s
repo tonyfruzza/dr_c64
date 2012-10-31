@@ -85,6 +85,7 @@ MSG_NEXT    .byte 14,5,24,20,0
 MSG_VIRUS   .byte 22,9,18,21,19,0
 MSG_SCORE   .byte 19, 3, 15, 18, 5, 0
 MSG_LEVEL   .byte 12,5,22,5,12,0
+MSG_CLEAR   .byte 3,12,5,1,18,33,0
 ORGBOARDER  .byte $00
 ORGBGRND    .byte $00
 ORIENTATION .byte $00 ; 0 = 12, 1 = 1
@@ -119,7 +120,7 @@ TMP1        .byte $00
 TMP2        .byte $00
 TMP3        .byte $00
 TMP4        .byte $00
-currentLvl  .byte 2
+currentLvl  .byte 0
 p1PiecesDroppedThisLvl  .byte 0
 DELAY       .byte 37
 pSideTmp1   .byte $00
@@ -153,9 +154,10 @@ init
     sty SCREEN_BG_COLOR
     lda COLOR_DARK_GREY
     sta SCREEN_BOARDER
-
-clears
+levelScreen
     jsr printLevelSelectScreen
+clears
+
     ; Programatically create game layout
     jsr ClearScreen
 ;jsr colorScreenWithCheckers
@@ -252,7 +254,29 @@ MoveDownForced
 NextLevel
     jsr updateScore
     inc currentLvl
-    jmp printMsg
+    lda #<MSG_CLEAR
+    pha
+    lda #>MSG_CLEAR
+    pha
+
+    lda #$51
+    pha
+    lda #$05
+    pha
+    jsr printMsgSub
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+    jsr WaitEventFrame
+
+    jmp clears
+
 EndGame
     lda #0
     sta P1_SCORE_B
@@ -260,7 +284,7 @@ EndGame
     sta P1_SCORE_B+2
     sta P1_SCORE_B+3
 ;    lda #21 ; testing
-    sta currentLvl
+;    sta currentLvl
     jmp printMsg
 
 
@@ -842,7 +866,7 @@ printComplete
             jsr WaitEventFrame
             jsr WaitEventFrame
 RestartGame
-            jmp clears
+            jmp levelScreen
 
 
 

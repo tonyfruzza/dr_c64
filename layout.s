@@ -127,11 +127,11 @@ printSinglePlayerLevelBox
 
 ; Virus count box and and message
 printSinglePlayerVirusCountBox
-    lda #8 ; Width
+    lda #10 ; Width
     pha
     lda #2 ; Height
     pha
-    lda #$1b
+    lda #$1a
     pha
     lda #$05
     pha
@@ -176,12 +176,12 @@ printSinglePlayerScoreBox
     rts
 
 printSinglePlayerNextPieceBox
-    lda #5 ; width
+    lda #10 ; width
     pha
     lda #2 ; height
     pha
 
-    lda #$2c
+    lda #$2a
     pha
     lda #$04
     pha
@@ -195,19 +195,19 @@ printSinglePlayerNextPieceBox
     lda #>MSG_NEXT
     pha
 
-    lda #$55
+    lda #$56
     pha
     lda #$04
     pha
     jsr printMsgSub
 
     ; Set up the position of the "next" pill colors
-    lda #$7E
+    lda #$7f
     sta piece1_next
     lda #$04
     sta piece1_next+1
 
-    lda #$7F
+    lda #$80
     sta piece2_next
     lda #$04
     sta piece2_next+1

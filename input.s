@@ -33,7 +33,7 @@ updateJoyPos
     ; do something for up?
 
 nextJoy1
-    txa ; transfer
+    txa ; Cache joystick input values
     and #2 ; Down
     bne nextJoy2
     lda d_repeatTime
@@ -158,7 +158,7 @@ gjifl_nextJoy3 ; Right
     and #8
     bne gjifl_RightNotPressed
 lda currentLvl
-cmp #21
+cmp #20
 beq gjifl_nextJoy4
 
 

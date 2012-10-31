@@ -16,8 +16,12 @@ dbb_start
     sta ret1
     pla
     sta zpPtr2+1
+    clc
+    adc #$d4
+    sta zpPtr1+1
     pla
     sta zpPtr2
+    sta zpPtr1
     pla
     sta dbb_height
     pla
@@ -33,6 +37,8 @@ dbb_start
 ldy #0
 lda #WALL_CHAR_TLFT
 sta (zpPtr2),y
+lda #COLOR_GREY
+sta (zpPtr1),y
 
 dbb_DrawTop
     iny
@@ -53,6 +59,15 @@ lda #0
 adc zpPtr2+1
 sta zpPtr2+1
 
+clc
+lda #40
+adc zpPtr1
+sta zpPtr1
+lda #0
+adc zpPtr1+1
+sta zpPtr1+1
+
+
 dbbLoop
     ldy #00
     lda #WALL_SIDES
@@ -65,6 +80,8 @@ dbbLoop
 dbb_clearGameField
     lda #' '
     sta (zpPtr2),y
+    lda #COLOR_WHITE
+    sta (zpPtr1),y
 
     iny
     cpy dbb_width
@@ -77,6 +94,15 @@ dbb_clearGameField
     lda zpPtr2+1
     adc #0
     sta zpPtr2+1
+
+clc
+lda zpPtr1
+adc #40
+sta zpPtr1
+lda zpPtr1+1
+adc #0
+sta zpPtr1+1
+
 
     inx
     cpx dbb_height
@@ -109,8 +135,12 @@ printMsgSub ; void (ret>, ret<, color, txt>, txt<, pos>, pos<)
 
     pla
     sta zpPtr2+1 ; screen pos
+    clc
+    adc #$d4
+    sta zpPtr3+1
     pla
     sta zpPtr2
+    sta zpPtr3
 
 ;    pla
 ;    txa ; stash color here
@@ -132,6 +162,8 @@ printLoopSub
     lda (zpPtr1), y
     beq printCompleteSub
     sta (zpPtr2), y
+    lda #COLOR_L_GREY
+    sta (zpPtr3),y
     iny
     jmp printLoopSub
 printCompleteSub

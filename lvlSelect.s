@@ -9,11 +9,11 @@ printLevelSelectScreen
     jsr ClearScreen
 
     ; Print Level box and message
-    lda #27 ; Width
+    lda #26 ; Width
     pha
     lda #1 ; Height
     pha
-    lda #$1d ; low byte upper left corner
+    lda #$1e ; low byte upper left corner
     pha
     lda #$05 ; high byte upper left corner
     pha
@@ -24,7 +24,7 @@ printLevelSelectScreen
     lda #>MSG_CHOOSE_LVL
     pha
 
-    lda #$46
+    lda #$47
     pha
     lda #$05
     pha
@@ -74,4 +74,13 @@ utlwhs_print
     ora #$30
     iny
     sta (zpPtr1),y
+
+clc
+lda #$d4
+adc zpPtr1+1
+sta zpPtr1+1
+lda #COLOR_WHITE
+sta (zpPtr1),y
+dey
+sta (zpPtr1),y
     rts

@@ -17,7 +17,7 @@ Clearing
     STA SCREENMEM + $100, x
     STA SCREENMEM + $200, x
     STA SCREENMEM + $300, x
-    lda #COLOR_L_GREY
+    lda #COLOR_DARK_GREY
     sta COLORMEM, x
     sta COLORMEM + $100, x
     sta COLORMEM + $200, x
