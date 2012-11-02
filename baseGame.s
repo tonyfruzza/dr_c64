@@ -152,8 +152,7 @@ init
 
     ldy #0
     sty SCREEN_BG_COLOR
-    lda COLOR_DARK_GREY
-    sta SCREEN_BOARDER
+    sty SCREEN_BOARDER
 levelScreen
     jsr printLevelSelectScreen
 clears
@@ -203,6 +202,7 @@ DropNew
     lda p1PiecesDroppedThisLvl
     cmp #10
     bne firstPieceToDrop
+    dec DELAY
     dec DELAY
     lda #0
     sta p1PiecesDroppedThisLvl
