@@ -76,6 +76,8 @@ zpPtr4          .equ $b8
 piece1_next     .equ $bc
 piece2_next     .equ $be
 
+zpPtr5          .equ $c0
+
 
 jmp init
 
@@ -165,7 +167,7 @@ clears
     jsr printSinglePlayerScoreBox
     jsr printSinglePlayerVirusCountBox
     jsr printSinglePlayerLevelBox
-    jsr putVirusesOnTheField
+;    jsr putVirusesOnTheField
 
 
     ldy #$00
@@ -174,6 +176,7 @@ clears
 ;jsr test3
 ;jsr test4
 ;jsr test6
+
 
     jsr FieldSearch ; Tally up the virus count, so it can be printed
     jsr printCurrentScore
@@ -238,6 +241,7 @@ firstPieceToDrop
     lda #00
     sta refreshCount ; refreshCount is at an unknown # after the drops, reset it
     jsr resetInputMovement
+jsr test7
 
 
 ;the main game loop
@@ -872,260 +876,6 @@ RestartGame
 
 
 
-lookForConnect4c ; varray (return>, return<, piece>, piece<)
-jmp lfc4_start
-            lfc4_ret    .byte $00, $00
-            lfc4_y      .byte $00
-lfc4_start
-            sty lfc4_y
-            pla
-            sta lfc4_ret+1
-            pla
-            sta lfc4_ret
-            pla
-            sta tmp+1 ; piece >
-            pla
-            sta tmp   ; piece <
-            jsr initClearArrays
-
-; Get color of this possition and store it CMPCOLOR
-            clc
-            lda tmp+1
-            adc #$D4
-            sta zpPtr3+1
-            lda tmp
-            sta zpPtr3
-            ldy #$00
-            lda(zpPtr3),y
-            and #$0f
-            sta CMPCOLOR
-
-
-; Look for horizontal block to clear
-lookLeft
-            sec ; set carry for subtraction
-            lda tmp ; piece <
-            sbc #$01 ; look to the left
-            sta zpPtr2
-            lda tmp+1
-            sbc #$00 ; piece >
-            sta zpPtr2+1
-            ldy #$00 ; zp index offset
-            lda (zpPtr2), y
-            cmp #PILL_SIDE
-            beq ll_piece
-            cmp #PILL_LEFT
-            beq ll_piece
-            cmp #PILL_RIGHT
-            beq ll_piece
-            cmp #PILL_TOP
-            beq ll_piece
-            cmp #PILL_BOTTOM
-            beq ll_piece
-            cmp #VIRUS_ONE
-            beq ll_piece
-            cmp #VIRUS_TWO
-            beq ll_piece
-            cmp #VIRUS_THREE
-            beq ll_piece
-            cmp #PILL_CLEAR_1
-            beq ll_piece
-            jmp lookLeftComplete
-            ll_piece
-            clc
-            lda zpPtr2 ; get color of piece to left to see if it matches
-            sta zpPtr3
-            lda #$D4
-            adc zpPtr2+1
-            sta zpPtr3+1
-            lda (zpPtr3),y
-            and #$0f
-            cmp CMPCOLOR
-            bne lookLeftComplete
-            ; Piece to left is the same color and type
-            lda zpPtr2
-            sta tmp
-            lda zpPtr2+1
-            sta tmp+1
-            jmp lookLeft
-lookLeftComplete
-            lda tmp
-            sta zpPtr2
-            pha
-            lda tmp+1
-            sta zpPtr2+1
-            pha
-            jsr pushOntoHarray
-lookRight
-            clc
-            lda #$01
-            adc zpPtr2
-            sta zpPtr2
-            lda #$00
-            tay ; init y index to 0
-            adc zpPtr2+1
-            sta zpPtr2+1
-            lda (zpPtr2), y
-            cmp #PILL_SIDE
-            beq lr_piece
-            cmp #PILL_LEFT
-            beq lr_piece
-            cmp #PILL_RIGHT
-            beq lr_piece
-            cmp #PILL_TOP
-            beq lr_piece
-            cmp #PILL_BOTTOM
-            beq lr_piece
-            cmp #VIRUS_ONE
-            beq lr_piece
-            cmp #VIRUS_TWO
-            beq lr_piece
-            cmp #VIRUS_THREE
-            beq lr_piece
-            cmp #PILL_CLEAR_1
-            beq lr_piece
-
-
-            jmp lookRightDone
-            lr_piece
-            clc
-            lda zpPtr2
-            sta zpPtr3
-            lda #$D4
-            adc zpPtr2+1
-            sta zpPtr3+1
-            lda (zpPtr3),y
-            and #$0f
-            cmp CMPCOLOR
-            bne lookRightDone
-            lda zpPtr2
-            pha
-            lda zpPtr2+1
-            pha
-            jsr pushOntoHarray ; void (ret2, ret1, addy2, addy1)
-            inc CONNECTCNT
-            jmp lookRight ; loop until we've counted them all
-lookRightDone
-
-
-; Look for vertical blocks to clear
-lookUp ; start at the top and work my way down
-            sec
-            lda tmp ; piece
-            sbc #40
-            sta zpPtr2
-            lda tmp+1
-            sbc #$00
-            sta zpPtr2+1
-            ldy #$00 ; index offset for zp load
-            lda (zpPtr2),y
-            cmp #PILL_SIDE
-            beq lu_piece
-            cmp #PILL_LEFT
-            beq lu_piece
-            cmp #PILL_RIGHT
-            beq lu_piece
-            cmp #PILL_TOP
-            beq lu_piece
-            cmp #PILL_BOTTOM
-            beq lu_piece
-            cmp #VIRUS_ONE
-            beq lu_piece
-            cmp #VIRUS_TWO
-            beq lu_piece
-            cmp #VIRUS_THREE
-            beq lu_piece
-            cmp #PILL_CLEAR_1
-            beq lu_piece
-
-
-            jmp lookUpComplete
-            lu_piece
-            clc
-            lda zpPtr2 ; load back in low byte
-            sta zpPtr3 ; and copy it over to the color place
-            lda #$D4
-            adc zpPtr2+1
-            sta zpPtr3+1
-            lda (zpPtr3),y
-            and #$0f
-            cmp CMPCOLOR
-            bne lookUpComplete
-            ; Piece is the same color, and type
-            lda zpPtr2
-            sta tmp ; make it the active top piece
-            lda zpPtr2+1
-            sta tmp+1
-            jmp lookUp
-lookUpComplete
-            lda tmp
-            sta zpPtr2
-            pha
-            lda tmp+1
-            sta zpPtr2+1
-            pha
-            jsr pushOntoVarray
-
-lookDown
-    clc ; Look for a piece below
-    lda #40
-    adc zpPtr2
-    sta zpPtr2
-    lda #$00
-    adc zpPtr2+1
-    sta zpPtr2+1
-    ldy #$00
-    lda (zpPtr2), y
-
-    cmp #PILL_SIDE
-    beq ld_piece
-    cmp #PILL_LEFT
-    beq ld_piece
-    cmp #PILL_RIGHT
-    beq ld_piece
-    cmp #PILL_TOP
-    beq ld_piece
-    cmp #PILL_BOTTOM
-    beq ld_piece
-    cmp #VIRUS_ONE
-    beq ld_piece
-    cmp #VIRUS_TWO
-    beq ld_piece
-    cmp #VIRUS_THREE
-    beq ld_piece
-    cmp #PILL_CLEAR_1
-    beq ld_piece
-
-
-    jmp lookDownDone
-ld_piece
-    clc ; Now look for color
-    lda zpPtr2
-    sta zpPtr3
-    lda #$D4
-    adc zpPtr2+1
-    sta zpPtr3+1
-    lda (zpPtr3), y
-    and #$0f ; mask out the top part of the byte, it could be garbage
-    cmp CMPCOLOR
-    bne lookDownDone
-    ; put this piece onto the array
-    lda zpPtr2 ; Store away low byte
-    pha
-    lda zpPtr2+1 ; Store away high byte onto stack
-    pha
-    jsr pushOntoVarray ; void (ret2, ret1, addy2, addy1)
-    inc CONNECTCNT
-    jmp lookDown ; loop until we've counted them all
-lookDownDone
-    jsr clearPiecesInArray
-    ; put back return address onto stack
-    ldy lfc4_y
-    lda lfc4_ret
-    pha
-    lda lfc4_ret+1
-    pha
-    rts
 
 
 ; Push 16 bit value onto varray
@@ -1353,187 +1103,8 @@ clearArraysDone
 
 
 
-;
-; Loop through the entire playing field and find connect 4's
-;
-lookForAnyConnect4s
-        ldy #$00
-        sty TMP1 ; used as a screen y offset, 0 - 15
-        sty tmp2 ; used as a screen x offset, 0 - 7
-        lda #OnePGameFieldLocLow ; start <
-;        lda #$0f
-        sta zpPtr1
-        lda #OnePGameFieldLocHigh ; start >
-;        lda #$04
-        sta zpPtr1+1
-connectsOuterLoop
-        lda tmp2 ; what's the current x offset?
-        cmp #8
-        beq anyConnectDone
-        clc
-        lda zpPtr1
-        adc #$01
-        sta zpPtr1
-        sta zpPtr4
-        lda #$00
-        sta tmp1 ; reset inner loop
-        adc zpPtr1+1
-        sta zpPtr1+1
-        sta zpPtr4+1
-anyConnectInnerLoop
-        lda tmp1  ; y offset
-        cmp #16
-        beq anyConnectInnerLoopDone
-        lda (zpPtr4),y
-        ; Tried writing this as a subroutine, it's corrupting the stack though :-(
-        cmp #VIRUS_ONE
-        beq lfac4_piece
-        cmp #VIRUS_TWO
-        beq lfac4_piece
-        cmp #VIRUS_THREE
-        beq lfac4_piece
-        cmp #PILL_SIDE
-        beq lfac4_piece
-        cmp #PILL_LEFT
-        beq lfac4_piece
-        cmp #PILL_RIGHT
-        beq lfac4_piece
-        cmp #PILL_TOP
-        beq lfac4_piece
-        cmp #PILL_BOTTOM
-        beq lfac4_piece
-        cmp #PILL_CLEAR_1
-        beq lfac4_piece
-        jmp nextConnectAnyRow
-lfac4_piece
-        lda zpPtr4
-        pha
-        lda zpPtr4+1
-        pha
-        jsr lookForConnect4c
-nextConnectAnyRow
-        inc tmp1
-        clc
-        lda zpPtr4
-        adc #40
-        sta zpPtr4
-        lda #$00
-        adc zpPtr4+1
-        sta zpPtr4+1
-        jmp anyConnectInnerLoop
-anyConnectInnerLoopDone
-        inc tmp2
-        jmp connectsOuterLoop
-anyConnectDone
-        rts
 
 
-FieldSearch
-    jmp fs_start
-    fs_outLoopIdx   .byte $00
-    fs_innerLoopIdx .byte $0f
-    fs_didWorkThisLoop  .byte $00
-    fs_didWorkReturn    .byte $00
-fs_start
-    lda #$00
-    sta fs_didWorkReturn ; to be returned as the count of drops that occured
-fs_Continue ; a = void()
-    lda #$10 ; #0f wasn't enough
-    sta fs_innerLoopIdx  ; used as screen y offset, 0 - 15
-    ldy #$00
-    sty fs_didWorkThisLoop      ; used to keep track if anything dropped, shared with dropDownIfYouCan
-    sty fs_outLoopIdx   ; used as screen x index 0 - 7
-    sty p1VirusCount ; reset our virus count for player one
-    sty p1VirusCountBinNew
-
-
-; Bottom left pos is +$0280 from top left game field
-; In bottom left wall corner
-clc
-lda #OnePGameFieldLocLow
-adc #$80
-sta zpPtr1
-lda #OnePGameFieldLocHigh
-adc #$02
-sta zpPtr1+1
-
-fs_dropOuterLoop
-    lda fs_outLoopIdx
-    cmp #8
-    beq fs_done
-
-    ; Move one right
-    clc
-    lda zpPtr1
-    adc #$01
-    sta zpPtr1
-    sta zpPtr2
-    lda #$00
-    adc zpPtr1+1
-    sta zpPtr1+1
-    sta zpPtr2+1
-    lda #$11 ; $0f wasn't enough
-    sta fs_innerLoopIdx ; reset inner loop index
-
-fs_dropInnerLoop
-    lda fs_innerLoopIdx
-    beq fs_dropInnerLoopComplete
-    sec
-    lda zpPtr2
-    sbc #40
-    sta zpPtr2
-    lda zpPtr2+1
-    sbc #$00
-    sta zpPtr2+1
-    lda (zpPtr2),y
-
-    ; Look for viruses for total
-    cmp #VIRUS_ONE
-    beq itIsAVirus
-    cmp #VIRUS_TWO
-    beq itIsAVirus
-    cmp #VIRUS_THREE
-    bne notAVirus
-itIsAVirus
-    ; It is a virus
-    sed ; go into decimal mode
-    clc
-    lda #1
-    adc p1VirusCount
-    sta p1VirusCount
-    cld ; back to binary math
-    inc p1VirusCountBinNew
-    lda (zpPtr2),y ; reload in what we are comparing
-notAVirus
-    cmp #PILL_CLEAR_1
-    bne fs_nextCharType
-    inc fs_didWorkThisLoop
-; This is where we'd sleep before
-    lda #PILL_CLEAR_2
-    sta (zpPtr2),y
-    jmp fs_nextRow
-
-fs_nextCharType
-    cmp #PILL_CLEAR_2
-    bne fs_nextRow
-    inc fs_didWorkReturn
-    lda #' '
-    sta (zpPtr2),y
-fs_nextRow
-    dec fs_innerLoopIdx
-    jmp fs_dropInnerLoop
-fs_dropInnerLoopComplete
-    inc fs_outLoopIdx
-    jmp fs_dropOuterLoop
-fs_done
-    lda fs_didWorkThisLoop
-    beq fs_reallyDone
-fs_doMoreWork
-    jsr WaitEventFrame ; Wait between clearing animation
-    jmp fs_Continue ; if there were any dropped this last time, see if there were any left
-fs_reallyDone
-    lda fs_didWorkReturn
-rts
 
 UpdateVirusCount
     ldy #0

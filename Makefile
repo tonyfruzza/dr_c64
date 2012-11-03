@@ -1,5 +1,5 @@
 all:
-	cat baseGame.s subroutines.s customchars.s refreshCounter.s testScenarios.s input.s drawBox.s layout.s drops.s virusLevels.s lvlSelect.s> baseGameCombine.s
+	cat baseGame.s subroutines.s customchars.s refreshCounter.s testScenarios.s input.s drawBox.s layout.s drops.s virusLevels.s lvlSelect.s search.s lookForConnect4.s> baseGameCombine.s
 	/usr/local/bin/mac2c64 -r baseGameCombine.s
 	mv baseGameCombine.rw drc64.prg
 	@./createLabels.sh baseGameCombine.s
@@ -22,3 +22,6 @@ interrupts:
 	/usr/local/bin/mac2c64 -r interrupt.s
 	mv interrupt.rw interrupt.prg
 
+cia:
+	/usr/local/bin/mac2c64 -r ciaTimer.s
+	mv ciaTimer.rw ciaTimer.prg

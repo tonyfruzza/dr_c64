@@ -11,6 +11,9 @@
 		EA286E85160BE57E00C4A9B2 /* example.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.prg; path = ../../ISOs/example.prg; sourceTree = "<group>"; };
 		EA286E86160C24F600C4A9B2 /* lightspeed.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = lightspeed.s; sourceTree = "<group>"; };
 		EA286E88160C486D00C4A9B2 /* flicker.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = flicker.prg; path = ../../ISOs/flicker.prg; sourceTree = "<group>"; };
+		EA859D0F164361F40016FB33 /* ciaTimer.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = ciaTimer.s; sourceTree = "<group>"; };
+		EA859D7D1644E83F0016FB33 /* lookForConnect4.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lookForConnect4.s; sourceTree = "<group>"; };
+		EA859D7F1644EAEA0016FB33 /* search.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = search.s; sourceTree = "<group>"; };
 		EA8B35BC1639598400C1059B /* testScenarios.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = testScenarios.s; sourceTree = "<group>"; };
 		EA8B35EB163A971000C1059B /* input.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = input.s; sourceTree = "<group>"; };
 		EA8D86DC162696C40003415E /* subroutines.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = subroutines.s; sourceTree = "<group>"; };
@@ -33,6 +36,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		EA859D801644EB310016FB33 /* Clearing */ = {
+			isa = PBXGroup;
+			children = (
+				EA859D7F1644EAEA0016FB33 /* search.s */,
+				EA859D7D1644E83F0016FB33 /* lookForConnect4.s */,
+			);
+			name = Clearing;
+			sourceTree = "<group>";
+		};
 		EA8D86F6162FE6CB0003415E /* experiements */ = {
 			isa = PBXGroup;
 			children = (
@@ -52,6 +64,8 @@
 			children = (
 				EABC8DE215CA2145006F2067 /* Makefile */,
 				EAB47DD0155219BF00516343 /* baseGame.s */,
+				EA859D801644EB310016FB33 /* Clearing */,
+				EA859D0F164361F40016FB33 /* ciaTimer.s */,
 				EA8DD138163EA5C000D3D0E5 /* virusLevels.s */,
 				EA8DD13916412F0300D3D0E5 /* lvlSelect.s */,
 				EA8DD136163D3ED400D3D0E5 /* drops.s */,

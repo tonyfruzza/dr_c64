@@ -172,16 +172,50 @@ sta (zpPtr2),y
 rts
 
 test6 ; Not clearing half way clears that end up at the top of the screen
-lda #OnePGameFieldLocLow
-sec
-sbc #39
-sta zpPtr2
+    lda #OnePGameFieldLocLow
+    sec
+    sbc #39
+    sta zpPtr2
 
+    lda #OnePGameFieldLocHigh
+    sbc #$00
+    sta zpPtr2+1
+
+    lda #PILL_CLEAR_1
+    sta (zpPtr2),y
+    rts
+
+test7 ; basic clearing not always happening here, not sure wth is up with this one
+lda #OnePGameFieldLocLow
+clc
+adc #$e4
+sta zpPtr2
 lda #OnePGameFieldLocHigh
-sbc #$00
+adc #$01
 sta zpPtr2+1
 
-lda #PILL_CLEAR_1
+ldy #40
+lda #PILL_SIDE
 sta (zpPtr2),y
-rts
+iny
+sta (zpPtr2),y
+ldy #80
+sta (zpPtr2),y
+iny
+sta (zpPtr2),y
+ldy #120
+sta (zpPtr2),y
+iny
+sta (zpPtr2),y
 
+iny
+lda #VIRUS_ONE
+sta (zpPtr2),y
+
+
+lda #COLOR_DARK_GREY
+sta PRICOLOR
+sta SECCOLOR
+jsr RepaintCurrentColor
+
+rts
