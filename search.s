@@ -25,8 +25,6 @@ sta tmp1 ; reset inner loop
 adc zpPtr1+1
 sta zpPtr1+1
 sta zpPtr4+1
-; Debug
-jsr WaitEventFrame
 anyConnectInnerLoop
 lda tmp1  ; y offset
 cmp #16
@@ -53,9 +51,6 @@ cmp #PILL_CLEAR_1
 beq lfac4_piece
 jmp nextConnectAnyRow
 lfac4_piece
-; Debug
-lda #0
-sta (zpPtr4),y
 lda zpPtr4
 pha
 lda zpPtr4+1

@@ -167,7 +167,7 @@ clears
     jsr printSinglePlayerScoreBox
     jsr printSinglePlayerVirusCountBox
     jsr printSinglePlayerLevelBox
-;    jsr putVirusesOnTheField
+    jsr putVirusesOnTheField
 
 
     ldy #$00
@@ -241,7 +241,7 @@ firstPieceToDrop
     lda #00
     sta refreshCount ; refreshCount is at an unknown # after the drops, reset it
     jsr resetInputMovement
-jsr test7
+;jsr test7
 
 
 ;the main game loop

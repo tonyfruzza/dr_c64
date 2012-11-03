@@ -119,14 +119,6 @@ dropContinueShortJump
 
 
 
-
-
-
-
-
-
-
-
 ; Given the top joined piece, can we drop it?
 dropDoubleVerticalIfYouCan
     jmp ddviyc_start
