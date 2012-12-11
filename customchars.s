@@ -32,7 +32,8 @@ MoveCharMap
     CLEAR_ONE   .byte 124, 254, 238, 198, 238, 254, 124, 0
     CLEAR_TWO   .byte 124, 198, 130, 130, 130, 198, 124, 0
 
-    BKGRD_CHAR  .byte 240, 240, 240, 240, 15, 15, 15, 15
+BKGRD_CHAR .byte 0, 0, 60, 36, 36, 60, 0, 0
+;    BKGRD_CHAR  .byte 240, 240, 240, 240, 15, 15, 15, 15
 ;    BKGRD_CHAR  .byte 0, 0, 0, 0, 0, 0, 0, 0
     BKGRD_CHAR2 .byte 135, 120, 120, 120, 120, 135, 135, 135
     BKGRD_CHAR3 .byte 195, 195, 60, 60, 60, 60, 195, 195
@@ -52,10 +53,23 @@ MoveCharMap
     V3_AN1      .byte 68, 56, 124, 238, 254, 198, 56, 0
     V3_AN2      .byte 136, 56, 124, 222, 254, 198, 56, 0
     V3_AN3      .byte 34, 56, 124, 246, 254, 198, 56, 0
+; Some numbers I generated from photoshop:
+CUST_CHAR_0 .byte 24, 36, 36, 36, 36, 36, 24, 0
+CUST_CHAR_1 .byte 16, 48, 16, 16, 16, 16, 56, 0
+CUST_CHAR_2 .byte 56, 68, 68, 8, 16, 36, 124, 0
+CUST_CHAR_3 .byte 56, 68, 4, 24, 4, 68, 56, 0
+CUST_CHAR_4 .byte 8, 24, 40, 72, 124, 8, 28, 0
+CUST_CHAR_5 .byte 124, 64, 120, 4, 4, 68, 56, 0
+CUST_CHAR_6 .byte 24, 32, 64, 120, 68, 68, 56, 0
+CUST_CHAR_7 .byte 62, 34, 2, 4, 4, 8, 8, 0
+CUST_CHAR_8 .byte 28, 34, 34, 28, 34, 34, 28, 0
+CUST_CHAR_9 .byte 28, 34, 34, 30, 2, 4, 24, 0
+
     ; End of custom character data
 
     PILL_STATE  .byte $00
     BKGRD_STATE .byte $00
+
 mcm_start
 
 ; 8 bytes to each char
@@ -103,6 +117,30 @@ CharCopyLoop2
 ; Do Pill parts
     ldx #00
 PillMakerLoop
+    ; For the numbers:
+    lda CUST_CHAR_0, x
+    sta NEWCHARMAP+384, x
+    lda CUST_CHAR_1, x
+    sta NEWCHARMAP+392, x
+    lda CUST_CHAR_2, x
+    sta NEWCHARMAP+400, x
+    lda CUST_CHAR_3, x
+    sta NEWCHARMAP+408, x
+    lda CUST_CHAR_4, x
+    sta NEWCHARMAP+416, x
+    lda CUST_CHAR_5, x
+    sta NEWCHARMAP+424, x
+    lda CUST_CHAR_6, x
+    sta NEWCHARMAP+432, x
+    lda CUST_CHAR_7, x
+    sta NEWCHARMAP+440, x
+    lda CUST_CHAR_8, x
+    sta NEWCHARMAP+448, x
+    lda CUST_CHAR_9, x
+    sta NEWCHARMAP+456, x
+    ; End of the numbers
+
+
     lda PILL_L_DEF, x
     sta NEWCHARMAP+856, x; 8 * 107
 
@@ -166,7 +204,10 @@ PillMakerLoop
 
     inx
     cpx #8
-    bne PillMakerLoop
+
+    beq charMakerComplete
+    jmp PillMakerLoop
+charMakerComplete
 
     ; Tell VIC where to get charmap from
     lda 53272

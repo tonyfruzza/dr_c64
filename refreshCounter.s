@@ -2,13 +2,15 @@
 
 RASTER_TO_COUNT_AT  .equ 0
 DELAY2              .equ 6
+songStartAdress     .equ $2300
+SOUND_ROTATE        .byte $00,$f6,$00,$a0,$12,$c0,$d0,$d1,$d2,$d4,$d6,$d8,$da,$10,$00
+SOUND_HORIZONTAL    .byte $00,$53,$00,$a0,$12,$c0,$d0,$d1,$d2,$d4,$d6,$d8,$da,$10,$00
+SOUND_BOTTOM        .byte $82,$24,$00,$a0,$81,$90,$41,$8e,$8a,$40,$00
+refreshCount        .byte $00
+refreshTimer2       .byte $00
+refreshTimer3       .byte $00
 
 initRefreshCounter
-    jmp irc_start
-    refreshCount    .byte $00
-    refreshTimer2   .byte $00
-    refreshTimer3   .byte $00
-irc_start
     sei          ; turn off interrupts
     lda #$7f
     ldx #$01
@@ -17,11 +19,7 @@ irc_start
     stx $d01a    ; Turn on raster interrupts
 
     lda #$1b
-    ;ldx #$08
-    ;ldy #$14
-sta $d011    ; Clear high bit of $d012, set text mode
-    ;stx $d016    ; single-colour
-    ;sty $d018    ; screen at $0400, charset at $2000
+    sta $d011    ; Clear high bit of $d012, set text mode
 
     lda #<irq_refreshCounter    ; low part of address of interrupt handler code
     ldx #>irq_refreshCounter    ; high part of address of interrupt handler code
@@ -38,6 +36,7 @@ sta $d011    ; Clear high bit of $d012, set text mode
 
 
 irq_refreshCounter ; void (y, x, a)
+    jsr songStartAdress+3
     inc refreshCount
     inc refreshTimer2
     inc refreshTimer3

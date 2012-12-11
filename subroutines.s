@@ -8,9 +8,6 @@
 ClearScreen ; void ()
     stx retx
     LDX #$00
-
-
-
 Clearing
     lda #127
     STA SCREENMEM, X
@@ -25,8 +22,6 @@ Clearing
     INX
     BNE Clearing;
     ldx retx
-
-
     RTS
 
 colorScreenWithCheckers

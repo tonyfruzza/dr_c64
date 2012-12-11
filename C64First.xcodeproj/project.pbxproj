@@ -6,27 +6,74 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		EA96DB951666FD7000BC97D7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA96DB941666FD7000BC97D7 /* main.cpp */; };
+		EAAD45F6166B248C005EAC00 /* bitmapReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EAAD45F5166B248C005EAC00 /* bitmapReader.cpp */; };
+		EAAD4604166C8562005EAC00 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EAAD4603166C8562005EAC00 /* main.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		EA96DB8E1666FD7000BC97D7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		EAAD45FE166C8562005EAC00 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		EA286E83160BE51300C4A9B2 /* drc64.prg */ = {isa = PBXFileReference; lastKnownFileType = file; path = drc64.prg; sourceTree = "<group>"; };
 		EA286E85160BE57E00C4A9B2 /* example.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.prg; path = ../../ISOs/example.prg; sourceTree = "<group>"; };
 		EA286E86160C24F600C4A9B2 /* lightspeed.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = lightspeed.s; sourceTree = "<group>"; };
 		EA286E88160C486D00C4A9B2 /* flicker.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = flicker.prg; path = ../../ISOs/flicker.prg; sourceTree = "<group>"; };
-		EA859D0F164361F40016FB33 /* ciaTimer.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = ciaTimer.s; sourceTree = "<group>"; };
 		EA859D7D1644E83F0016FB33 /* lookForConnect4.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lookForConnect4.s; sourceTree = "<group>"; };
 		EA859D7F1644EAEA0016FB33 /* search.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = search.s; sourceTree = "<group>"; };
+		EA8961AA1658B6B300C48645 /* down.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = down.s; sourceTree = "<group>"; };
+		EA8961AB1658B71A00C48645 /* left.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = left.s; sourceTree = "<group>"; };
+		EA8961AC1658B73C00C48645 /* right.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = right.s; sourceTree = "<group>"; };
+		EA8961AD1658B9AB00C48645 /* moveUtils.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = moveUtils.s; sourceTree = "<group>"; };
+		EA8961AF1658BAEF00C48645 /* newColor.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = newColor.s; sourceTree = "<group>"; };
+		EA8961B01658BB1700C48645 /* colorUtils.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = colorUtils.s; sourceTree = "<group>"; };
+		EA8961B11658BC6100C48645 /* rotate.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = rotate.s; sourceTree = "<group>"; };
 		EA8B35BC1639598400C1059B /* testScenarios.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = testScenarios.s; sourceTree = "<group>"; };
 		EA8B35EB163A971000C1059B /* input.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = input.s; sourceTree = "<group>"; };
 		EA8D86DC162696C40003415E /* subroutines.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = subroutines.s; sourceTree = "<group>"; };
 		EA8D871C163177730003415E /* customchars.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = customchars.s; sourceTree = "<group>"; };
 		EA8D873E1634AFCD0003415E /* interrupt.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = interrupt.s; sourceTree = "<group>"; };
 		EA8D873F1634E60D0003415E /* refreshCounter.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = refreshCounter.s; sourceTree = "<group>"; };
-		EA8D874016352AAF0003415E /* unused.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = unused.s; sourceTree = "<group>"; };
 		EA8D87431635D1AE0003415E /* arkanoid.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = arkanoid.prg; path = "../../Downloads/Arkanoid.Imagine+3.TCS/arkanoid.prg"; sourceTree = "<group>"; };
 		EA8DD136163D3ED400D3D0E5 /* drops.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = drops.s; sourceTree = "<group>"; };
 		EA8DD138163EA5C000D3D0E5 /* virusLevels.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = virusLevels.s; sourceTree = "<group>"; };
 		EA8DD13916412F0300D3D0E5 /* lvlSelect.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lvlSelect.s; sourceTree = "<group>"; };
+		EA92E7A1166329FA00DBF1B8 /* scroller.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = scroller.s; sourceTree = "<group>"; };
+		EA933B07165AF90E000B3E34 /* highres.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = highres.s; sourceTree = "<group>"; };
+		EA96DB901666FD7000BC97D7 /* bitmapReader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bitmapReader; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA96DB941666FD7000BC97D7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		EA96DB9C166731D100BC97D7 /* image.raw */ = {isa = PBXFileReference; lastKnownFileType = file; name = image.raw; path = ../../Desktop/image.raw; sourceTree = "<group>"; };
+		EA96DB9D1667326000BC97D7 /* image2.raw */ = {isa = PBXFileReference; lastKnownFileType = text; name = image2.raw; path = ../../Desktop/image2.raw; sourceTree = "<group>"; };
+		EA96DB9E1667357700BC97D7 /* image.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; name = image.bmp; path = ../../Desktop/image.bmp; sourceTree = "<group>"; };
 		EAA29EAA16110FA200C87D7F /* number.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = number.s; sourceTree = "<group>"; };
 		EAA2A0A11620115800C87D7F /* joytest.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = joytest.s; sourceTree = "<group>"; };
+		EAAD45F3166B2204005EAC00 /* bitmapReader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bitmapReader.h; sourceTree = "<group>"; };
+		EAAD45F5166B248C005EAC00 /* bitmapReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmapReader.cpp; sourceTree = "<group>"; };
+		EAAD45F8166B57D0005EAC00 /* ABC.raw */ = {isa = PBXFileReference; lastKnownFileType = file; name = ABC.raw; path = ../../Desktop/ABC.raw; sourceTree = "<group>"; };
+		EAAD45F9166B584B005EAC00 /* 8x8.raw */ = {isa = PBXFileReference; lastKnownFileType = file; name = 8x8.raw; path = ../../Desktop/8x8.raw; sourceTree = "<group>"; };
+		EAAD45FA166C77A6005EAC00 /* friday.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = friday.s; sourceTree = "<group>"; };
+		EAAD4600166C8562005EAC00 /* linker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = linker; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAAD4603166C8562005EAC00 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		EAAD46D0167494E2005EAC00 /* charAni.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = charAni.s; sourceTree = "<group>"; };
 		EAB47DD0155219BF00516343 /* baseGame.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = baseGame.s; sourceTree = "<group>"; };
 		EABC8DE215CA2145006F2067 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		EAD8212F163BCAD3007DFD49 /* drawBox.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = drawBox.s; sourceTree = "<group>"; };
@@ -34,6 +81,23 @@
 		EAE21A1115A3BB9600DCE4B2 /* Notes.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = Notes.s; sourceTree = "<group>"; };
 		EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = SimpleAddition.s; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EA96DB8D1666FD7000BC97D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAAD45FD166C8562005EAC00 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		EA859D801644EB310016FB33 /* Clearing */ = {
@@ -45,18 +109,68 @@
 			name = Clearing;
 			sourceTree = "<group>";
 		};
+		EA8961A81658B6A700C48645 /* Movement */ = {
+			isa = PBXGroup;
+			children = (
+				EA8961AA1658B6B300C48645 /* down.s */,
+				EA8961AB1658B71A00C48645 /* left.s */,
+				EA8961AC1658B73C00C48645 /* right.s */,
+				EA8961AD1658B9AB00C48645 /* moveUtils.s */,
+			);
+			name = Movement;
+			sourceTree = "<group>";
+		};
+		EA8961AE1658BA1600C48645 /* Colors */ = {
+			isa = PBXGroup;
+			children = (
+				EA8961AF1658BAEF00C48645 /* newColor.s */,
+				EA8961B01658BB1700C48645 /* colorUtils.s */,
+			);
+			name = Colors;
+			sourceTree = "<group>";
+		};
 		EA8D86F6162FE6CB0003415E /* experiements */ = {
 			isa = PBXGroup;
 			children = (
-				EA8D874016352AAF0003415E /* unused.s */,
+				EA933B07165AF90E000B3E34 /* highres.s */,
 				EA8D873E1634AFCD0003415E /* interrupt.s */,
 				EAE21A1115A3BB9600DCE4B2 /* Notes.s */,
 				EAA29EAA16110FA200C87D7F /* number.s */,
 				EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */,
 				EA286E86160C24F600C4A9B2 /* lightspeed.s */,
 				EAA2A0A11620115800C87D7F /* joytest.s */,
+				EA92E7A1166329FA00DBF1B8 /* scroller.s */,
+				EAAD45FA166C77A6005EAC00 /* friday.s */,
+				EAAD46D0167494E2005EAC00 /* charAni.s */,
 			);
 			name = experiements;
+			sourceTree = "<group>";
+		};
+		EA96DB911666FD7000BC97D7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EA96DB901666FD7000BC97D7 /* bitmapReader */,
+				EAAD4600166C8562005EAC00 /* linker */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EA96DB931666FD7000BC97D7 /* bitmapReader */ = {
+			isa = PBXGroup;
+			children = (
+				EA96DB941666FD7000BC97D7 /* main.cpp */,
+				EAAD45F5166B248C005EAC00 /* bitmapReader.cpp */,
+				EAAD45F3166B2204005EAC00 /* bitmapReader.h */,
+			);
+			path = bitmapReader;
+			sourceTree = "<group>";
+		};
+		EAAD4602166C8562005EAC00 /* linker */ = {
+			isa = PBXGroup;
+			children = (
+				EAAD4603166C8562005EAC00 /* main.cpp */,
+			);
+			path = linker;
 			sourceTree = "<group>";
 		};
 		EAB47DC31552197000516343 = {
@@ -64,8 +178,10 @@
 			children = (
 				EABC8DE215CA2145006F2067 /* Makefile */,
 				EAB47DD0155219BF00516343 /* baseGame.s */,
+				EA8961B11658BC6100C48645 /* rotate.s */,
+				EA8961AE1658BA1600C48645 /* Colors */,
+				EA8961A81658B6A700C48645 /* Movement */,
 				EA859D801644EB310016FB33 /* Clearing */,
-				EA859D0F164361F40016FB33 /* ciaTimer.s */,
 				EA8DD138163EA5C000D3D0E5 /* virusLevels.s */,
 				EA8DD13916412F0300D3D0E5 /* lvlSelect.s */,
 				EA8DD136163D3ED400D3D0E5 /* drops.s */,
@@ -78,6 +194,14 @@
 				EAD8212F163BCAD3007DFD49 /* drawBox.s */,
 				EA8D86F6162FE6CB0003415E /* experiements */,
 				EAB47DD11552219800516343 /* Target */,
+				EA96DB931666FD7000BC97D7 /* bitmapReader */,
+				EAAD4602166C8562005EAC00 /* linker */,
+				EA96DB911666FD7000BC97D7 /* Products */,
+				EAAD45F9166B584B005EAC00 /* 8x8.raw */,
+				EAAD45F8166B57D0005EAC00 /* ABC.raw */,
+				EA96DB9C166731D100BC97D7 /* image.raw */,
+				EA96DB9D1667326000BC97D7 /* image2.raw */,
+				EA96DB9E1667357700BC97D7 /* image.bmp */,
 			);
 			sourceTree = "<group>";
 		};
@@ -110,11 +234,48 @@
 		};
 /* End PBXLegacyTarget section */
 
+/* Begin PBXNativeTarget section */
+		EA96DB8F1666FD7000BC97D7 /* bitmapReader */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA96DB9A1666FD7000BC97D7 /* Build configuration list for PBXNativeTarget "bitmapReader" */;
+			buildPhases = (
+				EA96DB8C1666FD7000BC97D7 /* Sources */,
+				EA96DB8D1666FD7000BC97D7 /* Frameworks */,
+				EA96DB8E1666FD7000BC97D7 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = bitmapReader;
+			productName = bitmapReader;
+			productReference = EA96DB901666FD7000BC97D7 /* bitmapReader */;
+			productType = "com.apple.product-type.tool";
+		};
+		EAAD45FF166C8562005EAC00 /* linker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EAAD4607166C8562005EAC00 /* Build configuration list for PBXNativeTarget "linker" */;
+			buildPhases = (
+				EAAD45FC166C8562005EAC00 /* Sources */,
+				EAAD45FD166C8562005EAC00 /* Frameworks */,
+				EAAD45FE166C8562005EAC00 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = linker;
+			productName = linker;
+			productReference = EAAD4600166C8562005EAC00 /* linker */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
 /* Begin PBXProject section */
 		EAB47DC51552197000516343 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0440;
 				ORGANIZATIONNAME = "Lightspeed Systems";
 			};
 			buildConfigurationList = EAB47DC81552197000516343 /* Build configuration list for PBXProject "C64First" */;
@@ -125,15 +286,74 @@
 				en,
 			);
 			mainGroup = EAB47DC31552197000516343;
+			productRefGroup = EA96DB911666FD7000BC97D7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				EAB47DCA1552197000516343 /* C64First */,
+				EA96DB8F1666FD7000BC97D7 /* bitmapReader */,
+				EAAD45FF166C8562005EAC00 /* linker */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXSourcesBuildPhase section */
+		EA96DB8C1666FD7000BC97D7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA96DB951666FD7000BC97D7 /* main.cpp in Sources */,
+				EAAD45F6166B248C005EAC00 /* bitmapReader.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAAD45FC166C8562005EAC00 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAAD4604166C8562005EAC00 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
 /* Begin XCBuildConfiguration section */
+		EA96DB981666FD7000BC97D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		EA96DB991666FD7000BC97D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		EAAD4608166C8562005EAC00 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		EAAD4609166C8562005EAC00 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		EAB47DCB1552197000516343 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -182,6 +402,7 @@
 		EAB47DCE1552197000516343 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				DEBUGGING_SYMBOLS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -194,6 +415,7 @@
 		EAB47DCF1552197000516343 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -203,6 +425,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		EA96DB9A1666FD7000BC97D7 /* Build configuration list for PBXNativeTarget "bitmapReader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA96DB981666FD7000BC97D7 /* Debug */,
+				EA96DB991666FD7000BC97D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EAAD4607166C8562005EAC00 /* Build configuration list for PBXNativeTarget "linker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EAAD4608166C8562005EAC00 /* Debug */,
+				EAAD4609166C8562005EAC00 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		EAB47DC81552197000516343 /* Build configuration list for PBXProject "C64First" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

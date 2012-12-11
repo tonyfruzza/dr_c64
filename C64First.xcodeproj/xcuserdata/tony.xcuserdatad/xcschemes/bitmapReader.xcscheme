@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "EAB47DCA1552197000516343"
-               BuildableName = "C64First"
-               BlueprintName = "C64First"
+               BlueprintIdentifier = "EA96DB8F1666FD7000BC97D7"
+               BuildableName = "bitmapReader"
+               BlueprintName = "bitmapReader"
                ReferencedContainer = "container:C64First.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,6 +29,15 @@
       buildConfiguration = "Debug">
       <Testables>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "EA96DB8F1666FD7000BC97D7"
+            BuildableName = "bitmapReader"
+            BlueprintName = "bitmapReader"
+            ReferencedContainer = "container:C64First.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -39,6 +48,21 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "EA96DB8F1666FD7000BC97D7"
+            BuildableName = "bitmapReader"
+            BlueprintName = "bitmapReader"
+            ReferencedContainer = "container:C64First.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-f /Users/Tony/Development/DrC64/Images/8ballVerticalMove.raw -w 64 -h 8"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -48,6 +72,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "EA96DB8F1666FD7000BC97D7"
+            BuildableName = "bitmapReader"
+            BlueprintName = "bitmapReader"
+            ReferencedContainer = "container:C64First.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

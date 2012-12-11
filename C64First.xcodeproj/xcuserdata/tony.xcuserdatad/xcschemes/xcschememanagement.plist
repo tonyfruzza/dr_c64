@@ -9,9 +9,29 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>bitmapReader.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>linker.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>EA96DB8F1666FD7000BC97D7</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>EAAD45FF166C8562005EAC00</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>EAB47DCA1552197000516343</key>
 		<dict>
 			<key>primary</key>
