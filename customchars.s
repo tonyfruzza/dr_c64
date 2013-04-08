@@ -16,11 +16,6 @@ MoveCharMap
     ; Entry point
     jmp mcm_start
     ; Define some custom character data
-    PILL_L_DEF  .byte 126, 194, 190, 254, 254, 254, 126, 0
-    PILL_R_DEF  .byte 252, 134, 254, 254, 254, 254, 252, 0
-    PILL_T_DEF  .byte 124, 222, 190, 190, 190, 190, 254, 0
-    PILL_B_DEF  .byte 254, 190, 190, 190, 190, 254, 124, 0
-    PILL_S_DEF  .byte 124, 198, 190, 254, 254, 254, 124, 0
 
     LEFT_WALL   .byte 66, 66, 66, 66, 66, 66, 66, 66
     WALL_BOTTOM .byte 255, 0 , 0, 0, 0, 255, 0, 0
@@ -33,17 +28,9 @@ MoveCharMap
     CLEAR_TWO   .byte 124, 198, 130, 130, 130, 198, 124, 0
 
 BKGRD_CHAR .byte 0, 0, 60, 36, 36, 60, 0, 0
-;    BKGRD_CHAR  .byte 240, 240, 240, 240, 15, 15, 15, 15
-;    BKGRD_CHAR  .byte 0, 0, 0, 0, 0, 0, 0, 0
     BKGRD_CHAR2 .byte 135, 120, 120, 120, 120, 135, 135, 135
     BKGRD_CHAR3 .byte 195, 195, 60, 60, 60, 60, 195, 195
     BKGRD_CHAR4 .byte 225, 225, 225, 30, 30, 30, 30, 225
-
-
-
-    V1_AN1      .byte 68, 56, 214, 146, 254, 214, 68, 0
-    V1_AN2      .byte 198, 56, 214, 146, 254, 214, 130, 0
-    V1_AN3      .byte 130, 124, 146, 186, 254, 214, 68, 0
 
     V2_AN1      .byte 170, 124, 68, 238, 186, 198, 124, 0
     V2_AN2      .byte 170, 124, 68, 238, 254, 130, 124, 0
@@ -53,17 +40,6 @@ BKGRD_CHAR .byte 0, 0, 60, 36, 36, 60, 0, 0
     V3_AN1      .byte 68, 56, 124, 238, 254, 198, 56, 0
     V3_AN2      .byte 136, 56, 124, 222, 254, 198, 56, 0
     V3_AN3      .byte 34, 56, 124, 246, 254, 198, 56, 0
-; Some numbers I generated from photoshop:
-CUST_CHAR_0 .byte 24, 36, 36, 36, 36, 36, 24, 0
-CUST_CHAR_1 .byte 16, 48, 16, 16, 16, 16, 56, 0
-CUST_CHAR_2 .byte 56, 68, 68, 8, 16, 36, 124, 0
-CUST_CHAR_3 .byte 56, 68, 4, 24, 4, 68, 56, 0
-CUST_CHAR_4 .byte 8, 24, 40, 72, 124, 8, 28, 0
-CUST_CHAR_5 .byte 124, 64, 120, 4, 4, 68, 56, 0
-CUST_CHAR_6 .byte 24, 32, 64, 120, 68, 68, 56, 0
-CUST_CHAR_7 .byte 62, 34, 2, 4, 4, 8, 8, 0
-CUST_CHAR_8 .byte 28, 34, 34, 28, 34, 34, 28, 0
-CUST_CHAR_9 .byte 28, 34, 34, 30, 2, 4, 24, 0
 
     ; End of custom character data
 
@@ -118,42 +94,42 @@ CharCopyLoop2
     ldx #00
 PillMakerLoop
     ; For the numbers:
-    lda CUST_CHAR_0, x
+    lda NUMS, x
     sta NEWCHARMAP+384, x
-    lda CUST_CHAR_1, x
+    lda NUMS+8, x
     sta NEWCHARMAP+392, x
-    lda CUST_CHAR_2, x
+    lda NUMS+16, x
     sta NEWCHARMAP+400, x
-    lda CUST_CHAR_3, x
+    lda NUMS+24, x
     sta NEWCHARMAP+408, x
-    lda CUST_CHAR_4, x
+    lda NUMS+32, x
     sta NEWCHARMAP+416, x
-    lda CUST_CHAR_5, x
+    lda NUMS+40, x
     sta NEWCHARMAP+424, x
-    lda CUST_CHAR_6, x
+    lda NUMS+48, x
     sta NEWCHARMAP+432, x
-    lda CUST_CHAR_7, x
+    lda NUMS+56, x
     sta NEWCHARMAP+440, x
-    lda CUST_CHAR_8, x
+    lda NUMS+64, x
     sta NEWCHARMAP+448, x
-    lda CUST_CHAR_9, x
+    lda NUMS+72, x
     sta NEWCHARMAP+456, x
     ; End of the numbers
 
 
-    lda PILL_L_DEF, x
+    lda PILL_H, x
     sta NEWCHARMAP+856, x; 8 * 107
 
-    lda PILL_R_DEF, x
+    lda PILL_H + 8, x
     sta NEWCHARMAP+920, x; 8 * 115
 
-    lda PILL_T_DEF, x
+    lda PILL_V, x
     sta NEWCHARMAP+912, x ; 8 * 114
 
-    lda PILL_B_DEF, x
+    lda PILL_V + 8, x
     sta NEWCHARMAP+904, x ; 8 * 113
 
-    lda PILL_S_DEF, x
+    lda PILL_HLF2, x
     sta NEWCHARMAP+648, x ; 8 * 81
 
     lda LEFT_WALL, x
@@ -189,7 +165,7 @@ PillMakerLoop
 
 
 
-    lda V1_AN1, x
+    lda V1_AN, x
     sta NEWCHARMAP+664,x ; 8 * 83
 
     lda V2_AN1, x
@@ -298,7 +274,7 @@ cycleAnimatedViruses
     jmp newPillLoop2
 
 newPillLoop1
-    lda V1_AN1, x
+    lda V1_AN, x
     sta NEWCHARMAP+664, x ; 8 * 83
     lda V2_AN1, x
     sta NEWCHARMAP+672, x ; 8 * 84
@@ -310,7 +286,7 @@ newPillLoop1
     jmp cav_done
 
 newPillLoop2
-    lda V1_AN2, x
+    lda V1_AN + 8, x
     sta NEWCHARMAP+664, x ; 8 * 83
     lda V2_AN2, x
     sta NEWCHARMAP+672, x ; 8 * 84
@@ -323,7 +299,7 @@ newPillLoop2
     jmp cav_done
 
 newPillLoop3
-    lda V1_AN3, x
+    lda V1_AN + 16, x
     sta NEWCHARMAP+664, x ; 8 * 83
     lda V2_AN3, x
     sta NEWCHARMAP+672, x ; 8 * 84

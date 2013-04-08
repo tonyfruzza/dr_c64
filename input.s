@@ -1,16 +1,18 @@
 ; take input from user for gameplay
 
-JOY1            .equ 56321 ; Joystick flag byte
+JOY1                    .equ 56321 ; Joystick flag byte
 LR_MOVE_REPEAT_TIME     .equ 5
 LR_FIRST_MOVE_R_TIME    .equ 10
-DOWN_REPEAT_TIME    .equ 2
+DOWN_REPEAT_TIME        .equ 2
+FIRE_REPEAT_TIME        .equ 22
 
 l_repeatTime    .byte LR_FIRST_MOVE_R_TIME
 r_repeatTime    .byte LR_FIRST_MOVE_R_TIME
 l_firstPress    .byte $00
 r_firstPress    .byte $00
 d_repeatTime    .byte DOWN_REPEAT_TIME
-rotate_repeatTime   .byte $00 ; Actually there is no repeat, so using this byte to track if button is being held down
+f_repeatTime    .byte FIRE_REPEAT_TIME
+rotate_Hold     .byte $00 ; Actually there is no repeat, so using this byte to track if button is being held down
 
 
 ; This will make sure all is reset back to the init state
@@ -18,10 +20,12 @@ resetInputMovement
     lda #LR_FIRST_MOVE_R_TIME
     sta l_repeatTime
     sta r_repeatTime
+    lda #FIRE_REPEAT_TIME
+    sta f_repeatTime
     lda #0
     sta l_firstPress
     sta r_firstPress
-    sta rotate_repeatTime
+    sta rotate_Hold
     rts
 
 updateJoyPos
@@ -104,14 +108,19 @@ nextJoy4
     and #16 ; Button push
     bne ButtonNotPressed
 
-    lda rotate_repeatTime
+    lda rotate_Hold
     bne finishJoy
+    ; Look to see when the last time was that we rotated
+    lda f_repeatTime
+    cmp #FIRE_REPEAT_TIME
+    bcc finishJoy
+
     jsr rotate
-inc rotate_repeatTime
+    sty f_repeatTime ; Reset the last time we hit fire to 0 counter
+    inc rotate_Hold
     jmp finishJoy
 ButtonNotPressed
-;    lda #ROTATE_REPEAT_TIME
-    sty rotate_repeatTime
+    sty rotate_Hold ; Fire not pressed, prevent rotating while holding down fire
 finishJoy
     rts
 
@@ -193,7 +202,7 @@ gjifl_nextJoy4
     lda #1
     rts
 gjifl_ButtonNotPressed
-    sty rotate_repeatTime
+    sty rotate_Hold
     lda #0
     rts
 

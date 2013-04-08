@@ -59,7 +59,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-f /Users/Tony/Development/DrC64/Images/8ballVerticalMove.raw -w 64 -h 8"
+            argument = "-f /Users/Tony/Development/DrC64/Images/8ballVerticalMove.raw -w 64 -h 8 -c"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = " -w 24 -h 21 -f /Users/Tony/Development/DrC64/Images/spriteHead.raw -s"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

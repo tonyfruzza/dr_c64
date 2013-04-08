@@ -18,8 +18,15 @@ initRefreshCounter
     sta $dd0d    ; Turn off CIA 2 interrupts
     stx $d01a    ; Turn on raster interrupts
 
+    ; Set video mode
+    ; %0001 1011 = screen on, 25 rows : this is default
     lda #$1b
-    sta $d011    ; Clear high bit of $d012, set text mode
+    sta $d011
+    ; %0001 1000 = 40 columns, multicolor mode
+    lda #$18 ;
+    sta $d016
+
+
 
     lda #<irq_refreshCounter    ; low part of address of interrupt handler code
     ldx #>irq_refreshCounter    ; high part of address of interrupt handler code
@@ -43,6 +50,11 @@ irq_refreshCounter ; void (y, x, a)
 
 ; For input timers, these shouldn't roll over
     ldx #10 ; cached value for reseting a roll over
+
+    inc f_repeatTime ; Fire button repeat
+    bne fNoReset
+    stx f_repeatTime
+fNoReset
     inc r_repeatTime
     bne rNoReset
     stx r_repeatTime
