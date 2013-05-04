@@ -17,25 +17,12 @@ MoveCharMap
     jmp mcm_start
     ; Define some custom character data
 
-    LEFT_WALL   .byte 66, 66, 66, 66, 66, 66, 66, 66
-    WALL_BOTTOM .byte 255, 0 , 0, 0, 0, 255, 0, 0
-    WALL_BLFT   .byte 67, 64, 64, 64, 32, 31, 0, 0
-    WALL_BRT    .byte 194, 2, 2, 2, 4, 248, 0 , 0
-    WALL_TLFT   .byte 0, 0, 127, 96, 80, 72, 68, 67
-    WALL_TRT    .byte 0, 0, 254, 6, 10, 18, 34, 194
-    WALL_TOP    .byte 0, 0, 255, 0, 0, 0, 255, 0
     CLEAR_ONE   .byte 124, 254, 238, 198, 238, 254, 124, 0
     CLEAR_TWO   .byte 124, 198, 130, 130, 130, 198, 124, 0
-
-BKGRD_CHAR .byte 0, 0, 60, 36, 36, 60, 0, 0
-    BKGRD_CHAR2 .byte 135, 120, 120, 120, 120, 135, 135, 135
-    BKGRD_CHAR3 .byte 195, 195, 60, 60, 60, 60, 195, 195
-    BKGRD_CHAR4 .byte 225, 225, 225, 30, 30, 30, 30, 225
 
     V2_AN1      .byte 170, 124, 68, 238, 186, 198, 124, 0
     V2_AN2      .byte 170, 124, 68, 238, 254, 130, 124, 0
     V2_AN3      .byte 170, 124, 68, 238, 254, 198, 186, 0
-
 
     V3_AN1      .byte 68, 56, 124, 238, 254, 198, 56, 0
     V3_AN2      .byte 136, 56, 124, 222, 254, 198, 56, 0
@@ -44,7 +31,6 @@ BKGRD_CHAR .byte 0, 0, 60, 36, 36, 60, 0, 0
     ; End of custom character data
 
     PILL_STATE  .byte $00
-    BKGRD_STATE .byte $00
 
 mcm_start
 
@@ -86,8 +72,6 @@ CharCopyLoop2
     lda 56334
     ora #1
     sta 56334
-
-
 
 
 ; Do Pill parts
@@ -132,34 +116,34 @@ PillMakerLoop
     lda PILL_HLF2, x
     sta NEWCHARMAP+648, x ; 8 * 81
 
-    lda LEFT_WALL, x
-    sta NEWCHARMAP+816, x ; 8 * 102
-
-    lda WALL_TRT, x
-    sta NEWCHARMAP+584, x ; 8 * 73
-
-    lda WALL_TLFT, x
-    sta NEWCHARMAP+880, x ; 8 * 110
-
-    lda WALL_TOP, x
-    sta NEWCHARMAP+896, x ; 8 * 112
-
     lda CLEAR_ONE, x
     sta NEWCHARMAP+688, x ; 8 * 86
 
     lda CLEAR_TWO, x
     sta NEWCHARMAP+720, x ; 8 * 90
 
-    lda BKGRD_CHAR, x
+    lda GAME_BORDER_4, x ; background
     sta NEWCHARMAP+1016, x ; 8 * 127
 
-    lda WALL_BOTTOM, x
+    lda GAME_BORDER_3,x
+    sta NEWCHARMAP+816, x ; 8 * 102
+
+    lda GAME_BORDER_2, x
+    sta NEWCHARMAP+584, x ; 8 * 73
+
+    lda GAME_BORDER, x
+    sta NEWCHARMAP+880, x ; 8 * 110
+
+    lda GAME_BORDER_1, x
+    sta NEWCHARMAP+896, x ; 8 * 112
+
+    lda GAME_BORDER_7, x
     sta NEWCHARMAP+544, x ; 8 * 68
 
-    lda WALL_BLFT, x
+    lda GAME_BORDER_6, x
     sta NEWCHARMAP+592, x; 8 * 74
 
-    lda WALL_BRT, x
+    lda GAME_BORDER_8, x
     sta NEWCHARMAP+600, x; 8 * 75
 
 
@@ -193,63 +177,6 @@ charMakerComplete
     sta 53272
 
     rts
-
-
-
-cycleBackgroundAnimation
-    ldx #0
-    lda BKGRD_STATE
-    cmp #0
-    beq bg_state1_loop
-    cmp #1
-    beq bg_state2_loop
-    cmp #2
-    beq bg_state3_loop
-    cmp #3
-    beq bg_state4_loop
-
-
-bg_state1_loop
-    lda BKGRD_CHAR, x
-    sta NEWCHARMAP+1016, x
-    inx
-    cpx #8
-    bne bg_state1_loop
-    jmp cba_done
-
-bg_state2_loop
-    lda BKGRD_CHAR2, x
-    sta NEWCHARMAP+1016, x
-    inx
-    cpx #8
-    bne bg_state2_loop
-    jmp cba_done
-
-
-bg_state3_loop
-    lda BKGRD_CHAR3, x
-    sta NEWCHARMAP+1016, x
-    inx
-    cpx #8
-    bne bg_state3_loop
-    jmp cba_done
-
-
-bg_state4_loop
-    lda #$ff
-    sta BKGRD_STATE ; last cycle, so have it overflow back to 0 after this
-    lda BKGRD_CHAR4, x
-    sta NEWCHARMAP+1016, x
-    inx
-    cpx #8
-    bne bg_state4_loop
-    jmp cba_done
-
-
-cba_done
-    inc BKGRD_STATE
-    rts
-
 
 
 ; Animates the viruses in the field by cycling through

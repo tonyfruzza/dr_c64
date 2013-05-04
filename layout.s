@@ -11,10 +11,19 @@ ClearTopLine
     lda #OnePGameFieldLocHigh ; High byte start location
     sbc #0
     sta zpPtr2+1
-
-
-    lda #' '
 ClearTopLineLoop
+    cpy #0
+    bne NotTopLeft
+    lda #110
+    jmp ApplyClearingTopLine
+NotTopLeft
+    cpy #9
+    bne NotTopRight
+    lda #73
+    jmp ApplyClearingTopLine
+NotTopRight
+    lda #' '
+ApplyClearingTopLine
     sta (zpPtr2),y
     iny
     cpy #10
@@ -25,7 +34,7 @@ ctl_done
 
 
 ; Draw game board using char 230 as the boarder
-DrawGameBoarder
+DrawGameBorder
     lda #$00 ; Our counter
     tax
     tay
@@ -80,6 +89,8 @@ DrawBottom
 dgbDone
     lda #WALL_BR
     sta (zpPtr2),y
+    jsr displayTopSprite ; enable the top sprites
+    jsr removeBgNearTop
     rts
 
 
@@ -96,7 +107,7 @@ printSinglePlayerLevelBox
     pha
     lda #$05
     pha
-    jsr DrawBoarderBox
+    jsr DrawBorderBox
 
     lda #<MSG_LEVEL
     pha
@@ -142,7 +153,7 @@ printSinglePlayerVirusCountBox
     pha
     lda #$05
     pha
-    jsr DrawBoarderBox
+    jsr DrawBorderBox
 
 
     lda #<MSG_VIRUS
@@ -167,7 +178,7 @@ printSinglePlayerScoreBox
     pha
     lda #$04
     pha
-    jsr DrawBoarderBox
+    jsr DrawBorderBox
 
 
     lda #<MSG_SCORE
@@ -192,7 +203,7 @@ printSinglePlayerNextPieceBox
     pha
     lda #$04
     pha
-    jsr DrawBoarderBox
+    jsr DrawBorderBox
 
 
     ; Do the screen text for the first time
@@ -231,4 +242,19 @@ printSinglePlayerNextPieceBox
     jsr NewColors ; need to run this twice the first time
     rts
 
+TOP_CLEAR1 .equ 1161
+TOP_CLEAR2 .equ 1162
+TOP_CLEAR3 .equ 1163
+TOP_CLEAR4 .equ 1164
+TOP_CLEAR5 .equ 1165
+TOP_CLEAR6 .equ 1166
+removeBgNearTop
+    lda #' '
+    sta TOP_CLEAR1
+    sta TOP_CLEAR2
+    sta TOP_CLEAR3
+    sta TOP_CLEAR4
+    sta TOP_CLEAR5
+    sta TOP_CLEAR6
+    rts
 

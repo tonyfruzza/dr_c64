@@ -17,7 +17,7 @@ printLevelSelectScreen
     pha
     lda #$05 ; high byte upper left corner
     pha
-    jsr DrawBoarderBox
+    jsr DrawBorderBox
 
     lda #<MSG_CHOOSE_LVL
     pha
@@ -50,8 +50,8 @@ utlwhs_loop
     lda tmp
     adc #1
     sta tmp
-dex
-beq utlwhs_print
+    dex
+    beq utlwhs_print
 
     jmp utlwhs_loop
 utlwhs_print

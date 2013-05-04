@@ -12,14 +12,14 @@ MoveRightOne
     lda piece1+1
     pha
     jsr CheckCollisionRight
-    bne rightMoveDone
+    bne rightMoveDoneNoSound
 MoveRightHorizontalOnly
     lda piece2
     pha
     lda piece2+1
     pha
     jsr CheckCollisionRight
-    bne rightMoveDone
+    bne rightMoveDoneNoSound
 
     ; Secondary piece
     ldy #$00
@@ -47,12 +47,13 @@ MoveRightHorizontalOnly
     sta piece1+1
     lda pSideTmp1
     sta (piece1), y
-    JSR RepaintCurrentColor
+    jsr RepaintCurrentColor
 rightMoveDone
     lda #<SOUND_HORIZONTAL
     ldy #>SOUND_HORIZONTAL
     ldx #14
     jsr songStartAdress+6
-pla
-pla
+    pla
+    pla
+rightMoveDoneNoSound
     rts

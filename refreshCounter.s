@@ -9,6 +9,7 @@ SOUND_BOTTOM        .byte $82,$24,$00,$a0,$81,$90,$41,$8e,$8a,$40,$00
 refreshCount        .byte $00
 refreshTimer2       .byte $00
 refreshTimer3       .byte $00
+playMusic           .byte $00
 
 initRefreshCounter
     sei          ; turn off interrupts
@@ -43,7 +44,10 @@ initRefreshCounter
 
 
 irq_refreshCounter ; void (y, x, a)
-    jsr songStartAdress+3
+    lda playMusic
+    beq dontPlayMusic
+    jsr songStartAdress+3 ; Play song
+dontPlayMusic
     inc refreshCount
     inc refreshTimer2
     inc refreshTimer3

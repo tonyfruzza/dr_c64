@@ -1,11 +1,7 @@
-
 .org $0801
 ;Tells BASIC to run SYS 2064 to start our program
 .byte $0C,$08,$0A,$00,$9E,' ','2','0','6','4',$00,$00,$00,$00,$00
 
-CHROUT  .equ $FFD2
-GETIN   .equ $FFE4
-STOP    .equ $FFE1 ; Check for run stop, sets Z flag, then exit
 SCREENMEM   .equ 1024 ; Start of character screen map, color map is + $D400
 COLORMEM    .equ $D800
 VMEM        .equ $D000
@@ -22,7 +18,7 @@ VMEM        .equ $D000
 ; return
 
 VIC_MEM         .equ 53248
-SCREEN_BOARDER  .equ VIC_MEM + 32
+SCREEN_BORDER  .equ VIC_MEM + 32
 SCREEN_BG_COLOR .equ VIC_MEM + 33
 SCREEN_CHAR     .equ 52224
 COLOR_BLACK     .equ $00
@@ -41,8 +37,8 @@ COLOR_GREY      .equ $0c
 COLOR_L_GREEN   .equ $0d
 COLOR_L_BLUE    .equ $0e
 COLOR_L_GREY    .equ $0f
-;DELAY           .equ 37
 delay_slow      .equ 37
+
 PILL_SIDE       .equ 81 ; 'o'
 VIRUS_ONE       .equ 83
 VIRUS_TWO       .equ 84
@@ -88,18 +84,16 @@ MSG_VIRUS   .byte 22,9,18,21,19,0
 MSG_SCORE   .byte 19, 3, 15, 18, 5, 0
 MSG_LEVEL   .byte 12,5,22,5,12,0
 MSG_CLEAR   .byte 3,12,5,1,18,33,0
-ORGBOARDER  .byte $00
-ORGBGRND    .byte $00
 ORIENTATION .byte $00 ; 0 = 12, 1 = 1
                       ;             2
 PRICOLOR    .byte $00
 SECCOLOR    .byte $00
 NextPriC    .byte $00
 NextSecC    .byte $00
-
 CMPCOLOR    .byte $00 ; tmp for comparing variable colors
 CONNECTCNT  .byte $00
-colors      .byte COLOR_RED, COLOR_BLUE, COLOR_YELLOW, COLOR_BLUE
+;colors      .byte COLOR_RED, COLOR_BLUE, COLOR_YELLOW, COLOR_BLUE
+colors      .byte COLOR_CYAN, COLOR_MAGENTA, COLOR_YELLOW, COLOR_MAGENTA
 
 START_POS   .byte $13, $04 ; gets overwritten
 LAST_MOMENT_MOVE    .byte $00
@@ -133,7 +127,6 @@ p1VirusClearedInOneTurn  .byte $00
 p1VirusCountBinLast .byte $00
 p1VirusCountBinNew  .byte $00
 
-;P1_SCORE    .byte $00, $00, $00, $00
 P1_SCORE    .byte 0,0,0,0,0,0,0,0,0,0 ; 
 P1_SCORE_B  .byte $00, $00, $00, $00 ; Binary value of current score
 VIRUS_MUL_1 .byte $64, $00 ; 100
@@ -141,11 +134,9 @@ VIRUS_MUL_1 .byte $64, $00 ; 100
 
 
 init
-
-
     jsr MoveCharMap
     jsr initRefreshCounter
-    ; Init START_POS for where pill drops from, 4 to the right of left boarder
+    ; Init START_POS for where pill drops from, 4 to the right of left border
     clc
     lda #OnePGameFieldLocLow
     adc #4
@@ -154,21 +145,15 @@ init
     adc #0
     sta START_POS+1
 
-
-    lda #0
-    jsr songStartAdress
-
     ldy #0
     sty SCREEN_BG_COLOR
-    sty SCREEN_BOARDER
+    sty SCREEN_BORDER
 levelScreen
     jsr printLevelSelectScreen
 clears
-
     ; Programatically create game layout
     jsr ClearScreen
-;jsr colorScreenWithCheckers
-    jsr DrawGameBoarder
+    jsr DrawGameBorder
     jsr printSinglePlayerNextPieceBox
     jsr printSinglePlayerScoreBox
     jsr printSinglePlayerVirusCountBox
@@ -194,6 +179,9 @@ clears
     ; Reset drop speed for the game, or this level
     lda #delay_slow
     sta DELAY
+    lda #1
+    sta playMusic
+    jsr songStartAdress
     jmp firstPieceToDrop
 DropNew
     ; Loop through every piece to see if they can be cleared
@@ -265,6 +253,7 @@ MoveDownForced
 NextLevel
     jsr updateScore
     inc currentLvl
+    inc currentLvl ; Twice ?
     lda #<MSG_CLEAR
     pha
     lda #>MSG_CLEAR
@@ -275,6 +264,10 @@ NextLevel
     lda #$05
     pha
     jsr printMsgSub
+    ; Stop playing music
+    lda #0
+    sta playMusic
+    jsr songStartAdress
     jsr WaitEventFrame
     jsr WaitEventFrame
     jsr WaitEventFrame
@@ -290,6 +283,8 @@ NextLevel
 
 EndGame
     lda #0
+    jsr songStartAdress
+    sta playMusic ; stop laying music
     sta P1_SCORE_B
     sta P1_SCORE_B+1
     sta P1_SCORE_B+2
@@ -337,6 +332,7 @@ printComplete
             jsr WaitEventFrame
             jsr WaitEventFrame
 RestartGame
+            jsr hideTopSprites
             jmp levelScreen
 
 
@@ -728,6 +724,6 @@ scoreUpdateComplete
     rts
 
 scoreMultiplierTmp .byte $00, $00, $00, $00
-carryWasSet            .byte $00
+carryWasSet        .byte $00
 
 

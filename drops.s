@@ -12,7 +12,7 @@ dropContinue ; a = void()
     sty tmp1 ; used to keep track if anything dropped, shared with dropDownIfYouCan
     sty tmp2 ; used as screen x index 0 - 7
 
-    ; This the bottom left pos (in the boarder), to get there start at the top left
+    ; This the bottom left pos (in the border), to get there start at the top left
     ; then add $0258
     ; Originally was:  $0667 - $040f
 

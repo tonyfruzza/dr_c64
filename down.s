@@ -73,6 +73,8 @@ DropNewPiece
 
     lda LAST_MOMENT_MOVE
     beq LastMoveBeforeCommit ; if it's set to zero then do a drop with delay
+
+    jsr LandingPieceBright
     ; LAST_MOVE was set to 1
     lda #0
     sta LAST_MOMENT_MOVE
@@ -82,6 +84,8 @@ DropNewPiece
     jsr songStartAdress+6
     pla
     pla
+jsr WaitEventFrame
+jsr RepaintCurrentColor
     jmp DropNew
 LastMoveBeforeCommit
     lda #1

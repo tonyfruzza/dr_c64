@@ -1,0 +1,108 @@
+<script>
+function calcCharMemLocation(){
+ var base	= parseInt(viccalc.bank.options[viccalc.bank.selectedIndex].value);
+ var charloc	= base + parseInt(viccalc.charoffset.options[viccalc.charoffset.selectedIndex].value);
+ var sml	= base + parseInt(viccalc.screenoffset.options[viccalc.screenoffset.selectedIndex].value);
+ var sprtZptr	= sml + 1016;
+ viccalc.charlocation.value	= charloc + " $" + charloc.toString(16);
+ viccalc.screenmemlocation.value= sml + " $" + sml.toString(16);
+ viccalc.sprtZeroPtr.value	= sprtZptr + " $" + sprtZptr.toString(16);
+}
+
+function calcSpriteMemLoc(){
+ // Take video offset + (64 * sprite pointer value)
+ var base = parseInt(viccalc.bank.options[viccalc.bank.selectedIndex].value);
+ spritecalc.sprtZeroLocation.value = (spritecalc.sprtZeroValue.value * 64) + base;
+}
+
+function calcAll(){
+ calcCharMemLocation();
+ calcSpriteMemLoc();
+ setCharBankSpecial();
+}
+
+function setCharBankSpecial(){
+ var base = parseInt(viccalc.bank.options[viccalc.bank.selectedIndex].value);
+ if(base == 0 || base == 2){
+  viccalc.charoffset.options[2].text = 'CHAR ROM %xxxx010x, 2: $1000-$17FF, 4096-6143.';
+  viccalc.charoffset.options[3].text = 'CHAR ROM %xxxx011x, 3: $1800-$1FFF, 6144-8191.';
+ }else{
+  viccalc.charoffset.options[2].text = '%xxxx010x, 2: $1000-$17FF, 4096-6143.';
+  viccalc.charoffset.options[3].text = '%xxxx011x, 3: $1800-$1FFF, 6144-8191.';
+ }
+}
+
+</script>
+<body onLoad="calcAll()">
+
+<form name=viccalc>
+Video Mode 
+<li><span id=d011>$D011: %00<b><u>0</u></b>11011</span>
+<li><span id=d016>$D016: %110<b><u>0</u></b>1000</span>
+<br>
+
+<input type=radio name=mode value=char checked onClick='d011.innerHTML="$D011: %00<b><u>0</u></b>11011"'>Character
+<input type=radio name=mode value=bitmap onClick='d011.innerHTML="$D011: %00<b><u>1</u></b>11011"'>Bitmap
+<br>
+<input type=radio name=color value=single checked onClick='d016.innerHTML="$D016: %110<b><u>0</u></b>1000"'>Single Color
+<input type=radio name=color value=multi onClick='d016.innerHTML="$D016: %110<b><u>1</u></b>1000"'>Multicolor
+<br>
+
+$DD00 VIC Bank selection<br>
+<select name=bank onChange="calcAll()">
+<option value=49152>%xxxxxx00, 0: Bank #3, $C000-$FFFF, 49152-65535.</option>
+<option value=32768>%xxxxxx01, 1: Bank #2, $8000-$BFFF, 32768-49151.</option>
+<option value=16384>%xxxxxx10, 2: Bank #1, $4000-$7FFF, 16384-32767.</option>
+<option value=0 selected>%xxxxxx11, 3: Bank #0, $0000-$3FFF, 0-16383.</option>
+</select>
+<br>
+
+$D018 Character set memory offset (#1-#3) 2k increments<br>
+<i>%010 and %011 in Bank #0 and #2</i><br>
+<select name=charoffset onChange="calcAll()">
+<option value=0>%xxxx000x, 0: $0000-$07FF, 0-2047</option>
+<option value=2048>%xxxx001x, 1: $0800-$0FFF, 2048-4095.</option>
+<option value=4096 selected>%xxxx010x, 2: $1000-$17FF, 4096-6143.</option>
+<option value=6144>%xxxx011x, 3: $1800-$1FFF, 6144-8191.</option>
+<option value=8192>%xxxx100x, 4: $2000-$27FF, 8192-10239.</option>
+<option value=10240>%xxxx101x, 5: $2800-$2FFF, 10240-12287.</option>
+<option value=12288>%xxxx110x, 6: $3000-$37FF, 12288-14335.</option>
+<option value=14336>%xxxx111x, 7: $3800-$3FFF, 14336-16383.</option>
+</select>
+<br>
+
+$D018 Screen memory offset (#4-#7 bits) 1k increments<br>
+<select name=screenoffset onChange="calcAll()">
+<option value=0>%0000xxxx, 0: $0000-$03FF, 0-1023.</option>
+<option value=1024 selected>%0001xxxx, 1: $0400-$07FF, 1024-2047.</option>
+<option value=2048>%0010xxxx, 2: $0800-$0BFF, 2048-3071.</option>
+<option value=3072>%0011xxxx, 3: $0C00-$0FFF, 3072-4095.</option>
+<option value=4096>%0100xxxx, 4: $1000-$13FF, 4096-5119.</option>
+<option value=5120>%0101xxxx, 5: $1400-$17FF, 5120-6143.</option>
+<option value=6144>%0110xxxx, 6: $1800-$1BFF, 6144-7167.</option>
+<option value=7168>%0111xxxx, 7: $1C00-$1FFF, 7168-8191.</option>
+<option value=8192>%1000xxxx, 8: $2000-$23FF, 8192-9215.</option>
+<option value=9216>%1001xxxx, 9: $2400-$27FF, 9216-10239.</option>
+<option value=10240>%1010xxxx, 10: $2800-$2BFF, 10240-11263.</option>
+<option value=11264>%1011xxxx, 11: $2C00-$2FFF, 11264-12287.</option>
+<option value=12288>%1100xxxx, 12: $3000-$33FF, 12288-13311.</option>
+<option value=13312>%1101xxxx, 13: $3400-$37FF, 13312-14335.</option>
+<option value=14336>%1110xxxx, 14: $3800-$3BFF, 14336-15359.</option>
+<option value=15360>%1111xxxx, 15: $3C00-$3FFF, 15360-16383.</option>
+</select>
+<p>
+<table border=1><tr><td colspan=2 align=center>Results</td></tr>
+<tr><td align=right>Character Memory location:</td><td> <input type=text name=charlocation></td></tr>
+<tr><td align=right>Screen memory location:</td><td> <input type=text    name=screenmemlocation></td></tr>
+<tr><td align=right>Sprite 0 pointer:</td><td> <input type=text    name=sprtZeroPtr></td></tr>
+</table>
+</form>
+
+<form name=spritecalc>
+<table border=1>
+<tr><td align=right>Sprite 0 Value: #</td><td> <input type=text name=sprtZeroValue value='0'></td></tr>
+<tr><td align=right>Sprite 0 location: #</td><td> <input type=text disabled=true name=sprtZeroLocation value='$0000'></td></tr>
+<tr><td colspan=2><input type=button value=calc onClick='calcSpriteMemLoc()'></td></tr>
+</table>
+Sprite visible location is x:24- /0-320 y:50-229 (if 21 tall) 0-320
+</form>

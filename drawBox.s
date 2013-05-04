@@ -3,9 +3,9 @@ WALL_CHAR_TRT   .equ 73
 WALL_CHAR_TLFT  .equ 110
 WALL_CHAR_TOP   .equ 112
 
-; Draw game board using char 230 as the boarder
+; Draw game board using char 230 as the border
 ; We'll start at the top left +3, draw down 16, 8 accross
-DrawBoarderBox ; void = (ret>, ret<, topLeftPos>, topLeftPos<, height, width)
+DrawBorderBox ; void = (ret>, ret<, topLeftPos>, topLeftPos<, height, width)
     jmp dbb_start
     dbb_height  .byte $00
     dbb_width   .byte $00
@@ -37,8 +37,8 @@ dbb_start
 ldy #0
 lda #WALL_CHAR_TLFT
 sta (zpPtr2),y
-lda #COLOR_GREY
-sta (zpPtr1),y
+;lda #COLOR_CYAN
+;sta (zpPtr1),y
 
 dbb_DrawTop
     iny
@@ -162,7 +162,7 @@ printLoopSub
     lda (zpPtr1), y
     beq printCompleteSub
     sta (zpPtr2), y
-    lda #COLOR_L_GREY
+    lda #COLOR_CYAN ; inner default color for text
     sta (zpPtr3),y
     iny
     jmp printLoopSub

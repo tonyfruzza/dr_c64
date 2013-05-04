@@ -2,9 +2,9 @@
 
 JOY1                    .equ 56321 ; Joystick flag byte
 LR_MOVE_REPEAT_TIME     .equ 5
-LR_FIRST_MOVE_R_TIME    .equ 10
+LR_FIRST_MOVE_R_TIME    .equ 7
 DOWN_REPEAT_TIME        .equ 2
-FIRE_REPEAT_TIME        .equ 22
+FIRE_REPEAT_TIME        .equ 7
 
 l_repeatTime    .byte LR_FIRST_MOVE_R_TIME
 r_repeatTime    .byte LR_FIRST_MOVE_R_TIME

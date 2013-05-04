@@ -14,7 +14,7 @@ Clearing
     STA SCREENMEM + $100, x
     STA SCREENMEM + $200, x
     STA SCREENMEM + $300, x
-    lda #COLOR_DARK_GREY
+    lda #COLOR_WHITE
     sta COLORMEM, x
     sta COLORMEM + $100, x
     sta COLORMEM + $200, x
@@ -23,60 +23,6 @@ Clearing
     BNE Clearing;
     ldx retx
     RTS
-
-colorScreenWithCheckers
-    lda #0
-    sta tmp1
-    lda #$c0
-    sta zpPtr1
-    lda #$07
-    sta zpPtr1+1
-
-    clc
-    lda zpPtr1+1
-    adc #$d4
-    sta zpPtr1+1
-
-    ldx #24
-    ldy #40
-rowClearLoop
-    lda #COLOR_YELLOW
-    sta (zpPtr1),y
-    dey
-    beq next_cswc_Row
-    dey
-    beq next_cswc_Row
-    jmp rowClearLoop
-next_cswc_Row
-    dex
-    beq cswc_done
-    ldy #40
-    sec
-    lda zpPtr1
-    sbc #40
-    sta zpPtr1
-    lda zpPtr1+1
-    sbc #0
-    sta zpPtr1+1
-
-;    lda #1
-;    eor tmp1
-;    sta tmp1
-lda tmp1
-eor #1
-sta tmp1
-
-
-    tya
-    sec
-    sbc #1
-    tay
-
-    jmp rowClearLoop
-cswc_done
-rts
-
-
 
 
 get_random_number ; reg a ()

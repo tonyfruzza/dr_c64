@@ -31,7 +31,9 @@ size_t rawImageParser::readImageFile(string fileName){
     }
     
     while(!feof(imgptr) && lastRead > 0){
-        lastRead = fread(&imgBuffer[bytesRead], 1, 1, imgptr);
+        if(!(lastRead = fread(&imgBuffer[bytesRead], 1, 1, imgptr))){
+            continue;
+        }
         bytesRead++;
     }
     return bytesRead;

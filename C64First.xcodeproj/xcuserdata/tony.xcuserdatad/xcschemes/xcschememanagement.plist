@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>bin2hex.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
 		<key>bitmapReader.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -23,6 +28,11 @@
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>EA96DB8F1666FD7000BC97D7</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>EAA0A437172DDD7200C60DF3</key>
 		<dict>
 			<key>primary</key>
 			<true/>

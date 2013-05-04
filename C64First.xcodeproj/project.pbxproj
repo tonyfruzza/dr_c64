@@ -8,12 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		EA96DB951666FD7000BC97D7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA96DB941666FD7000BC97D7 /* main.cpp */; };
+		EAA0A43B172DDD7200C60DF3 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EAA0A43A172DDD7200C60DF3 /* main.cpp */; };
 		EAAD45F6166B248C005EAC00 /* bitmapReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EAAD45F5166B248C005EAC00 /* bitmapReader.cpp */; };
 		EAAD4604166C8562005EAC00 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EAAD4603166C8562005EAC00 /* main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		EA96DB8E1666FD7000BC97D7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		EAA0A436172DDD7200C60DF3 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -35,15 +45,12 @@
 
 /* Begin PBXFileReference section */
 		EA1CCD5416786CBB00C0651D /* tree.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = tree.s; sourceTree = "<group>"; };
+		EA240D921723B22C006A10BA /* spritePath.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = spritePath.s; sourceTree = "<group>"; };
 		EA286E83160BE51300C4A9B2 /* drc64.prg */ = {isa = PBXFileReference; lastKnownFileType = file; path = drc64.prg; sourceTree = "<group>"; };
 		EA286E85160BE57E00C4A9B2 /* example.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.prg; path = ../../ISOs/example.prg; sourceTree = "<group>"; };
-		EA286E86160C24F600C4A9B2 /* lightspeed.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = lightspeed.s; sourceTree = "<group>"; };
 		EA286E88160C486D00C4A9B2 /* flicker.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = flicker.prg; path = ../../ISOs/flicker.prg; sourceTree = "<group>"; };
 		EA4D2A9D16927295005FF3E9 /* newyear.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = newyear.s; sourceTree = "<group>"; };
-		EA4D2AAD1694CFCB005FF3E9 /* happyNewYear640x8.raw */ = {isa = PBXFileReference; lastKnownFileType = file; name = happyNewYear640x8.raw; path = Images/happyNewYear640x8.raw; sourceTree = "<group>"; };
-		EA4D2B9516A503D8005FF3E9 /* dna3-kola.kla */ = {isa = PBXFileReference; lastKnownFileType = file; name = "dna3-kola.kla"; path = "../../ISOs/dna3-kola.kla"; sourceTree = "<group>"; };
 		EA4D2B9F16A605C8005FF3E9 /* koalaplay.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = koalaplay.s; sourceTree = "<group>"; };
-		EA4D2BA116A60C81005FF3E9 /* KoalaViewer.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = KoalaViewer.prg; path = ../../ISOs/KoalaViewer.prg; sourceTree = "<group>"; };
 		EA859D7D1644E83F0016FB33 /* lookForConnect4.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lookForConnect4.s; sourceTree = "<group>"; };
 		EA859D7F1644EAEA0016FB33 /* search.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = search.s; sourceTree = "<group>"; };
 		EA8961AA1658B6B300C48645 /* down.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = down.s; sourceTree = "<group>"; };
@@ -67,6 +74,9 @@
 		EA933B07165AF90E000B3E34 /* highres.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = highres.s; sourceTree = "<group>"; };
 		EA96DB901666FD7000BC97D7 /* bitmapReader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bitmapReader; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA96DB941666FD7000BC97D7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		EAA0A438172DDD7200C60DF3 /* bin2hex */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bin2hex; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAA0A43A172DDD7200C60DF3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		EAA0A441172E1AB800C60DF3 /* dna4.kla */ = {isa = PBXFileReference; lastKnownFileType = file; path = dna4.kla; sourceTree = SOURCE_ROOT; };
 		EAA29EAA16110FA200C87D7F /* number.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = number.s; sourceTree = "<group>"; };
 		EAA2A0A11620115800C87D7F /* joytest.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = joytest.s; sourceTree = "<group>"; };
 		EAAC7FDC170F834B004B023E /* pill_h.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = pill_h.raw; sourceTree = "<group>"; };
@@ -84,6 +94,10 @@
 		EAAD47F51677D1C7005EAC00 /* showSprite.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = showSprite.s; sourceTree = "<group>"; };
 		EAB47DD0155219BF00516343 /* baseGame.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = baseGame.s; sourceTree = "<group>"; };
 		EABC8DE215CA2145006F2067 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		EABF2B1F1732E3F200813708 /* quiet.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = quiet.prg; path = ../../quiet.prg; sourceTree = "<group>"; };
+		EABF2B2117344ED700813708 /* gameborder.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = gameborder.raw; sourceTree = "<group>"; };
+		EABF2B221734540100813708 /* leftTopSprite.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = leftTopSprite.raw; sourceTree = "<group>"; };
+		EABF2B23173455CB00813708 /* layout_sprites.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = layout_sprites.s; sourceTree = "<group>"; };
 		EAD8212F163BCAD3007DFD49 /* drawBox.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = drawBox.s; sourceTree = "<group>"; };
 		EAD82131163CB59F007DFD49 /* layout.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = layout.s; sourceTree = "<group>"; };
 		EAE21A1115A3BB9600DCE4B2 /* Notes.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = Notes.s; sourceTree = "<group>"; };
@@ -92,6 +106,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		EA96DB8D1666FD7000BC97D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAA0A435172DDD7200C60DF3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -111,6 +132,8 @@
 		EA859D801644EB310016FB33 /* Clearing */ = {
 			isa = PBXGroup;
 			children = (
+				EAD82131163CB59F007DFD49 /* layout.s */,
+				EABF2B23173455CB00813708 /* layout_sprites.s */,
 				EA859D7F1644EAEA0016FB33 /* search.s */,
 				EA859D7D1644E83F0016FB33 /* lookForConnect4.s */,
 			);
@@ -124,6 +147,7 @@
 				EA8961AB1658B71A00C48645 /* left.s */,
 				EA8961AC1658B73C00C48645 /* right.s */,
 				EA8961AD1658B9AB00C48645 /* moveUtils.s */,
+				EA8961B11658BC6100C48645 /* rotate.s */,
 			);
 			name = Movement;
 			sourceTree = "<group>";
@@ -146,7 +170,6 @@
 				EAE21A1115A3BB9600DCE4B2 /* Notes.s */,
 				EAA29EAA16110FA200C87D7F /* number.s */,
 				EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */,
-				EA286E86160C24F600C4A9B2 /* lightspeed.s */,
 				EAA2A0A11620115800C87D7F /* joytest.s */,
 				EA92E7A1166329FA00DBF1B8 /* scroller.s */,
 				EAAD45FA166C77A6005EAC00 /* friday.s */,
@@ -154,6 +177,7 @@
 				EAAD47F51677D1C7005EAC00 /* showSprite.s */,
 				EA4D2A9D16927295005FF3E9 /* newyear.s */,
 				EA4D2B9F16A605C8005FF3E9 /* koalaplay.s */,
+				EA240D921723B22C006A10BA /* spritePath.s */,
 			);
 			name = experiements;
 			sourceTree = "<group>";
@@ -163,6 +187,7 @@
 			children = (
 				EA96DB901666FD7000BC97D7 /* bitmapReader */,
 				EAAD4600166C8562005EAC00 /* linker */,
+				EAA0A438172DDD7200C60DF3 /* bin2hex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -177,9 +202,21 @@
 			path = bitmapReader;
 			sourceTree = "<group>";
 		};
+		EAA0A439172DDD7200C60DF3 /* bin2hex */ = {
+			isa = PBXGroup;
+			children = (
+				EAA0A43A172DDD7200C60DF3 /* main.cpp */,
+			);
+			path = bin2hex;
+			sourceTree = "<group>";
+		};
 		EAAC7FDB170F834B004B023E /* outbreak_assets */ = {
 			isa = PBXGroup;
 			children = (
+				EABF2B221734540100813708 /* leftTopSprite.raw */,
+				EABF2B1F1732E3F200813708 /* quiet.prg */,
+				EAA0A441172E1AB800C60DF3 /* dna4.kla */,
+				EABF2B2117344ED700813708 /* gameborder.raw */,
 				EAAC7FED171332D6004B023E /* numbers.raw */,
 				EAAC7FDC170F834B004B023E /* pill_h.raw */,
 				EAAC7FDD170F834B004B023E /* pill_v.raw */,
@@ -203,14 +240,12 @@
 			children = (
 				EABC8DE215CA2145006F2067 /* Makefile */,
 				EAB47DD0155219BF00516343 /* baseGame.s */,
-				EA8961B11658BC6100C48645 /* rotate.s */,
 				EA8961AE1658BA1600C48645 /* Colors */,
 				EA8961A81658B6A700C48645 /* Movement */,
 				EA859D801644EB310016FB33 /* Clearing */,
 				EA8DD138163EA5C000D3D0E5 /* virusLevels.s */,
 				EA8DD13916412F0300D3D0E5 /* lvlSelect.s */,
 				EA8DD136163D3ED400D3D0E5 /* drops.s */,
-				EAD82131163CB59F007DFD49 /* layout.s */,
 				EA8B35EB163A971000C1059B /* input.s */,
 				EA8B35BC1639598400C1059B /* testScenarios.s */,
 				EA8D873F1634E60D0003415E /* refreshCounter.s */,
@@ -222,10 +257,8 @@
 				EAB47DD11552219800516343 /* Target */,
 				EA96DB931666FD7000BC97D7 /* bitmapReader */,
 				EAAD4602166C8562005EAC00 /* linker */,
+				EAA0A439172DDD7200C60DF3 /* bin2hex */,
 				EA96DB911666FD7000BC97D7 /* Products */,
-				EA4D2B9516A503D8005FF3E9 /* dna3-kola.kla */,
-				EA4D2BA116A60C81005FF3E9 /* KoalaViewer.prg */,
-				EA4D2AAD1694CFCB005FF3E9 /* happyNewYear640x8.raw */,
 			);
 			sourceTree = "<group>";
 		};
@@ -276,6 +309,23 @@
 			productReference = EA96DB901666FD7000BC97D7 /* bitmapReader */;
 			productType = "com.apple.product-type.tool";
 		};
+		EAA0A437172DDD7200C60DF3 /* bin2hex */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EAA0A440172DDD7200C60DF3 /* Build configuration list for PBXNativeTarget "bin2hex" */;
+			buildPhases = (
+				EAA0A434172DDD7200C60DF3 /* Sources */,
+				EAA0A435172DDD7200C60DF3 /* Frameworks */,
+				EAA0A436172DDD7200C60DF3 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = bin2hex;
+			productName = bin2hex;
+			productReference = EAA0A438172DDD7200C60DF3 /* bin2hex */;
+			productType = "com.apple.product-type.tool";
+		};
 		EAAD45FF166C8562005EAC00 /* linker */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EAAD4607166C8562005EAC00 /* Build configuration list for PBXNativeTarget "linker" */;
@@ -299,7 +349,7 @@
 		EAB47DC51552197000516343 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0440;
+				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "Lightspeed Systems";
 			};
 			buildConfigurationList = EAB47DC81552197000516343 /* Build configuration list for PBXProject "C64First" */;
@@ -317,6 +367,7 @@
 				EAB47DCA1552197000516343 /* C64First */,
 				EA96DB8F1666FD7000BC97D7 /* bitmapReader */,
 				EAAD45FF166C8562005EAC00 /* linker */,
+				EAA0A437172DDD7200C60DF3 /* bin2hex */,
 			);
 		};
 /* End PBXProject section */
@@ -328,6 +379,14 @@
 			files = (
 				EA96DB951666FD7000BC97D7 /* main.cpp in Sources */,
 				EAAD45F6166B248C005EAC00 /* bitmapReader.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAA0A434172DDD7200C60DF3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAA0A43B172DDD7200C60DF3 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,6 +419,36 @@
 			};
 			name = Release;
 		};
+		EAA0A43E172DDD7200C60DF3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		EAA0A43F172DDD7200C60DF3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		EAAD4608166C8562005EAC00 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -383,6 +472,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -409,6 +502,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -454,6 +551,15 @@
 			buildConfigurations = (
 				EA96DB981666FD7000BC97D7 /* Debug */,
 				EA96DB991666FD7000BC97D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EAA0A440172DDD7200C60DF3 /* Build configuration list for PBXNativeTarget "bin2hex" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EAA0A43E172DDD7200C60DF3 /* Debug */,
+				EAA0A43F172DDD7200C60DF3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -64,7 +64,10 @@ CantDoRotateToLeftVertical
     sta zpPtr2+1
     lda (zpPtr2),y
     cmp #' '
-    bne RotateFinished ; No room above or below, eject!
+beq RotateCanContinue
+jmp RotateFinishedNoSound
+RotateCanContinue
+;    bne RotateFinishedNoSound ; No room above or below, eject!
     ; put the piece2 under piece1 and inc ORIENTATION
     clc
     lda piece1
@@ -110,7 +113,10 @@ rotateToLeft
     lda piece2+1
     pha
     jsr CheckCollisionLeft ; Is there room to the left?
-    bne RotateFinished ; there was no room
+beq RotateCanContinue2
+jmp RotateFinishedNoSound
+RotateCanContinue2
+;    bne RotateFinishedNoSound ; there was no room
     ; Nothing to the left of the bottom, but what about the top?
     ; Well there could be something to the top, which would fail a move left
     ; in which case we have to manually rotate and move left so as to not
@@ -144,6 +150,13 @@ commitRotateToHorizontal
     lda #$00
     sta ORIENTATION
 RotateFinished
+    ; Play noise
+    lda #<SOUND_ROTATE
+    ldy #>SOUND_ROTATE
+    ldx #14 ; channel 3
+    jsr songStartAdress+6
+    ; Done with sound
+RotateFinishedNoSound
     jsr RepaintCurrentColor
     ; print the result
     ldy #$00
@@ -153,25 +166,12 @@ RotateFinished
     sta (piece1),y
     lda #PILL_BOTTOM
     sta (piece2),y
-    ; Play noise
-lda #<SOUND_ROTATE
-ldy #>SOUND_ROTATE
-    ldx #14 ; channel 3
-    jsr songStartAdress+6
-    ; Done with sound
     rts
-
 RotateEndHorizontal
     lda #PILL_LEFT
     sta (piece1),y
     lda #PILL_RIGHT
     sta (piece2),y
-; Play noise
-lda #<SOUND_ROTATE
-ldy #>SOUND_ROTATE
-    ldx #14
-    jsr songStartAdress+6
-; Done with sound
     rts
 
 ORIENTATION_BEFORE  .byte $00
