@@ -1,6 +1,8 @@
 all:
 	tools/bitmapReader -t PILL_H -cf outbreak_assets/pill_h.raw -w 16 -h 8 > compiledAssets.s
 	tools/bitmapReader -t PILL_V -cf outbreak_assets/pill_v.raw -w 8 -h 16 >> compiledAssets.s
+	tools/bitmapReader -t PILL_HD -cf outbreak_assets/pill_h-dropped.raw -w 16 -h 8 >> compiledAssets.s
+	tools/bitmapReader -t PILL_VD -cf outbreak_assets/pill_v-dropped.raw -w 8 -h 16 >> compiledAssets.s
 	tools/bitmapReader -t PILL_HLF -cf outbreak_assets/pillHalf.raw -w 8 -h 8 >> compiledAssets.s
 	tools/bitmapReader -t PILL_HLF2 -cf outbreak_assets/pillHalf2.raw -w 8 -h 8 >> compiledAssets.s
 	tools/bitmapReader -t V1_AN -cf outbreak_assets/v1_an.raw -w 24 -h 8 >> compiledAssets.s
@@ -8,9 +10,21 @@ all:
 	tools/bitmapReader -t GAME_BORDER -cf outbreak_assets/gameborder.raw -w 24 -h 24 >> compiledAssets.s
 	tools/bitmapReader -t leftTopSprite -sf outbreak_assets/leftTopSprite.raw -w 24 -h 21 >> compiledAssets.s
 	tools/bitmapReader -t rightTopSprite -sf outbreak_assets/rightTopSprite.raw -w 24 -h 21 >> compiledAssets.s
+#	tools/bitmapReader -t scorePopUp -sf outbreak_assets/scorePopUp.raw -w 24 -h 21 >> compiledAssets.s
+	tools/bitmapReader -t CLEAR_PIECE -cf outbreak_assets/clearPieces.raw -w 24 -h 8 >> compiledAssets.s
+	# These small numbers are only 5 pixels tall, so I'm going to chop off the bottom 3 pixels
+	# each number is 4x5 bits 
+	tools/bitmapReader -t SN01 -cf outbreak_assets/smallNums/smallNum01.raw -w 8 -h 8 >> compiledAssets.s
+	tools/bitmapReader -t SN23 -cf outbreak_assets/smallNums/smallNum23.raw -w 8 -h 8 >> compiledAssets.s
+	tools/bitmapReader -t SN45 -cf outbreak_assets/smallNums/smallNum45.raw -w 8 -h 8 >> compiledAssets.s
+	tools/bitmapReader -t SN67 -cf outbreak_assets/smallNums/smallNum67.raw -w 8 -h 8 >> compiledAssets.s
+	tools/bitmapReader -t SN89 -cf outbreak_assets/smallNums/smallNum89.raw -w 8 -h 8 >> compiledAssets.s
+
+	#tools/bitmapReader -t smallNums -cf outbreak_assets/smallNumbers.raw -w 40 -h 8|sed s/', 0, 0, 0'// >> compiledAssets.s
+	tools/bin2hex -kf outbreak_assets/dna5.kla -n dylan1 >> compiledAssets.s
 	cat baseGame.s subroutines.s customchars.s refreshCounter.s testScenarios.s input.s drawBox.s layout.s drops.s \
     virusLevels.s lvlSelect.s search.s lookForConnect4.s down.s left.s right.s moveUtils.s newColor.s colorUtils.s \
-    rotate.s compiledAssets.s layout_sprites.s > baseGameCombine.s
+    rotate.s compiledAssets.s layout_sprites.s showSplashScreen.s scoreOverTop.s lvlPieceColor.s scoring.s > baseGameCombine.s
 	/usr/local/bin/mac2c64 -r baseGameCombine.s
 	mv baseGameCombine.rw drc64.prg
 #	tools/linker drc64.prg quiet.prg > outbreak.prg
@@ -57,16 +71,10 @@ charAni:
 	/usr/local/bin/mac2c64 -r charAni.s
 	mv charAni.rw charAni.prg	
 showSprite:
-	@/Users/Tony/Library/Developer/Xcode/DerivedData/C64First-bcaelnhlmpesixdidkmnvslvslar/Build/Products/Debug/bitmapReader -w 24 -h 21 -s -f Images/spriteTitleTiles_1.raw
-	@/Users/Tony/Library/Developer/Xcode/DerivedData/C64First-bcaelnhlmpesixdidkmnvslvslar/Build/Products/Debug/bitmapReader -w 24 -h 21 -s -f Images/spriteTitleTiles_2.raw
-	@/Users/Tony/Library/Developer/Xcode/DerivedData/C64First-bcaelnhlmpesixdidkmnvslvslar/Build/Products/Debug/bitmapReader -w 24 -h 21 -s -f Images/spriteTitleTiles_3.raw
-	@/Users/Tony/Library/Developer/Xcode/DerivedData/C64First-bcaelnhlmpesixdidkmnvslvslar/Build/Products/Debug/bitmapReader -w 24 -h 21 -s -f Images/spriteTitleTiles_4.raw
-	@/Users/Tony/Library/Developer/Xcode/DerivedData/C64First-bcaelnhlmpesixdidkmnvslvslar/Build/Products/Debug/bitmapReader -w 24 -h 21 -s -f Images/spriteTitleTiles_5.raw
-	@/Users/Tony/Library/Developer/Xcode/DerivedData/C64First-bcaelnhlmpesixdidkmnvslvslar/Build/Products/Debug/bitmapReader -w 24 -h 21 -s -f Images/spriteTitleTiles_6.raw
-	@/Users/Tony/Library/Developer/Xcode/DerivedData/C64First-bcaelnhlmpesixdidkmnvslvslar/Build/Products/Debug/bitmapReader -w 24 -h 21 -s -f Images/spriteTitleTiles_7.raw
-	@/Users/Tony/Library/Developer/Xcode/DerivedData/C64First-bcaelnhlmpesixdidkmnvslvslar/Build/Products/Debug/bitmapReader -w 24 -h 21 -s -f Images/spriteTitleTiles_8.raw
-	/usr/local/bin/mac2c64 -r showSprite.s
-	tools/linker showSprite.rwa showSprite.rwb > showSprite.prg
+	cp -f showSprite.s showSpriteCombine.s
+	tools/bitmapReader -t CUST_SPRITE_0 -w 24 -h 21 -s -f Images/spriteTitleTiles_1.raw >> showSpriteCombine.s
+	/usr/local/bin/mac2c64 -r showSpriteCombine.s
+	mv showSpriteCombine.rw showSprite.prg
 newyear:
 	/usr/local/bin/mac2c64 -r newyear.s
 	mv newyear.rw newyear.prg

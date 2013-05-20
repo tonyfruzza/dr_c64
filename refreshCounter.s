@@ -2,7 +2,8 @@
 
 RASTER_TO_COUNT_AT  .equ 0
 DELAY2              .equ 6
-songStartAdress     .equ $2300
+;songStartAdress     .equ $2300
+songStartAdress     .equ $5000
 SOUND_ROTATE        .byte $00,$f6,$00,$a0,$12,$c0,$d0,$d1,$d2,$d4,$d6,$d8,$da,$10,$00
 SOUND_HORIZONTAL    .byte $00,$53,$00,$a0,$12,$c0,$d0,$d1,$d2,$d4,$d6,$d8,$da,$10,$00
 SOUND_BOTTOM        .byte $82,$24,$00,$a0,$81,$90,$41,$8e,$8a,$40,$00
@@ -10,6 +11,7 @@ refreshCount        .byte $00
 refreshTimer2       .byte $00
 refreshTimer3       .byte $00
 playMusic           .byte $00
+flashTimes          .byte $00
 
 initRefreshCounter
     sei          ; turn off interrupts
@@ -42,8 +44,59 @@ initRefreshCounter
     cli          ; turn interrupts back on
     rts
 
-
+;
+; Event entry point
 irq_refreshCounter ; void (y, x, a)
+    ; See if we need to turn off a score sprite
+    lda $d015
+    and #4
+    beq noScoreSpriteEnabled
+    lda framesToShowSprite
+    beq disableScoreSprite
+    cmp #15
+    bne noScoreSpriteMods
+    ; For 15 do
+    lda #COLOR_GREY
+    sta VMEM+41
+    dec $d005
+    dec $d005
+    jmp noScoreSpriteMods
+
+    cmp #5
+    lda #COLOR_DARK_GREY
+    sta VMEM+41
+    dec $d005
+    dec $d005
+
+
+noScoreSpriteMods
+    dec framesToShowSprite
+    jmp noScoreSpriteEnabled
+disableScoreSprite
+    ; everything except for sprite 3 enabled
+    lda $d015
+    and #$fb
+    sta $d015
+noScoreSpriteEnabled
+
+    lda SCREEN_BORDER
+    and #$0f ; Upper bits are being set to F here, not sure why!?
+    bne turnFlashOff ; Not black?
+; do we flash for a score?
+doWeFlash
+    lda flashTimes
+    beq doneFlash ; Do we need to flash?
+    lda #COLOR_DARK_GREY
+    sta SCREEN_BORDER
+    dec flashTimes
+    jmp doneFlash
+turnFlashOff
+    lda framesToShowSprite ; extend flash time out as long as score is displayed
+    bne doneFlash
+    lda #COLOR_BLACK
+    sta SCREEN_BORDER
+doneFlash
+
     lda playMusic
     beq dontPlayMusic
     jsr songStartAdress+3 ; Play song
@@ -77,7 +130,6 @@ lNoReset
 
 ;    jsr cycleBackgroundAnimation
 noRefreshTimer3Work
-
     asl $d019    ; ACK interrupt (to re-enable it)
 
     pla

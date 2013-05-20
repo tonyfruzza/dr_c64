@@ -16,10 +16,6 @@ MoveCharMap
     ; Entry point
     jmp mcm_start
     ; Define some custom character data
-
-    CLEAR_ONE   .byte 124, 254, 238, 198, 238, 254, 124, 0
-    CLEAR_TWO   .byte 124, 198, 130, 130, 130, 198, 124, 0
-
     V2_AN1      .byte 170, 124, 68, 238, 186, 198, 124, 0
     V2_AN2      .byte 170, 124, 68, 238, 254, 130, 124, 0
     V2_AN3      .byte 170, 124, 68, 238, 254, 198, 186, 0
@@ -116,11 +112,12 @@ PillMakerLoop
     lda PILL_HLF2, x
     sta NEWCHARMAP+648, x ; 8 * 81
 
-    lda CLEAR_ONE, x
+    lda CLEAR_PIECE, x
     sta NEWCHARMAP+688, x ; 8 * 86
-
-    lda CLEAR_TWO, x
+    lda CLEAR_PIECE_1, x
     sta NEWCHARMAP+720, x ; 8 * 90
+    lda CLEAR_PIECE_2, x
+    sta NEWCHARMAP+728, x; 8 * 91
 
     lda GAME_BORDER_4, x ; background
     sta NEWCHARMAP+1016, x ; 8 * 127
@@ -146,9 +143,6 @@ PillMakerLoop
     lda GAME_BORDER_8, x
     sta NEWCHARMAP+600, x; 8 * 75
 
-
-
-
     lda V1_AN, x
     sta NEWCHARMAP+664,x ; 8 * 83
 
@@ -157,6 +151,17 @@ PillMakerLoop
 
     lda V3_AN1, x
     sta NEWCHARMAP+680,x ; 8 * 85
+
+    lda PILL_HD, x
+    sta NEWCHARMAP+864,x ; 8 * 108
+
+    lda PILL_HD+8, x
+    sta NEWCHARMAP+928,x ; 8 * 116
+
+    lda PILL_VD, x
+    sta NEWCHARMAP+888,x ; 8 * 111
+    lda PILL_VD+8, x
+    sta NEWCHARMAP+936,x ; 8 * 117
 
 
 

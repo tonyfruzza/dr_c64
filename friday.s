@@ -2,7 +2,7 @@ SCREENMEM   .equ 1024 ; Start of character screen map, color map is + $D400
 NEWCHARMAP  .equ 12288 ; $3000 new place for Charset
 FRIDAY_LOC  .equ 1278
 VIC_MEM         .equ 53248
-SCREEN_BOARDER  .equ VIC_MEM + 32
+SCREEN_BORDER  .equ VIC_MEM + 32
 SCREEN_BG_COLOR .equ VIC_MEM + 33
 COLORMEM    .equ $D800
 RASTER_TO_COUNT_AT  .equ 80
@@ -65,9 +65,9 @@ doneWithLoadingString
 
 backgroundColorFlicker
     jsr get_random_number
-    sta SCREEN_BOARDER
+    sta SCREEN_BORDER
 lda #0
-sta SCREEN_BOARDER
+sta SCREEN_BORDER
 nop
 nop
 nop

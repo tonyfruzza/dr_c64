@@ -18,7 +18,7 @@ VMEM        .equ $D000
 ; return
 
 VIC_MEM         .equ 53248
-SCREEN_BORDER  .equ VIC_MEM + 32
+SCREEN_BORDER   .equ VIC_MEM + 32
 SCREEN_BG_COLOR .equ VIC_MEM + 33
 SCREEN_CHAR     .equ 52224
 COLOR_BLACK     .equ $00
@@ -39,22 +39,25 @@ COLOR_L_BLUE    .equ $0e
 COLOR_L_GREY    .equ $0f
 delay_slow      .equ 37
 
+WALL_B          .equ 68
+WALL_BL         .equ 74
+WALL_BR         .equ 75
 PILL_SIDE       .equ 81 ; 'o'
 VIRUS_ONE       .equ 83
 VIRUS_TWO       .equ 84
 VIRUS_THREE     .equ 85
-
-
-PILL_LEFT       .equ 107
-PILL_RIGHT      .equ 115
-PILL_TOP        .equ 114
-PILL_BOTTOM     .equ 113
-WALL_SIDES      .equ 102
-WALL_B          .equ 68
-WALL_BL         .equ 74
-WALL_BR         .equ 75
 PILL_CLEAR_1    .equ 86
 PILL_CLEAR_2    .equ 90
+PILL_CLEAR_3    .equ 91
+WALL_SIDES      .equ 102
+PILL_LEFT       .equ 107
+PILL_LEFT_D     .equ 108
+PILL_TOP_D      .equ 111
+PILL_BOTTOM     .equ 113
+PILL_TOP        .equ 114
+PILL_RIGHT      .equ 115
+PILL_RIGHT_D    .equ 116
+PILL_BOTTOM_D   .equ 117
 
 OnePGameFieldLocLow   .equ $D7
 OnePGameFieldLocHigh  .equ $04
@@ -134,6 +137,21 @@ VIRUS_MUL_1 .byte $64, $00 ; 100
 
 
 init
+
+jsr setupScreenForSpashScreen
+; Look for button press
+splashLoop
+    lda JOY1
+    and #16
+    beq GotButtonPress
+    jmp splashLoop
+GotButtonPress
+; Taking too many joystick button inputs turn it off for a moment
+    lda #1
+    sta turnInputOff
+
+    jsr returnScreenBackFromSpash
+
     jsr MoveCharMap
     jsr initRefreshCounter
     ; Init START_POS for where pill drops from, 4 to the right of left border
@@ -154,6 +172,7 @@ clears
     ; Programatically create game layout
     jsr ClearScreen
     jsr DrawGameBorder
+    jsr changeColorSet
     jsr printSinglePlayerNextPieceBox
     jsr printSinglePlayerScoreBox
     jsr printSinglePlayerVirusCountBox
@@ -181,7 +200,10 @@ clears
     sta DELAY
     lda #1
     sta playMusic
+    lda #0
     jsr songStartAdress
+    lda #15
+    jsr songStartAdress+9
     jmp firstPieceToDrop
 DropNew
     ; Loop through every piece to see if they can be cleared
@@ -267,7 +289,8 @@ NextLevel
     ; Stop playing music
     lda #0
     sta playMusic
-    jsr songStartAdress
+    jsr songStartAdress+9 ; set volume 0
+
     jsr WaitEventFrame
     jsr WaitEventFrame
     jsr WaitEventFrame
@@ -283,10 +306,14 @@ NextLevel
 
 EndGame
     lda #0
-    jsr songStartAdress
+    jsr songStartAdress+9 ; turn volume to 0
     sta playMusic ; stop laying music
+
+; Debug
     sta P1_SCORE_B
+lda #19
     sta P1_SCORE_B+1
+lda #0
     sta P1_SCORE_B+2
     sta P1_SCORE_B+3
 ;    lda #21 ; testing
@@ -456,12 +483,38 @@ cl_SideManipulationComplete
             sta zpPtr4+1
 
             ; Animation for clearning of pieces, one piece at a time
-            lda #PILL_CLEAR_1
-            sta (zpPtr4), y
-            dey ; set it back to 0
+
+    ; Look for viruses for total
+    lda (zpPtr4), y
+    cmp #VIRUS_ONE
+    beq cl_itIsAVirus
+    cmp #VIRUS_TWO
+    beq cl_itIsAVirus
+    cmp #VIRUS_THREE
+    bne cl_notAVirus
+cl_itIsAVirus
+inc flashTimes
+
+lda zpPtr4
+sta placeScoreHere
+lda zpPtr4+1
+sta placeScoreHere+1
+
+jsr SetSpriteBasedOnCharPos
+
+jmp cl_storeValue
+cl_notAVirus
+    lda #PILL_CLEAR_1
+cl_storeValue
+    lda #PILL_CLEAR_1
+    sta (zpPtr4), y
+    dey ; set it back to 0
+;jsr WaitEventFrame
             lda tmp
             cmp varrayIndex
-            bne clearingLoop
+beq cl_noclearingLoop
+jmp clearingLoop
+cl_noclearingLoop
 finishedClearingV
             jmp ClearH
 ClearHFinished ; another exit because our previous branch was too far
@@ -471,7 +524,6 @@ ClearH
             ; Clear H array if we need to
             lda harrayIndex
             cmp #04
-;            bcc finishedClearingH
             bcc ClearHFinished
             ldx #$00 ; h array indexing * 2
             ldy #$00 ; zero page indexing, leave as 0
@@ -563,167 +615,5 @@ initClearArrayLoop
 clearArraysDone
             rts
 
-
-
-
-
-
-UpdateVirusCount
-    ldy #0
-    lda #$6f
-    sta zpPtr2
-    lda #$05
-    sta zpPtr2+1
-    ldx p1VirusCount
-    txa
-    and #$f0
-    lsr ; Shift over 4 times
-    lsr
-    lsr
-    lsr
-    ora #$30
-    sta (zpPtr2),y
-    iny
-    txa
-    and #$0f
-    ora #$30
-    sta (zpPtr2),y
-    rts
-
-
-; score is made up of 4 bytes of decimal numbers
-updateScore
-    ; See if there is any difference between the last virus count and the new one
-    lda p1VirusCountBinLast
-    cmp p1VirusCountBinNew
-    bne us_continue ; There was something cleared
-;    ldx #1
-;    lda #0
-;    tax
-;    sta scoreMultiplierTmp
-;    sta scoreMultiplierTmp+1
-;    sta scoreMultiplierTmp+2
-;    sta scoreMultiplierTmp+3
-    jmp printCurrentScoreWithNoChange
-us_continue
-    sec
-    sbc p1VirusCountBinNew
-    tax ; x contains the difference
-
-    ; Make the new count the current one now
-    lda p1VirusCountBinNew
-    sta p1VirusCountBinLast
-
-    ; Add the points up
-scoreLoop
-    lda VIRUS_MUL_1
-    sta scoreMultiplierTmp
-    lda VIRUS_MUL_1+1
-    sta scoreMultiplierTmp+1
-    lda #0
-    sta scoreMultiplierTmp+2
-    sta scoreMultiplierTmp+3
-    stx tmp ; store how many times to shift to the left
-
-multiplierLoop
-    dec tmp
-    beq multiplierDone
-
-lda #0
-sta carryWasSet
-    clc
-    asl scoreMultiplierTmp
-    bcc firstNoCarry
-    lda #1
-    sta carryWasSet
-firstNoCarry
-    clc
-    asl scoreMultiplierTmp+1
-    lda carryWasSet
-    ora scoreMultiplierTmp+1
-    sta scoreMultiplierTmp+1
-    lda #0
-    sta carryWasSet
-    bcc secondNoCarry
-    lda #1
-    sta carryWasSet
-secondNoCarry
-    clc
-    asl scoreMultiplierTmp+2
-    lda carryWasSet
-    ora scoreMultiplierTmp+2
-    sta scoreMultiplierTmp+2
-    lda #0
-    sta carryWasSet
-    bcc thirdNoCarry
-    lda #1
-    sta carryWasSet
-thirdNoCarry
-    clc
-    asl scoreMultiplierTmp+2
-    lda carryWasSet
-    ora scoreMultiplierTmp+2
-    sta scoreMultiplierTmp+2
-
-    jmp multiplierLoop
-
-
-multiplierDone
-    clc
-    lda P1_SCORE_B
-    adc scoreMultiplierTmp
-    sta P1_SCORE_B
-    sta P1_SCORE_B_COPY
-
-    lda P1_SCORE_B+1
-    adc scoreMultiplierTmp+1
-    sta P1_SCORE_B+1
-    sta P1_SCORE_B_COPY+1
-
-    lda P1_SCORE_B+2
-    adc scoreMultiplierTmp+2
-    sta P1_SCORE_B+2
-    sta P1_SCORE_B_COPY+2
-
-    lda P1_SCORE_B+3
-    adc scoreMultiplierTmp+3
-    sta P1_SCORE_B+3
-    sta P1_SCORE_B_COPY+3
-
-    dex
-    beq printCurrentScore
-    jmp scoreLoop
-
-
-printCurrentScoreWithNoChange
-    lda P1_SCORE_B
-    sta P1_SCORE_B_COPY
-    lda P1_SCORE_B+1
-    sta P1_SCORE_B_COPY+1
-    lda P1_SCORE_B+2
-    sta P1_SCORE_B_COPY+2
-    lda P1_SCORE_B+3
-    sta P1_SCORE_B_COPY+3
-printCurrentScore
-    jsr convertP1ScoreToDecimal
-    ldy #$00
-    lda #$94
-    sta zpPtr2
-    lda #$04
-    sta zpPtr2+1
-
-    ldx #8
-l2
-    lda P1_SCORE,x
-    ora #$30
-    sta (zpPtr2),y
-    iny
-    dex
-    bpl l2
-scoreUpdateComplete
-    rts
-
-scoreMultiplierTmp .byte $00, $00, $00, $00
-carryWasSet        .byte $00
 
 

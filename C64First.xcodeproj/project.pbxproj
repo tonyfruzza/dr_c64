@@ -44,7 +44,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		EA1CCD5416786CBB00C0651D /* tree.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = tree.s; sourceTree = "<group>"; };
 		EA240D921723B22C006A10BA /* spritePath.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = spritePath.s; sourceTree = "<group>"; };
 		EA286E83160BE51300C4A9B2 /* drc64.prg */ = {isa = PBXFileReference; lastKnownFileType = file; path = drc64.prg; sourceTree = "<group>"; };
 		EA286E85160BE57E00C4A9B2 /* example.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.prg; path = ../../ISOs/example.prg; sourceTree = "<group>"; };
@@ -98,6 +97,10 @@
 		EABF2B2117344ED700813708 /* gameborder.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = gameborder.raw; sourceTree = "<group>"; };
 		EABF2B221734540100813708 /* leftTopSprite.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = leftTopSprite.raw; sourceTree = "<group>"; };
 		EABF2B23173455CB00813708 /* layout_sprites.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = layout_sprites.s; sourceTree = "<group>"; };
+		EABF2B241734DA2500813708 /* showSplashScreen.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = showSplashScreen.s; sourceTree = "<group>"; };
+		EABF2B28173A104600813708 /* scoreOverTop.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = scoreOverTop.s; sourceTree = "<group>"; };
+		EABF2B311748AE7A00813708 /* lvlPieceColor.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lvlPieceColor.s; sourceTree = "<group>"; };
+		EABF2B321748B7D300813708 /* scoring.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = scoring.s; sourceTree = "<group>"; };
 		EAD8212F163BCAD3007DFD49 /* drawBox.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = drawBox.s; sourceTree = "<group>"; };
 		EAD82131163CB59F007DFD49 /* layout.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = layout.s; sourceTree = "<group>"; };
 		EAE21A1115A3BB9600DCE4B2 /* Notes.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = Notes.s; sourceTree = "<group>"; };
@@ -136,6 +139,8 @@
 				EABF2B23173455CB00813708 /* layout_sprites.s */,
 				EA859D7F1644EAEA0016FB33 /* search.s */,
 				EA859D7D1644E83F0016FB33 /* lookForConnect4.s */,
+				EABF2B28173A104600813708 /* scoreOverTop.s */,
+				EABF2B321748B7D300813708 /* scoring.s */,
 			);
 			name = Clearing;
 			sourceTree = "<group>";
@@ -157,6 +162,7 @@
 			children = (
 				EA8961AF1658BAEF00C48645 /* newColor.s */,
 				EA8961B01658BB1700C48645 /* colorUtils.s */,
+				EABF2B311748AE7A00813708 /* lvlPieceColor.s */,
 			);
 			name = Colors;
 			sourceTree = "<group>";
@@ -166,7 +172,6 @@
 			children = (
 				EA933B07165AF90E000B3E34 /* highres.s */,
 				EA8D873E1634AFCD0003415E /* interrupt.s */,
-				EA1CCD5416786CBB00C0651D /* tree.s */,
 				EAE21A1115A3BB9600DCE4B2 /* Notes.s */,
 				EAA29EAA16110FA200C87D7F /* number.s */,
 				EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */,
@@ -240,6 +245,7 @@
 			children = (
 				EABC8DE215CA2145006F2067 /* Makefile */,
 				EAB47DD0155219BF00516343 /* baseGame.s */,
+				EABF2B241734DA2500813708 /* showSplashScreen.s */,
 				EA8961AE1658BA1600C48645 /* Colors */,
 				EA8961A81658B6A700C48645 /* Movement */,
 				EA859D801644EB310016FB33 /* Clearing */,

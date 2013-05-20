@@ -13,6 +13,7 @@ r_firstPress    .byte $00
 d_repeatTime    .byte DOWN_REPEAT_TIME
 f_repeatTime    .byte FIRE_REPEAT_TIME
 rotate_Hold     .byte $00 ; Actually there is no repeat, so using this byte to track if button is being held down
+turnInputOff    .byte $00
 
 
 ; This will make sure all is reset back to the init state
@@ -126,6 +127,11 @@ finishJoy
 
 
 getJoystickInputForLevel ; returns 1 if button pressed to accept
+    lda turnInputOff
+    beq gjifl_readInput
+    jmp gjifl_ButtonNotPressed
+gjifl_readInput
+
     ldx JOY1 ; cache JOY1 value in x
 ; Left
     ldy #0

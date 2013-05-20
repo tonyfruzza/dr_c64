@@ -79,8 +79,8 @@ rts
 ;
 FieldSearch
 jmp fs_start
-fs_outLoopIdx   .byte $00
-fs_innerLoopIdx .byte $0f
+fs_outLoopIdx       .byte $00
+fs_innerLoopIdx     .byte $0f
 fs_didWorkThisLoop  .byte $00
 fs_didWorkReturn    .byte $00
 fs_start

@@ -2,8 +2,8 @@
 ; Levels are 0 - 20 that can be chosen lvl 21 is only reachable if you play through 20
 ; Read input from joystick and print
 
-
-MSG_CHOOSE_LVL  .byte 3,8,15,15,19,5,32,12,5,22,5,12,32,23,9,20,8,32,10,15,25,49,58,0
+;                     C H O  O  S  E    L  E V  E L     W  I T  H    J  O  Y  1  :
+MSG_CHOOSE_LVL  .byte 3,8,15,15,19,5,32,12,5,22,5,12,58,0
 
 printLevelSelectScreen
     jsr ClearScreen
@@ -30,6 +30,13 @@ printLevelSelectScreen
     pha
     jsr printMsgSub
     jsr resetInputMovement
+
+jsr WaitEventFrame
+
+
+lda #0
+sta turnInputOff
+
 
 levelSelectLoop
     jsr updateTheLevelWeHaveSelected

@@ -2,6 +2,8 @@
 
 SPRITE1_DATA    .equ $0240
 SPRITE2_DATA    .equ $0280
+SPRITE3_DATA    .equ $02C0
+
 SPRITE1_POINT   .equ $07f8
 SPRITE2_POINT   .equ $07f9
 ; VIC is using memory bank #0 so VIC sees $0000-$3FFF
@@ -20,6 +22,9 @@ csdiul_loop
     lda rightTopSprite,x
     sta SPRITE2_DATA,x
 
+;    lda scorePopUp,x ; We dynamically build this now
+;    sta SPRITE3_DATA,x
+
     inx
     cpx #62
     bne csdiul_loop
@@ -31,12 +36,16 @@ displayTopSprite
     sta SPRITE1_POINT ; Sprite 1 pointer
     lda #10
     sta SPRITE2_POINT
+    lda #11
+    sta SPRITE1_POINT+2
+
     lda $d015 ; See what sprites are enabled
     ora #3
     sta $d015 ; enable sprite 1 & 2
     lda #1
     sta VMEM+39 ; set color
     sta VMEM+40
+    sta VMEM+41
     lda #152
     sta $d000 ; x pos
     lda #69

@@ -14,7 +14,8 @@ putVirusesOnTheField ;
     pha
     jsr eightBitMul
     lda tmp1 ; low byte of multiplication result
-    sta viruses_to_print
+    sta viruses_to_print ; Set p1VirusCountBinNew to this?
+
     dec viruses_to_print
 
 
@@ -40,10 +41,6 @@ printLevelWorth
     dec tmp2
     dec tmp2
     dec tmp2
-;    tax
-;    dex
-;    dex
-;    dex
 
     lda currentLvl
     lsr

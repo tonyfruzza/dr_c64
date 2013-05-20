@@ -84,8 +84,9 @@ DropNewPiece
     jsr songStartAdress+6
     pla
     pla
-jsr WaitEventFrame
-jsr RepaintCurrentColor
+    jsr WaitEventFrame
+    jsr RepaintCurrentColor
+    jsr setPiecesBackToNormalAfterLanding
     jmp DropNew
 LastMoveBeforeCommit
     lda #1

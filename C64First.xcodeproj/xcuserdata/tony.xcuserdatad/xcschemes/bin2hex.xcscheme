@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "EAB47DCA1552197000516343"
-               BuildableName = "C64First"
-               BlueprintName = "C64First"
+               BlueprintIdentifier = "EAA0A437172DDD7200C60DF3"
+               BuildableName = "bin2hex"
+               BlueprintName = "bin2hex"
                ReferencedContainer = "container:C64First.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,6 +29,15 @@
       buildConfiguration = "Debug">
       <Testables>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "EAA0A437172DDD7200C60DF3"
+            BuildableName = "bin2hex"
+            BlueprintName = "bin2hex"
+            ReferencedContainer = "container:C64First.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -39,6 +48,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "EAA0A437172DDD7200C60DF3"
+            BuildableName = "bin2hex"
+            BlueprintName = "bin2hex"
+            ReferencedContainer = "container:C64First.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -48,6 +66,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "EAA0A437172DDD7200C60DF3"
+            BuildableName = "bin2hex"
+            BlueprintName = "bin2hex"
+            ReferencedContainer = "container:C64First.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
