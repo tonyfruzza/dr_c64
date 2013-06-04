@@ -58,5 +58,5 @@ displayTopSprite
 hideTopSprites
     lda $d015
     and #%11111100
-    sta $d015 ; enable sprite 1 & 2
+    sta $d015 ; disable sprite 1 & 2
     rts

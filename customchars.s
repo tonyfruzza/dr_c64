@@ -73,7 +73,7 @@ CharCopyLoop2
 ; Do Pill parts
     ldx #00
 PillMakerLoop
-    ; For the numbers:
+    ; For the numbers
     lda NUMS, x
     sta NEWCHARMAP+384, x
     lda NUMS+8, x
@@ -162,6 +162,60 @@ PillMakerLoop
     sta NEWCHARMAP+888,x ; 8 * 111
     lda PILL_VD+8, x
     sta NEWCHARMAP+936,x ; 8 * 117
+
+; Zombie Dude is 15 chars total 3x5 starting at character 128
+; 128, 129, 130
+; 131, 132, 133
+; 134, 135, 136
+; 137, 138, 139
+; 140, 141, 142
+
+lda zombie, x
+sta NEWCHARMAP+1024,x ; 8 * 128
+lda zombie_1, x
+sta NEWCHARMAP+1032,x
+lda zombie_2, x
+sta NEWCHARMAP+1040,x
+lda zombie_3, x
+sta NEWCHARMAP+1048,x
+lda zombie_4, x
+sta NEWCHARMAP+1056,x
+lda zombie_5, x
+sta NEWCHARMAP+1064,x
+lda zombie_6, x
+sta NEWCHARMAP+1072,x
+lda zombie_7, x
+sta NEWCHARMAP+1080,x
+lda zombie_8, x
+sta NEWCHARMAP+1088,x
+lda zombie_9, x
+sta NEWCHARMAP+1096,x
+lda zombie_10, x
+sta NEWCHARMAP+1104,x
+lda zombie_11, x
+sta NEWCHARMAP+1112,x
+lda zombie_12, x
+sta NEWCHARMAP+1120,x
+lda zombie_13, x
+sta NEWCHARMAP+1128,x
+lda zombie_14, x
+sta NEWCHARMAP+1136,x ; 8 * 142
+
+
+; 5 chars tall
+lda vdemo, x
+sta NEWCHARMAP+1144,x ; 8 * 143
+lda vdemo_1, x
+sta NEWCHARMAP+1152,x
+lda vdemo_2, x
+sta NEWCHARMAP+1160,x
+lda vdemo_3, x
+sta NEWCHARMAP+1168,x
+lda vdemo_4, x
+sta NEWCHARMAP+1176,x ; 8 * 147
+
+
+
 
 
 

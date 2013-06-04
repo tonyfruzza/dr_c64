@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
                 if(sscanf(optarg, "%d,%d,%d", &bgc1, &bgc2, &bgc3) != 3){
                     cout << "Multicolor mode bgcolors options should be: -m #,#,#" << endl;
                 }else{
-                    cout << "Multcolor set using:" << endl << "bgc1: " << bgc1 << endl << "bgc2: " << bgc2 << endl << "bgc3: " << bgc3 << endl;
+                    cout << "; Multcolor set using:" << endl << ";bgc1: " << bgc1 << endl << ";bgc2: " << bgc2 << endl << ";bgc3: " << bgc3 << endl;
                 }
                 break;
             default:
@@ -78,11 +78,11 @@ int main(int argc, char *argv[]){
     if(flags & FLAG_CHAR_TYPE){
         int charactersParsed;
         if(flags & FLAG_MULTI_COLOR){
-            cout << "Doing multicolor character set" << endl;
+            cout << "; Doing multicolor character set" << endl;
             charactersParsed = rip->parseCharacterMapMultiColor(bgc1, bgc2, bgc3);
         }else{
             if(flags & FLAG_DEBUG){
-                cout << "Doing single color character set" << endl;
+                cout << "; Doing single color character set" << endl;
             }
             charactersParsed = rip->parseCharacterMap();
         }

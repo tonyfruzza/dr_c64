@@ -1,6 +1,17 @@
 .org $0801
 ;Tells BASIC to run SYS 2064 to start our program
 .byte $0C,$08,$0A,$00,$9E,' ','2','0','6','4',$00,$00,$00,$00,$00
+;
+; - - Master Memory Layout - -
+; $0801 - $5200 main game ; Bitmap starts at $229b - ~$49aB
+; $3000 - $3800 Custom Character RAM ?????? OVERLAPPING
+; $4000 - $4200 Sprite data
+; $5C00 - $5FFF Screen ram
+; $6000 - $7F3F Bitmap
+; $8000 - $876b SID
+; $D800 - $DBFF Color ram
+; Need 512bytes free which is $200
+
 
 SCREENMEM   .equ 1024 ; Start of character screen map, color map is + $D400
 COLORMEM    .equ $D800
@@ -105,9 +116,9 @@ vOneCount   .byte $00
 vTwoCount   .byte $00
 vThreeCount .byte $00
 
-varray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+varray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 varrayIndex .byte $00
-harray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+harray      .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 harrayIndex .byte $00
 
 RET1        .byte $00, $00
@@ -138,14 +149,27 @@ VIRUS_MUL_1 .byte $64, $00 ; 100
 
 init
 
-jsr setupScreenForSpashScreen
-; Look for button press
+    jsr setupScreenForSpashScreen
+    jsr startHSpriteScroller
+    ; Look for button press
+    jsr MoveCharMap
+    jsr init_irq
 splashLoop
+    ; H MSG Movement
+    jsr copySpriteDataIn
+    jsr moveSpritesLeft
+    inc msgOffset
+    ; End H MSG
     lda JOY1
     and #16
     beq GotButtonPress
     jmp splashLoop
 GotButtonPress
+; disable all of the sprites
+lda #0
+sta $d015
+sta SPRITE_DB_H
+
 ; Taking too many joystick button inputs turn it off for a moment
     lda #1
     sta turnInputOff
@@ -166,8 +190,16 @@ GotButtonPress
     ldy #0
     sty SCREEN_BG_COLOR
     sty SCREEN_BORDER
+    ; init the pop over sprite. Initially clear the whole sprite, after that we only use the first 5 lines
+    lda #63
+    sta bytesToClearForSprite
+    jsr clearScoreSprite
+    lda #15 ; 5 * 3 bytes only need to be cleared
+    sta bytesToClearForSprite
 levelScreen
-    jsr printLevelSelectScreen
+;jsr printLevelSelectScreen
+lda #0
+sta currentLvl
 clears
     ; Programatically create game layout
     jsr ClearScreen
@@ -177,20 +209,11 @@ clears
     jsr printSinglePlayerScoreBox
     jsr printSinglePlayerVirusCountBox
     jsr printSinglePlayerLevelBox
+    jsr printQuickZombieInBox
     jsr putVirusesOnTheField
-
-
-    ldy #$00
-;jsr test1
-;jsr test2
-;jsr test3
-;jsr test4
-;jsr test6
-
-
-    jsr FieldSearch ; Tally up the virus count, so it can be printed
+    jsr FieldSearch ; Tally up the virus count, so it can be printed, finish clearing
     jsr printCurrentScore
-    jsr printCurrentScore
+
 
     lda p1VirusCountBinNew
     sta p1VirusCountBinLast
@@ -198,6 +221,8 @@ clears
     ; Reset drop speed for the game, or this level
     lda #delay_slow
     sta DELAY
+    lda #15
+    sta SID_VOLUME
     lda #1
     sta playMusic
     lda #0
@@ -242,6 +267,7 @@ firstPieceToDrop
     ldy #$00
     sty ORIENTATION ; reset to 0
     sty CONNECTCNT ; reset to 0
+    sty virusesClearedForPopUpScore ; reset this value to 0
     lda (piece1), y ; See if there is a piece in the way at the top
     cmp #" "
     bne EndGame
@@ -257,7 +283,6 @@ firstPieceToDrop
     lda #00
     sta refreshCount ; refreshCount is at an unknown # after the drops, reset it
     jsr resetInputMovement
-;jsr test7
 
 
 ;the main game loop
@@ -288,9 +313,11 @@ NextLevel
     jsr printMsgSub
     ; Stop playing music
     lda #0
+sta SID_VOLUME
     sta playMusic
     jsr songStartAdress+9 ; set volume 0
-
+    jsr hideTopSprites
+    jsr vScrollScreenOff
     jsr WaitEventFrame
     jsr WaitEventFrame
     jsr WaitEventFrame
@@ -306,6 +333,7 @@ NextLevel
 
 EndGame
     lda #0
+    sta SID_VOLUME
     jsr songStartAdress+9 ; turn volume to 0
     sta playMusic ; stop laying music
 
@@ -484,36 +512,40 @@ cl_SideManipulationComplete
 
             ; Animation for clearning of pieces, one piece at a time
 
-    ; Look for viruses for total
+    ; Look for viruses for total Vertical
     lda (zpPtr4), y
     cmp #VIRUS_ONE
     beq cl_itIsAVirus
     cmp #VIRUS_TWO
     beq cl_itIsAVirus
     cmp #VIRUS_THREE
-    bne cl_notAVirus
+    bne cl_storeValue ; not a virus
 cl_itIsAVirus
-inc flashTimes
+    inc flashTimes
+stx posOffsetXY
+sty posOffsetXY+1
+; Play noise
+lda #<SOUND_CLEAR
+ldy #>SOUND_CLEAR
+ldx #14 ; channel 3
+jsr songStartAdress+6
+ldx posOffsetXY
+ldy posOffsetXY+1
 
-lda zpPtr4
-sta placeScoreHere
-lda zpPtr4+1
-sta placeScoreHere+1
-
-jsr SetSpriteBasedOnCharPos
-
-jmp cl_storeValue
-cl_notAVirus
-    lda #PILL_CLEAR_1
+    inc virusesClearedForPopUpScore
+    lda zpPtr4
+    sta placeScoreHere
+    lda zpPtr4+1
+    sta placeScoreHere+1
+    jsr SetSpriteBasedOnCharPos
 cl_storeValue
     lda #PILL_CLEAR_1
     sta (zpPtr4), y
     dey ; set it back to 0
-;jsr WaitEventFrame
-            lda tmp
-            cmp varrayIndex
-beq cl_noclearingLoop
-jmp clearingLoop
+    lda tmp
+    cmp varrayIndex
+    beq cl_noclearingLoop
+    jmp clearingLoop
 cl_noclearingLoop
 finishedClearingV
             jmp ClearH
@@ -583,18 +615,51 @@ clh_whatsToTheLeft
 
 ; Finished looking around
 clh_SideManipulationComplete
-            ldy #$00
-            lda cpia_pieceTmp
-            sta zpPtr4
-            lda cpia_pieceTmp+1
-            sta zpPtr4+1
-            lda #PILL_CLEAR_1
-            sta (zpPtr4), y
-            lda tmp
-            cmp harrayIndex
-            bne hclearingLoop
+    ldy #$00
+    lda cpia_pieceTmp
+    sta zpPtr4
+    lda cpia_pieceTmp+1
+    sta zpPtr4+1
+; Clearing a piece for this pill drop
+lda (zpPtr4), y
+cmp #VIRUS_ONE
+beq cl_itIsAVirus_2
+cmp #VIRUS_TWO
+beq cl_itIsAVirus_2
+cmp #VIRUS_THREE
+bne cl_storeValue_2 ; not a virus
+cl_itIsAVirus_2
+inc flashTimes
+
+stx posOffsetXY
+sty posOffsetXY+1
+; Play noise
+lda #<SOUND_CLEAR
+ldy #>SOUND_CLEAR
+ldx #14 ; channel 3
+jsr songStartAdress+6
+ldx posOffsetXY
+ldy posOffsetXY+1
+
+
+inc virusesClearedForPopUpScore
+lda zpPtr4
+sta placeScoreHere
+lda zpPtr4+1
+sta placeScoreHere+1
+jsr SetSpriteBasedOnCharPos
+cl_storeValue_2
+;
+
+    lda #PILL_CLEAR_1
+    sta (zpPtr4), y
+    lda tmp
+    cmp harrayIndex
+    beq finishedClearingH
+    jmp hclearingLoop
 finishedClearingH
             rts
+posOffsetXY .byte $00, $00
 
 
 
@@ -602,7 +667,7 @@ finishedClearingH
 
 ; Zeros out the vertical clear array
 initClearArrays
-            ldx #17 ; 8 x 2 bytes is how large it can be
+            ldx #21 ; 10 x 2 bytes is how large it can be
             lda #$00
             sta varrayIndex
             sta harrayIndex

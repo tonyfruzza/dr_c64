@@ -4,9 +4,9 @@ copyImage
 ; Load background color and set it
 ; $8710 - $6000 = 2710
 lda dylan1+$2710
-;lda #0
-sta $d020
 sta $d021
+sta $d020
+
 ; Loop to 256 31 times here
 
 ldx #0

@@ -3,10 +3,12 @@
 RASTER_TO_COUNT_AT  .equ 0
 DELAY2              .equ 6
 ;songStartAdress     .equ $2300
-songStartAdress     .equ $5000
+SID_VOLUME          .equ $D418
+songStartAdress     .equ $8000
 SOUND_ROTATE        .byte $00,$f6,$00,$a0,$12,$c0,$d0,$d1,$d2,$d4,$d6,$d8,$da,$10,$00
 SOUND_HORIZONTAL    .byte $00,$53,$00,$a0,$12,$c0,$d0,$d1,$d2,$d4,$d6,$d8,$da,$10,$00
 SOUND_BOTTOM        .byte $82,$24,$00,$a0,$81,$90,$41,$8e,$8a,$40,$00
+SOUND_CLEAR         .byte $01, $93, $00, $c4, $81, $c4, $c4, $c4, $21, $c4, $c0, $c7, $c0, $c6, $c0, $c4, $c0, $c4, $80, $00
 refreshCount        .byte $00
 refreshTimer2       .byte $00
 refreshTimer3       .byte $00
@@ -89,6 +91,7 @@ doWeFlash
     lda #COLOR_DARK_GREY
     sta SCREEN_BORDER
     dec flashTimes
+    jsr zombieColorSwap
     jmp doneFlash
 turnFlashOff
     lda framesToShowSprite ; extend flash time out as long as score is displayed

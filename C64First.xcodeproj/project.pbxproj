@@ -48,7 +48,6 @@
 		EA286E83160BE51300C4A9B2 /* drc64.prg */ = {isa = PBXFileReference; lastKnownFileType = file; path = drc64.prg; sourceTree = "<group>"; };
 		EA286E85160BE57E00C4A9B2 /* example.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.prg; path = ../../ISOs/example.prg; sourceTree = "<group>"; };
 		EA286E88160C486D00C4A9B2 /* flicker.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = flicker.prg; path = ../../ISOs/flicker.prg; sourceTree = "<group>"; };
-		EA4D2A9D16927295005FF3E9 /* newyear.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = newyear.s; sourceTree = "<group>"; };
 		EA4D2B9F16A605C8005FF3E9 /* koalaplay.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = koalaplay.s; sourceTree = "<group>"; };
 		EA859D7D1644E83F0016FB33 /* lookForConnect4.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lookForConnect4.s; sourceTree = "<group>"; };
 		EA859D7F1644EAEA0016FB33 /* search.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = search.s; sourceTree = "<group>"; };
@@ -59,7 +58,6 @@
 		EA8961AF1658BAEF00C48645 /* newColor.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = newColor.s; sourceTree = "<group>"; };
 		EA8961B01658BB1700C48645 /* colorUtils.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = colorUtils.s; sourceTree = "<group>"; };
 		EA8961B11658BC6100C48645 /* rotate.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = rotate.s; sourceTree = "<group>"; };
-		EA8B35BC1639598400C1059B /* testScenarios.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = testScenarios.s; sourceTree = "<group>"; };
 		EA8B35EB163A971000C1059B /* input.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = input.s; sourceTree = "<group>"; };
 		EA8D86DC162696C40003415E /* subroutines.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = subroutines.s; sourceTree = "<group>"; };
 		EA8D871C163177730003415E /* customchars.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = customchars.s; sourceTree = "<group>"; };
@@ -78,6 +76,13 @@
 		EAA0A441172E1AB800C60DF3 /* dna4.kla */ = {isa = PBXFileReference; lastKnownFileType = file; path = dna4.kla; sourceTree = SOURCE_ROOT; };
 		EAA29EAA16110FA200C87D7F /* number.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = number.s; sourceTree = "<group>"; };
 		EAA2A0A11620115800C87D7F /* joytest.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = joytest.s; sourceTree = "<group>"; };
+		EAA4ED5117534AAC00636B0B /* colorZombies.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = colorZombies.s; sourceTree = "<group>"; };
+		EAA4ED521755283B00636B0B /* vscroller.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vscroller.s; sourceTree = "<group>"; };
+		EAA4ED5317552F5100636B0B /* vScrollScreen.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vScrollScreen.s; sourceTree = "<group>"; };
+		EAA4ED541756C5C100636B0B /* openBorders.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = openBorders.s; sourceTree = "<group>"; };
+		EAA4ED581759422300636B0B /* spriteTextScroller.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = spriteTextScroller.s; sourceTree = "<group>"; };
+		EAA4ED59175DA56A00636B0B /* hSpriteScroller.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = hSpriteScroller.s; sourceTree = "<group>"; };
+		EAA4ED5A175DA5C900636B0B /* openBorderInGame.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = openBorderInGame.s; sourceTree = "<group>"; };
 		EAAC7FDC170F834B004B023E /* pill_h.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = pill_h.raw; sourceTree = "<group>"; };
 		EAAC7FDD170F834B004B023E /* pill_v.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = pill_v.raw; sourceTree = "<group>"; };
 		EAAC7FDE170F834B004B023E /* pillHalf.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = pillHalf.raw; sourceTree = "<group>"; };
@@ -136,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				EAD82131163CB59F007DFD49 /* layout.s */,
+				EAA4ED5117534AAC00636B0B /* colorZombies.s */,
 				EABF2B23173455CB00813708 /* layout_sprites.s */,
 				EA859D7F1644EAEA0016FB33 /* search.s */,
 				EA859D7D1644E83F0016FB33 /* lookForConnect4.s */,
@@ -180,9 +186,11 @@
 				EAAD45FA166C77A6005EAC00 /* friday.s */,
 				EAAD46D0167494E2005EAC00 /* charAni.s */,
 				EAAD47F51677D1C7005EAC00 /* showSprite.s */,
-				EA4D2A9D16927295005FF3E9 /* newyear.s */,
 				EA4D2B9F16A605C8005FF3E9 /* koalaplay.s */,
 				EA240D921723B22C006A10BA /* spritePath.s */,
+				EAA4ED521755283B00636B0B /* vscroller.s */,
+				EAA4ED541756C5C100636B0B /* openBorders.s */,
+				EAA4ED581759422300636B0B /* spriteTextScroller.s */,
 			);
 			name = experiements;
 			sourceTree = "<group>";
@@ -245,6 +253,9 @@
 			children = (
 				EABC8DE215CA2145006F2067 /* Makefile */,
 				EAB47DD0155219BF00516343 /* baseGame.s */,
+				EAA4ED5317552F5100636B0B /* vScrollScreen.s */,
+				EAA4ED59175DA56A00636B0B /* hSpriteScroller.s */,
+				EAA4ED5A175DA5C900636B0B /* openBorderInGame.s */,
 				EABF2B241734DA2500813708 /* showSplashScreen.s */,
 				EA8961AE1658BA1600C48645 /* Colors */,
 				EA8961A81658B6A700C48645 /* Movement */,
@@ -253,7 +264,6 @@
 				EA8DD13916412F0300D3D0E5 /* lvlSelect.s */,
 				EA8DD136163D3ED400D3D0E5 /* drops.s */,
 				EA8B35EB163A971000C1059B /* input.s */,
-				EA8B35BC1639598400C1059B /* testScenarios.s */,
 				EA8D873F1634E60D0003415E /* refreshCounter.s */,
 				EA8D871C163177730003415E /* customchars.s */,
 				EA8D86DC162696C40003415E /* subroutines.s */,

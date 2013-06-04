@@ -1,25 +1,25 @@
 
 UpdateVirusCount
-ldy #0
-lda #$6f
-sta zpPtr2
-lda #$05
-sta zpPtr2+1
-ldx p1VirusCount
-txa
-and #$f0
-lsr ; Shift over 4 times
-lsr
-lsr
-lsr
-ora #$30
-sta (zpPtr2),y
-iny
-txa
-and #$0f
-ora #$30
-sta (zpPtr2),y
-rts
+    ldy #0
+    lda #$6f
+    sta zpPtr2
+    lda #$05
+    sta zpPtr2+1
+    ldx p1VirusCount
+    txa
+    and #$f0
+    lsr ; Shift over 4 times
+    lsr
+    lsr
+    lsr
+    ora #$30
+    sta (zpPtr2),y
+    iny
+    txa
+    and #$0f
+    ora #$30
+    sta (zpPtr2),y
+    rts
 
 
 ; score is made up of 4 bytes of decimal numbers
@@ -28,13 +28,6 @@ updateScore
 lda p1VirusCountBinLast
 cmp p1VirusCountBinNew
 bne us_continue ; There was something cleared
-;    ldx #1
-;    lda #0
-;    tax
-;    sta scoreMultiplierTmp
-;    sta scoreMultiplierTmp+1
-;    sta scoreMultiplierTmp+2
-;    sta scoreMultiplierTmp+3
 jmp printCurrentScoreWithNoChange
 us_continue
 sec

@@ -19,18 +19,20 @@ all:
 	tools/bitmapReader -t SN45 -cf outbreak_assets/smallNums/smallNum45.raw -w 8 -h 8 >> compiledAssets.s
 	tools/bitmapReader -t SN67 -cf outbreak_assets/smallNums/smallNum67.raw -w 8 -h 8 >> compiledAssets.s
 	tools/bitmapReader -t SN89 -cf outbreak_assets/smallNums/smallNum89.raw -w 8 -h 8 >> compiledAssets.s
-
+	tools/bitmapReader -cw 24 -h 40 -f outbreak_assets/zombie24x40char.raw -t zombie >> compiledAssets.s
+	tools/bitmapReader -cw 8 -h 40 -f outbreak_assets/vDemo8x40.raw -t vdemo >> compiledAssets.s
 	#tools/bitmapReader -t smallNums -cf outbreak_assets/smallNumbers.raw -w 40 -h 8|sed s/', 0, 0, 0'// >> compiledAssets.s
-	tools/bin2hex -kf outbreak_assets/dna5.kla -n dylan1 >> compiledAssets.s
-	cat baseGame.s subroutines.s customchars.s refreshCounter.s testScenarios.s input.s drawBox.s layout.s drops.s \
-    virusLevels.s lvlSelect.s search.s lookForConnect4.s down.s left.s right.s moveUtils.s newColor.s colorUtils.s \
-    rotate.s compiledAssets.s layout_sprites.s showSplashScreen.s scoreOverTop.s lvlPieceColor.s scoring.s > baseGameCombine.s
+	tools/bin2hex -kf outbreak_assets/dna6.kla -n dylan1 >> compiledAssets.s
+	cat baseGame.s subroutines.s customchars.s refreshCounter.s input.s drawBox.s layout.s drops.s \
+    virusLevels.s lvlSelect.s search.s lookForConnect4.s down.s left.s right.s moveUtils.s newColor.s colorUtils.s vScrollScreen.s \
+    rotate.s compiledAssets.s layout_sprites.s showSplashScreen.s scoreOverTop.s lvlPieceColor.s scoring.s colorZombies.s \
+    hSpriteScroller.s openBorderInGame.s > baseGameCombine.s
 	/usr/local/bin/mac2c64 -r baseGameCombine.s
 	mv baseGameCombine.rw drc64.prg
 #	tools/linker drc64.prg quiet.prg > outbreak.prg
-	tools/linker drc64.prg everlasting.prg > outbreak.prg
+	tools/linker drc64.prg everlasting-8000.prg > outbreak.prg
 	@./createLabels.sh baseGameCombine.s
-#	/Applications/x64.app/Contents/MacOS/c1541 -format dr64,02 d64 dr64.d64 -attach dr64.d64 -write drc64.prg drc64
+	/Applications/x64.app/Contents/MacOS/c1541 -format outbreak,02 d64 outbreak.d64 -attach outbreak.d64 -write outbreak.prg outbreak
 linker:
 	/Users/Tony/Library/Developer/Xcode/DerivedData/C64First-bcaelnhlmpesixdidkmnvslvslar/Build/Products/Debug/linker drc64.prg quiet.prg 2049 > combined.prg
 compress:
@@ -90,3 +92,15 @@ koalaplay:
 spritePath:
 	/usr/local/bin/mac2c64 -r spritePath.s
 	mv spritePath.rw spritePath.prg
+vscroller:
+	/usr/local/bin/mac2c64 -r vscroller.s
+	mv vscroller.rw vscroller.prg
+openBorders:
+	/usr/local/bin/mac2c64 -r openBorders.s
+	mv openBorders.rw openBorders.prg
+spriteTextScroller:
+	cp spriteTextScroller.s spriteTextScroller-bday.s
+	tools/bin2hex -kf outbreak_assets/dna6.kla -n bday >> spriteTextScroller-bday.s
+	/usr/local/bin/mac2c64 -r spriteTextScroller-bday.s
+	mv spriteTextScroller-bday.rw spriteTextScroller-bday.prg
+	 @./createLabels.sh spriteTextScroller.s
