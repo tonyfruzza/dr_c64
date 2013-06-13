@@ -95,6 +95,7 @@ spritePath:
 vscroller:
 	/usr/local/bin/mac2c64 -r vscroller.s
 	mv vscroller.rw vscroller.prg
+	 @./createLabels.sh vscroller.s
 openBorders:
 	/usr/local/bin/mac2c64 -r openBorders.s
 	mv openBorders.rw openBorders.prg
@@ -104,3 +105,7 @@ spriteTextScroller:
 	/usr/local/bin/mac2c64 -r spriteTextScroller-bday.s
 	mv spriteTextScroller-bday.rw spriteTextScroller-bday.prg
 	 @./createLabels.sh spriteTextScroller.s
+queue:
+	/usr/local/bin/mac2c64 -r queue.s
+	mv queue.rw queue.prg
+	 @./createLabels.sh queue.s

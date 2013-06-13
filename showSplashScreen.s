@@ -96,6 +96,7 @@ STA $5F00,X
 ; COLOR RAM
 ; $8328 - $6000 = $2328
 ; $7C00 more than screen mem??
+bitmapColorCopy
 lda dylan1+$2328,x
 STA $D800,X
 lda dylan1+$2428,x
@@ -114,8 +115,10 @@ rts
 
 
 setupScreenForSpashScreen
-    jsr backUpCurrentVideoSettings
     jsr copyImage
+reShowImage
+    jsr backUpCurrentVideoSettings
+
 
     lda #$02 ; bank #1 index 0 $4000-$7FFF + $2000 = $6000, default is 3 which is bank #0
     sta $DD00

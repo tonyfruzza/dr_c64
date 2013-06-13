@@ -302,3 +302,17 @@ noDrop
     lda ddiyc_ret+1
     pha
     rts
+
+incrementPillUsedP1
+    ; Look to see if we should make the pieces drop quicker
+    inc p1PiecesDroppedThisLvl
+    lda p1PiecesDroppedThisLvl
+    cmp #10
+    bne noIncreaseInSpeedYet
+    dec DELAY
+    dec DELAY
+    lda #0
+    sta p1PiecesDroppedThisLvl
+noIncreaseInSpeedYet
+    rts
+

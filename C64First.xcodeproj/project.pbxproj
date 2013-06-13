@@ -106,6 +106,7 @@
 		EABF2B28173A104600813708 /* scoreOverTop.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = scoreOverTop.s; sourceTree = "<group>"; };
 		EABF2B311748AE7A00813708 /* lvlPieceColor.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lvlPieceColor.s; sourceTree = "<group>"; };
 		EABF2B321748B7D300813708 /* scoring.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = scoring.s; sourceTree = "<group>"; };
+		EAD5AB2B17667AE900FEBEA6 /* queue.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = queue.s; sourceTree = "<group>"; };
 		EAD8212F163BCAD3007DFD49 /* drawBox.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = drawBox.s; sourceTree = "<group>"; };
 		EAD82131163CB59F007DFD49 /* layout.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = layout.s; sourceTree = "<group>"; };
 		EAE21A1115A3BB9600DCE4B2 /* Notes.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = Notes.s; sourceTree = "<group>"; };
@@ -191,6 +192,7 @@
 				EAA4ED521755283B00636B0B /* vscroller.s */,
 				EAA4ED541756C5C100636B0B /* openBorders.s */,
 				EAA4ED581759422300636B0B /* spriteTextScroller.s */,
+				EAD5AB2B17667AE900FEBEA6 /* queue.s */,
 			);
 			name = experiements;
 			sourceTree = "<group>";

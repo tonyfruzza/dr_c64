@@ -160,7 +160,7 @@ splashLoop
     jsr moveSpritesLeft
     inc msgOffset
     ; End H MSG
-    lda JOY1
+    lda JOY2
     and #16
     beq GotButtonPress
     jmp splashLoop
@@ -197,10 +197,10 @@ sta SPRITE_DB_H
     lda #15 ; 5 * 3 bytes only need to be cleared
     sta bytesToClearForSprite
 levelScreen
-;jsr printLevelSelectScreen
-lda #0
-sta currentLvl
-clears
+    ;jsr printLevelSelectScreen
+    lda #0
+    sta currentLvl
+clears ; Run at beginning of new level/game
     ; Programatically create game layout
     jsr ClearScreen
     jsr DrawGameBorder
@@ -218,7 +218,7 @@ clears
     lda p1VirusCountBinNew
     sta p1VirusCountBinLast
 
-    ; Reset drop speed for the game, or this level
+    ; Reset drop speed for the game, for this level
     lda #delay_slow
     sta DELAY
     lda #15
@@ -240,21 +240,10 @@ DropNew
     beq NextLevel ; disable for debugging
     jsr doDrop
     bne DropNew ; A is set to count of how many dropped, loop until no drops
-
-    ; Look to see if we should make the pieces drop quicker
-    inc p1PiecesDroppedThisLvl
-    lda p1PiecesDroppedThisLvl
-    cmp #10
-    bne firstPieceToDrop
-    dec DELAY
-    dec DELAY
-    lda #0
-    sta p1PiecesDroppedThisLvl
-
+    jsr incrementPillUsedP1
 firstPieceToDrop
     jsr FieldSearch
     jsr UpdateVirusCount
-
     jsr updateScore
     ldy START_POS ; Start Offset low byte location
     sty piece1
@@ -270,10 +259,14 @@ firstPieceToDrop
     sty virusesClearedForPopUpScore ; reset this value to 0
     lda (piece1), y ; See if there is a piece in the way at the top
     cmp #" "
-    bne EndGame
+    beq notEndGame
+    jmp EndGame
+notEndGame
     lda (piece2), y ; See if there is a piece in the way at the top
     cmp #" "
-    bne EndGame
+    beq notEndGame2
+    jmp EndGame
+notEndGame2
     lda #PILL_LEFT ; 'o'
     sta (piece1), y ; print new pieces
     lda #PILL_RIGHT
@@ -299,8 +292,8 @@ MoveDownForced
     jmp GameLoop
 NextLevel
     jsr updateScore
-    inc currentLvl
-    inc currentLvl ; Twice ?
+;    inc currentLvl
+;    inc currentLvl ; Twice ?
     lda #<MSG_CLEAR
     pha
     lda #>MSG_CLEAR
@@ -312,26 +305,29 @@ NextLevel
     pha
     jsr printMsgSub
     ; Stop playing music
+demoEnd
     lda #0
 sta SID_VOLUME
     sta playMusic
     jsr songStartAdress+9 ; set volume 0
     jsr hideTopSprites
-    jsr vScrollScreenOff
-    jsr WaitEventFrame
-    jsr WaitEventFrame
-    jsr WaitEventFrame
-    jsr WaitEventFrame
-    jsr WaitEventFrame
-    jsr WaitEventFrame
-    jsr WaitEventFrame
-    jsr WaitEventFrame
-    jsr WaitEventFrame
-    jsr WaitEventFrame
 
+    jsr vScrollScreenOff
+holdTextOnScreen
+    lda JOY1
+    and #16
+    beq GotButtonPress2
+    jsr WaitEventFrame
+    jsr cycleColorsOnSecondToBottomRow
+jsr WaitEventFrame
+    jmp holdTextOnScreen
+
+
+GotButtonPress2
     jmp clears
 
 EndGame
+    jmp demoEnd
     lda #0
     sta SID_VOLUME
     jsr songStartAdress+9 ; turn volume to 0
@@ -344,8 +340,6 @@ lda #19
 lda #0
     sta P1_SCORE_B+2
     sta P1_SCORE_B+3
-;    lda #21 ; testing
-;    sta currentLvl
     jmp printMsg
 
 

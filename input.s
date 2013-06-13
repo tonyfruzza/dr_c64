@@ -1,6 +1,9 @@
 ; take input from user for gameplay
 
-JOY1                    .equ 56321 ; Joystick flag byte
+;JOY1                    .equ 56321 ; Joystick flag byte
+; Swapping joysticks!!! JOY1 is actually JOY2!
+JOY1                    .equ 56320 ; Joystick flag byte
+JOY2                    .equ 56320
 LR_MOVE_REPEAT_TIME     .equ 5
 LR_FIRST_MOVE_R_TIME    .equ 7
 DOWN_REPEAT_TIME        .equ 2

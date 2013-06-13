@@ -1,6 +1,6 @@
 ; Interup based timing events
 
-RASTER_TO_COUNT_AT  .equ 0
+RASTER_TO_COUNT_AT  .equ 220
 DELAY2              .equ 6
 ;songStartAdress     .equ $2300
 SID_VOLUME          .equ $D418
@@ -70,6 +70,7 @@ irq_refreshCounter ; void (y, x, a)
     dec $d005
     dec $d005
 
+;jsr handleScreenFlash
 
 noScoreSpriteMods
     dec framesToShowSprite
@@ -80,25 +81,6 @@ disableScoreSprite
     and #$fb
     sta $d015
 noScoreSpriteEnabled
-
-    lda SCREEN_BORDER
-    and #$0f ; Upper bits are being set to F here, not sure why!?
-    bne turnFlashOff ; Not black?
-; do we flash for a score?
-doWeFlash
-    lda flashTimes
-    beq doneFlash ; Do we need to flash?
-    lda #COLOR_DARK_GREY
-    sta SCREEN_BORDER
-    dec flashTimes
-    jsr zombieColorSwap
-    jmp doneFlash
-turnFlashOff
-    lda framesToShowSprite ; extend flash time out as long as score is displayed
-    bne doneFlash
-    lda #COLOR_BLACK
-    sta SCREEN_BORDER
-doneFlash
 
     lda playMusic
     beq dontPlayMusic
@@ -154,4 +136,26 @@ waitStart
     bcc waitDone ; >= than DELAY2
     jmp waitStart
 waitDone
+    rts
+
+
+handleScreenFlash
+    lda SCREEN_BORDER
+    and #$0f ; Upper bits are being set to F here, not sure why!?
+    bne turnFlashOff ; Not black?
+    ; do we flash for a score?
+doWeFlash
+    lda flashTimes
+    beq doneFlash ; Do we need to flash?
+    lda #COLOR_DARK_GREY
+    sta SCREEN_BORDER
+    dec flashTimes
+    jsr zombieColorSwap
+    jmp doneFlash
+    turnFlashOff
+    lda framesToShowSprite ; extend flash time out as long as score is displayed
+    bne doneFlash
+    lda #COLOR_BLACK
+    sta SCREEN_BORDER
+doneFlash
     rts

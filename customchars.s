@@ -163,6 +163,7 @@ PillMakerLoop
     lda PILL_VD+8, x
     sta NEWCHARMAP+936,x ; 8 * 117
 
+
 ; Zombie Dude is 15 chars total 3x5 starting at character 128
 ; 128, 129, 130
 ; 131, 132, 133

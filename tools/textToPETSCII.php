@@ -1,7 +1,7 @@
 <?php
 $values = array();
 $string = "                          this horizontal scroller using 8 sprites all at the same time lined up together. the sprites shift over 16 pixels together and then copy in a new char from the character map from a null terminated message                       ";
-$string = "                   presenting a preview of what is to come later this year. use joystick 2 to play. the game has a lot of work left, but i'm excited to share comments can go to tony240zt@gmail.com enjoy our favorite 8bit pill game                       ";
+$string = "                   presenting a preview of outbreak, a pill puzzle game in development, but i'm excited to share. use joystick 2 to play. comments can go to tony240zt@gmail.com enjoy our favorite 8bit pill game finally on the c64                      ";
 for($i=0;$i<strlen($string);$i++){
  //echo "$string[$i]: ".
  getPETSCII($string[$i], $i, $values);
