@@ -1,10 +1,10 @@
-SCREENMEM   .equ 1024 ; Start of character screen map, color map is + $D400
-NEWCHARMAP  .equ 12288 ; $3000 new place for Charset
-FRIDAY_LOC  .equ 1278
-VIC_MEM         .equ 53248
-SCREEN_BORDER  .equ VIC_MEM + 32
-SCREEN_BG_COLOR .equ VIC_MEM + 33
-COLORMEM    .equ $D800
+SCREENMEM           .equ 1024 ; Start of character screen map, color map is + $D400
+NEWCHARMAP          .equ 12288 ; $3000 new place for Charset
+FRIDAY_LOC          .equ 1278
+VIC_MEM             .equ 53248
+SCREEN_BORDER       .equ VIC_MEM + 32
+SCREEN_BG_COLOR     .equ VIC_MEM + 33
+COLORMEM            .equ $D800
 RASTER_TO_COUNT_AT  .equ 80
 songStartAdress     .equ $2300
 
@@ -123,17 +123,16 @@ rts
 
 
 irq_refreshCounter ; void (y, x, a)
+    asl $d019    ; ACK interrupt (to re-enable it)
+    jsr songStartAdress+3
 
-asl $d019    ; ACK interrupt (to re-enable it)
-jsr songStartAdress+3
-
-pla
-tay
-pla
-tax
-pla
-;    jmp $ea31 ; Go back to the default interupt address
-rti          ; return from interrupt
+    pla
+    tay
+    pla
+    tax
+    pla
+    ;    jmp $ea31 ; Go back to the default interupt address
+    rti          ; return from interrupt
 
 
 

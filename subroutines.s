@@ -140,3 +140,26 @@ itsZero
 
 
 
+; Count how many raster lines it takes to complete task.
+; Used in conjunction with IRQ
+startTimer
+    lda #0
+    sta vBlanks
+    lda $d012
+    sta rasterCounter
+    rts
+
+stopTimer
+lda $d012
+    sta rasterCntTotal
+lda vBlanks
+sta vBlanksEnd
+    rts
+
+
+rasterCounter   .byte $00
+rasterCntTotal  .byte $00
+vBlanks         .byte $00
+vBlanksEnd      .byte $00
+
+

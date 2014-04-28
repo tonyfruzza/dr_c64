@@ -132,7 +132,8 @@ TMP3        .byte $00
 TMP4        .byte $00
 currentLvl  .byte 0
 p1PiecesDroppedThisLvl  .byte 0
-DELAY       .byte 37
+;DELAY       .byte 37
+DELAY       .byte 0
 pSideTmp1   .byte $00
 pSideTmp2   .byte $00
 p1VirusCount    .byte $00
@@ -197,11 +198,12 @@ sta SPRITE_DB_H
     lda #15 ; 5 * 3 bytes only need to be cleared
     sta bytesToClearForSprite
 levelScreen
-    ;jsr printLevelSelectScreen
-    lda #0
-    sta currentLvl
+    jsr printLevelSelectScreen
+    ;lda #0
+    ;sta currentLvl
 clears ; Run at beginning of new level/game
     ; Programatically create game layout
+jsr startTimer
     jsr ClearScreen
     jsr DrawGameBorder
     jsr changeColorSet
@@ -209,7 +211,7 @@ clears ; Run at beginning of new level/game
     jsr printSinglePlayerScoreBox
     jsr printSinglePlayerVirusCountBox
     jsr printSinglePlayerLevelBox
-    jsr printQuickZombieInBox
+    ;jsr printQuickZombieInBox
     jsr putVirusesOnTheField
     jsr FieldSearch ; Tally up the virus count, so it can be printed, finish clearing
     jsr printCurrentScore
@@ -225,10 +227,11 @@ clears ; Run at beginning of new level/game
     sta SID_VOLUME
     lda #1
     sta playMusic
-    lda #0
+    lda #1 ; Play song 2
     jsr songStartAdress
     lda #15
     jsr songStartAdress+9
+jsr stopTimer
     jmp firstPieceToDrop
 DropNew
     ; Loop through every piece to see if they can be cleared
@@ -292,8 +295,8 @@ MoveDownForced
     jmp GameLoop
 NextLevel
     jsr updateScore
-;    inc currentLvl
-;    inc currentLvl ; Twice ?
+    inc currentLvl
+    inc currentLvl ; Twice ?
     lda #<MSG_CLEAR
     pha
     lda #>MSG_CLEAR
@@ -310,16 +313,14 @@ demoEnd
 sta SID_VOLUME
     sta playMusic
     jsr songStartAdress+9 ; set volume 0
-    jsr hideTopSprites
+;    jsr hideTopSprites
 
-    jsr vScrollScreenOff
+;    jsr vScrollScreenOff
 holdTextOnScreen
     lda JOY1
     and #16
     beq GotButtonPress2
-    jsr WaitEventFrame
-    jsr cycleColorsOnSecondToBottomRow
-jsr WaitEventFrame
+;    jsr cycleColorsOnSecondToBottomRow
     jmp holdTextOnScreen
 
 

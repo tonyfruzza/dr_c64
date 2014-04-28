@@ -125,10 +125,7 @@ cRaster     .byte $00
 
 ; Interrupt area
 int
-
     sei ; turn interupt off
-
-
     ldx rasters
     inx
 noThereYet
@@ -136,14 +133,11 @@ noThereYet
     beq rasterFound
     jmp noThereYet
 rasterFound
-
-
     sty SCREEN_BORDER
     sta SCREEN_BG_COLOR
     cli
 
 ; Set up next raster line
-;    inc rasterIndex
     ldx rasterIndex
 
     lda rasters, x

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>468EB458-3F3E-4C83-A81C-715C726733D4</string>
+	<key>IDESourceControlProjectName</key>
+	<string>C64First</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>DFA7082A-EB7D-428F-BF68-FB1AB273AD97</key>
+		<string>ssh://github.com/Turbo240Z/dr_c64.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>C64First.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>DFA7082A-EB7D-428F-BF68-FB1AB273AD97</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/Turbo240Z/dr_c64.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>DFA7082A-EB7D-428F-BF68-FB1AB273AD97</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>DFA7082A-EB7D-428F-BF68-FB1AB273AD97</string>
+			<key>IDESourceControlWCCName</key>
+			<string>DrC64</string>
+		</dict>
+	</array>
+</dict>
+</plist>

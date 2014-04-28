@@ -1,4 +1,6 @@
 
+; For calculating and displaying sprite scores where pieces are cleared
+;
 
 virusesClearedForPopUpScore .byte $00
 ;                                   0,   1,   2,   3,   4,   5,   6 Virus clears values / 100

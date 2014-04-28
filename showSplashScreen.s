@@ -153,7 +153,6 @@ returnScreenBackFromSpash
     lda old_D018
     sta $d018
     rts
-
 old_DD00    .byte $00
 old_D011    .byte $00
 old_d016    .byte $00

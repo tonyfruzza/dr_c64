@@ -49,6 +49,7 @@ initRefreshCounter
 ;
 ; Event entry point
 irq_refreshCounter ; void (y, x, a)
+    inc vBlanks ; for raster counter
     ; See if we need to turn off a score sprite
     lda $d015
     and #4

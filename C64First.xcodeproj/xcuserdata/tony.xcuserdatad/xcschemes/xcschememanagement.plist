@@ -14,6 +14,11 @@
 			<key>orderHint</key>
 			<integer>3</integer>
 		</dict>
+		<key>bin2raw.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
 		<key>bitmapReader.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -27,6 +32,16 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>EA8034C9190EEB2E004F7BAD</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>EA8034DB190EED3A004F7BAD</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>EA96DB8F1666FD7000BC97D7</key>
 		<dict>
 			<key>primary</key>

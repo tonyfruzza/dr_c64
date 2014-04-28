@@ -26,3 +26,12 @@ C64First.xcodeproj/project.xcworkspace/xcuserdata/tony.xcuserdatad/UserInterface
 /dr64.d64
 /friday.rwa
 /friday.rwb
+/compiledAssets.s
+
+/combined.prg
+
+/highResExpCombine.s
+
+/pongBattleCombine.s
+
+/showSpriteCombine.s

@@ -13,6 +13,10 @@ init_irq
     lda #$01
     sta $d01a ; raster interrupt enabled by #1
     cli
+    lda #0 ; Play song 1
+    jsr songStartAdress
+    lda #15 ; Set volumn
+    jsr songStartAdress+9
     rts
 
 irq1
@@ -25,6 +29,7 @@ irq1
     sta $314
     lda #>irq2
     sta $315
+jsr songStartAdress+3 ; play song
     jmp $ea31 ; return to standard irq
 
 irq2

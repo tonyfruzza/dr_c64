@@ -31,11 +31,9 @@ printLevelSelectScreen
     jsr printMsgSub
     jsr resetInputMovement
 
-jsr WaitEventFrame
-
-
-lda #0
-sta turnInputOff
+    jsr WaitEventFrame
+    lda #0
+    sta turnInputOff
 
 
 levelSelectLoop
@@ -82,12 +80,12 @@ utlwhs_print
     iny
     sta (zpPtr1),y
 
-clc
-lda #$d4
-adc zpPtr1+1
-sta zpPtr1+1
-lda #COLOR_WHITE
-sta (zpPtr1),y
-dey
-sta (zpPtr1),y
+    clc
+    lda #$d4
+    adc zpPtr1+1
+    sta zpPtr1+1
+    lda #COLOR_WHITE
+    sta (zpPtr1),y
+    dey
+    sta (zpPtr1),y
     rts

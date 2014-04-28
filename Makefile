@@ -30,7 +30,8 @@ all:
 	/usr/local/bin/mac2c64 -r baseGameCombine.s
 	mv baseGameCombine.rw drc64.prg
 #	tools/linker drc64.prg quiet.prg > outbreak.prg
-	tools/linker drc64.prg everlasting-8000.prg > outbreak.prg
+#	tools/linker drc64.prg everlasting-8000.prg > outbreak.prg
+	tools/linker drc64.prg Outbreak-8000sng.prg > outbreak.prg
 	@./createLabels.sh baseGameCombine.s
 	/Applications/x64.app/Contents/MacOS/c1541 -format outbreak,02 d64 outbreak.d64 -attach outbreak.d64 -write outbreak.prg outbreak
 linker:
@@ -59,8 +60,10 @@ cia:
 	/usr/local/bin/mac2c64 -r ciaTimer.s
 	mv ciaTimer.rw ciaTimer.prg
 highres:
-	/usr/local/bin/mac2c64 -r highres.s
-	mv highres.rw highres.prg
+	cat highres.s > highresAll.s
+	tools/bin2hex -kf kennel.kla -n highDot >> highresAll.s
+	/usr/local/bin/mac2c64 -r highresAll.s
+	mv highresAll.rw highres.prg
 	
 scroller:
 	/usr/local/bin/mac2c64 -r scroller.s
@@ -84,7 +87,8 @@ koalaplay:
 # Using Project One to convert BMP to koala format
 #	tools/linker koalaplay.rw dude.rw dna3-kola.kla > koalaplay.prg
 	cat koalaplay.s > koala.s
-	tools/bin2hex -kf diana-almond.kla -n dna4 >> koala.s
+	tools/bin2hex -kf 100inthemiddle.kla -n dna4 >> koala.s
+#	tools/bin2hex -kf diana-almond.kla -n dna4 >> koala.s
 	tools/bin2hex -kf tony-racing.kla -n dylan1 >> koala.s
 	/usr/local/bin/mac2c64 -r koala.s
 	mv koala.rw koala.prg
@@ -109,3 +113,51 @@ queue:
 	/usr/local/bin/mac2c64 -r queue.s
 	mv queue.rw queue.prg
 	 @./createLabels.sh queue.s
+int2:
+	/usr/local/bin/mac2c64 -r int2.s
+	mv int2.rw int2.prg
+multiSprite:
+	/usr/local/bin/mac2c64 -r multiSprite.s
+	mv multiSprite.rw multiSprite.prg
+	
+songBy:
+	echo ".org \x243000" > oblogo.s
+	# 5 x 25 * 8 = 1000 bytes
+	tools/bitmapReader -t logo -cf song/outbreak40x200.raw -w 40 -h 200 >> oblogo.s
+	tools/bitmapReader -t status -cf song/status32x8.raw -w 40 -h 8
+
+	echo ".org \x2433E8" > obby.s
+	tools/bitmapReader -t songby -cf song/songby72x32.raw -w 72 -h 32 >> obby.s
+
+	/usr/local/bin/mac2c64 -r songBy.s
+	/usr/local/bin/mac2c64 -r oblogo.s
+	/usr/local/bin/mac2c64 -r obby.s
+	/Applications/x64.app/Contents/MacOS/c1541 -format outbreaksong,02 d64 ob-song.d64 -attach ob-song.d64 -write songBy.rw song -write oblogo.rw logo -write obby.rw by -write song/obsong.prg sid
+	@./createLabels.sh songBy.s
+simple:
+	/usr/local/bin/mac2c64 -r simple.s
+	mv simple.rw simple.prg
+	@./createLabels.sh simple.s
+prof:
+	/usr/local/bin/mac2c64 -r prof.s
+	mv prof.rw prof.prg
+	tools/linker Sprites.prg  prof.prg > profsprite.prg
+timerBasedCountDown:
+	/usr/local/bin/mac2c64 -r timerBasedCountDown.s
+	mv timerBasedCountDown.rw timerBasedCountDown.prg
+	@./createLabels.sh timerBasedCountDown.s
+pongBattle:
+	cp -f pongBattle.s pongBattleCombine.s
+	php tools/preCalcCircle.php >> pongBattleCombine.s
+	tools/bitmapReader -t CUST_SPRITE_0 -w 24 -h 21 -s -f Images/squareSingleColorSprite.raw >> pongBattleCombine.s
+	/usr/local/bin/mac2c64 -r pongBattleCombine.s
+	mv pongBattleCombine.rw pongBattle.prg
+	@./createLabels.sh pongBattleCombine.s
+	/Applications/x64.app/Contents/MacOS/c1541 -format pongbattle,02 d64 pongbattle.d64 -attach pongbattle.d64 -write pongBattle.prg pongbattle
+highResExp:
+	cat highResExp.s > highResExpCombine.s
+	php tools/preCalcBitmapTables.php >> highResExpCombine.s
+	mac2c64 -r highResExpCombine.s
+	mv highResExpCombine.rw highResExp.prg
+	@./createLabels.sh highResExpCombine.s
+#	/Applications/x64.app/Contents/MacOS/c1541 -format highresdraw,02 d64 highresdraw.d64 -attach highresdraw.d64 -write highResExp.prg highresdraw
