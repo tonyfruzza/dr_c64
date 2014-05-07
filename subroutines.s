@@ -2,14 +2,14 @@
 ;
 ; print8BitDecNumber    ; void (ret_2, ret_1, pos_high, pos_low, number); alters y, tmp, zptr1
 ; eightBitMul           ; tmp1, tmp4 = (return_2, return_1, num1, num2) ; alter x, tmp1, tmp2, tmp4
-; ClearScreen           ; void ()
+; ClearScreen           ; void (), uses global clearingChar
 ; get_random_number     ; a ()
 
 ClearScreen ; void ()
     stx retx
     LDX #$00
 Clearing
-    lda #127
+    lda clearingChar
     STA SCREENMEM, X
     STA SCREENMEM + $100, x
     STA SCREENMEM + $200, x
@@ -20,9 +20,10 @@ Clearing
     sta COLORMEM + $200, x
     sta COLORMEM + $300, x
     INX
-    BNE Clearing;
+    BNE Clearing
     ldx retx
     RTS
+clearingChar    .byte BACKGROUND_CHAR
 
 
 get_random_number ; reg a ()
@@ -137,29 +138,5 @@ itsZero
     lda ret1+1
     pha
     rts ; and return
-
-
-
-; Count how many raster lines it takes to complete task.
-; Used in conjunction with IRQ
-startTimer
-    lda #0
-    sta vBlanks
-    lda $d012
-    sta rasterCounter
-    rts
-
-stopTimer
-lda $d012
-    sta rasterCntTotal
-lda vBlanks
-sta vBlanksEnd
-    rts
-
-
-rasterCounter   .byte $00
-rasterCntTotal  .byte $00
-vBlanks         .byte $00
-vBlanksEnd      .byte $00
 
 

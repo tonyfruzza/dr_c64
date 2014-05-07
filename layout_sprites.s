@@ -1,11 +1,6 @@
 
 
-SPRITE1_DATA    .equ $0240
-SPRITE2_DATA    .equ $0280
-SPRITE3_DATA    .equ $02C0
 
-SPRITE1_POINT   .equ $07f8
-SPRITE2_POINT   .equ $07f9
 ; VIC is using memory bank #0 so VIC sees $0000-$3FFF
 
 copySpriteDataIntoUseableLocation

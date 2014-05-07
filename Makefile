@@ -1,43 +1,53 @@
 all:
-	tools/bitmapReader -t PILL_H -cf outbreak_assets/pill_h.raw -w 16 -h 8 > compiledAssets.s
-	tools/bitmapReader -t PILL_V -cf outbreak_assets/pill_v.raw -w 8 -h 16 >> compiledAssets.s
-	tools/bitmapReader -t PILL_HD -cf outbreak_assets/pill_h-dropped.raw -w 16 -h 8 >> compiledAssets.s
-	tools/bitmapReader -t PILL_VD -cf outbreak_assets/pill_v-dropped.raw -w 8 -h 16 >> compiledAssets.s
-	tools/bitmapReader -t PILL_HLF -cf outbreak_assets/pillHalf.raw -w 8 -h 8 >> compiledAssets.s
-	tools/bitmapReader -t PILL_HLF2 -cf outbreak_assets/pillHalf2.raw -w 8 -h 8 >> compiledAssets.s
-	tools/bitmapReader -t V1_AN -cf outbreak_assets/v1_an.raw -w 24 -h 8 >> compiledAssets.s
-	tools/bitmapReader -t NUMS -cf outbreak_assets/numbers.raw -w 80 -h 8 >> compiledAssets.s
-	tools/bitmapReader -t GAME_BORDER -cf outbreak_assets/gameborder.raw -w 24 -h 24 >> compiledAssets.s
-	tools/bitmapReader -t leftTopSprite -sf outbreak_assets/leftTopSprite.raw -w 24 -h 21 >> compiledAssets.s
-	tools/bitmapReader -t rightTopSprite -sf outbreak_assets/rightTopSprite.raw -w 24 -h 21 >> compiledAssets.s
-#	tools/bitmapReader -t scorePopUp -sf outbreak_assets/scorePopUp.raw -w 24 -h 21 >> compiledAssets.s
-	tools/bitmapReader -t CLEAR_PIECE -cf outbreak_assets/clearPieces.raw -w 24 -h 8 >> compiledAssets.s
 	# These small numbers are only 5 pixels tall, so I'm going to chop off the bottom 3 pixels
 	# each number is 4x5 bits 
+	echo ".org \$$9000" > compiledAssets.s
 	tools/bitmapReader -t SN01 -cf outbreak_assets/smallNums/smallNum01.raw -w 8 -h 8 >> compiledAssets.s
 	tools/bitmapReader -t SN23 -cf outbreak_assets/smallNums/smallNum23.raw -w 8 -h 8 >> compiledAssets.s
 	tools/bitmapReader -t SN45 -cf outbreak_assets/smallNums/smallNum45.raw -w 8 -h 8 >> compiledAssets.s
 	tools/bitmapReader -t SN67 -cf outbreak_assets/smallNums/smallNum67.raw -w 8 -h 8 >> compiledAssets.s
 	tools/bitmapReader -t SN89 -cf outbreak_assets/smallNums/smallNum89.raw -w 8 -h 8 >> compiledAssets.s
-	tools/bitmapReader -cw 24 -h 40 -f outbreak_assets/zombie24x40char.raw -t zombie >> compiledAssets.s
-	tools/bitmapReader -cw 8 -h 40 -f outbreak_assets/vDemo8x40.raw -t vdemo >> compiledAssets.s
-	#tools/bitmapReader -t smallNums -cf outbreak_assets/smallNumbers.raw -w 40 -h 8|sed s/', 0, 0, 0'// >> compiledAssets.s
-	tools/bin2hex -kf outbreak_assets/dna6.kla -n dylan1 >> compiledAssets.s
+	php tools/convertBitmapToCharMap.php -f outbreak_assets/worldmap-base40x25.raw -t WORLDCHARMAP -z >> compiledAssets.s
+	php tools/convertBitmapToCharMap.php -f outbreak_assets/worldmap-progression40x25.raw -t WMCOLORMAP -z >> compiledAssets.s
+	php tools/asciiToPETSCII.php -n "ENDMSG" -m "end" >> compiledAssets.s
+	php tools/asciiToPETSCII.php -n "MSG_NEXT" -m "next" >> compiledAssets.s
+	php tools/asciiToPETSCII.php -n "MSG_VIRUS" -m "virus" >> compiledAssets.s
+	php tools/asciiToPETSCII.php -n "MSG_SCORE" -m "score" >> compiledAssets.s
+	php tools/asciiToPETSCII.php -n "MSG_LEVEL" -m "level" >> compiledAssets.s
+	php tools/asciiToPETSCII.php -n "MSG_CLEAR" -m "clear" >> compiledAssets.s
+	php tools/asciiToPETSCII.php -n "PROGRESS" -m "global infestation progress  [00:00]" >> compiledAssets.s
+	php tools/asciiToPETSCII.php -n "LABELS" -m "~all clear    ~outbreak    ~pandemic" >> compiledAssets.s
+
 	cat baseGame.s subroutines.s customchars.s refreshCounter.s input.s drawBox.s layout.s drops.s \
-    virusLevels.s lvlSelect.s search.s lookForConnect4.s down.s left.s right.s moveUtils.s newColor.s colorUtils.s vScrollScreen.s \
-    rotate.s compiledAssets.s layout_sprites.s showSplashScreen.s scoreOverTop.s lvlPieceColor.s scoring.s colorZombies.s \
-    hSpriteScroller.s openBorderInGame.s > baseGameCombine.s
+    virusLevels.s lvlSelect.s search.s lookForConnect4.s down.s left.s right.s moveUtils.s newColor.s colorUtils.s \
+    rotate.s scoreOverTop.s lvlPieceColor.s scoring.s wmBorderText.s  wmColor.s compiledAssets.s \
+    > baseGameCombine.s
 	/usr/local/bin/mac2c64 -r baseGameCombine.s
-	mv baseGameCombine.rw drc64.prg
-#	tools/linker drc64.prg quiet.prg > outbreak.prg
-#	tools/linker drc64.prg everlasting-8000.prg > outbreak.prg
-	tools/linker drc64.prg Outbreak-8000sng.prg > outbreak.prg
+	tools/linker baseGameCombine.rwa baseGameCombine.rwb > drc64.prg
+	tools/linker drc64.prg Outbreak-8000sng.prg > outbreak_wsong.prg
+	tools/linker outbreak_wsong.prg outbreak_assets/chars3000.prg > outbreak_wchars.prg
+	tools/exomizer sfx \$$$0801 -q outbreak_wchars.prg -o outbreak.prg
 	@./createLabels.sh baseGameCombine.s
 	/Applications/x64.app/Contents/MacOS/c1541 -format outbreak,02 d64 outbreak.d64 -attach outbreak.d64 -write outbreak.prg outbreak
-linker:
-	/Users/Tony/Library/Developer/Xcode/DerivedData/C64First-bcaelnhlmpesixdidkmnvslvslar/Build/Products/Debug/linker drc64.prg quiet.prg 2049 > combined.prg
-compress:
-	pucrunch -c64 combined.prg compressed.prg
+
+
+#	tools/bitmapReader -t PILL_H -cf outbreak_assets/pill_h.raw -w 16 -h 8 > compiledAssets.s
+#	tools/bitmapReader -t PILL_V -cf outbreak_assets/pill_v.raw -w 8 -h 16 >> compiledAssets.s
+#	tools/bitmapReader -t PILL_HD -cf outbreak_assets/pill_h-dropped.raw -w 16 -h 8 >> compiledAssets.s
+#	tools/bitmapReader -t PILL_VD -cf outbreak_assets/pill_v-dropped.raw -w 8 -h 16 >> compiledAssets.s
+#	tools/bitmapReader -t PILL_HLF -cf outbreak_assets/pillHalf.raw -w 8 -h 8 >> compiledAssets.s
+#	tools/bitmapReader -t PILL_HLF2 -cf outbreak_assets/pillHalf2.raw -w 8 -h 8 >> compiledAssets.s
+#	tools/bitmapReader -t V1_AN -cf outbreak_assets/v1_an.raw -w 24 -h 8 >> compiledAssets.s
+#	tools/bitmapReader -t GAME_BORDER -cf outbreak_assets/gameborder.raw -w 24 -h 24 >> compiledAssets.s
+#	tools/bitmapReader -t leftTopSprite -sf outbreak_assets/leftTopSprite.raw -w 24 -h 21 > compiledAssets.s
+#	tools/bitmapReader -t rightTopSprite -sf outbreak_assets/rightTopSprite.raw -w 24 -h 21 >> compiledAssets.s
+#	tools/bitmapReader -t scorePopUp -sf outbreak_assets/scorePopUp.raw -w 24 -h 21 >> compiledAssets.s
+#	tools/bitmapReader -t CLEAR_PIECE -cf outbreak_assets/clearPieces.raw -w 24 -h 8 >> compiledAssets.s
+#	php tools/asciiToPETSCII.php "   hello    " >> compiledAssets.s
+#	php tools/textToPETSCII.php "                       multi color splash screen bitmap messed up, overlapped mem. still working on my memory layout skills and such....               " >> compiledAssets.s
+#	tools/bin2hex -kf outbreak_assets/dna6.kla -n dylan1 >> compiledAssets.s
+#	tools/bin2hex -n customchars -f outbreak_assets/chars.raw >> compiledAssets.s
+
 demo:
 	/usr/local/bin/mac2c64 -r lightspeed.s
 	mv lightspeed.rw lightspeed.prg

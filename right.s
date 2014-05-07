@@ -23,7 +23,7 @@ MoveRightHorizontalOnly
 
     ; Secondary piece
     ldy #$00
-    lda #' '
+    lda #CLEAR_CHAR
     sta (piece2), y
     clc
     lda #$01
@@ -35,7 +35,7 @@ MoveRightHorizontalOnly
     lda pSideTmp2
     sta (piece2), y
     ; clear pos
-    lda #' '
+    lda #CLEAR_CHAR
     sta (piece1), y
     ; increment the pointer value by one
     clc

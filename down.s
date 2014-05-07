@@ -9,7 +9,7 @@ MoveDownOne
     lda (piece2),y
     sta pSideTmp2
 ; Clear
-    lda #" "
+    lda #CLEAR_CHAR
     sta (piece1), y
     sta (piece2), y
     lda ORIENTATION

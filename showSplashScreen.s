@@ -115,7 +115,7 @@ rts
 
 
 setupScreenForSpashScreen
-    jsr copyImage
+;    jsr copyImage
 reShowImage
     jsr backUpCurrentVideoSettings
 

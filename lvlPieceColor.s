@@ -26,11 +26,11 @@ rts
 FIRST_COLOR_SET
 lda #COLOR_CYAN
 sta colors
-lda #COLOR_MAGENTA
+lda #COLOR_L_BLUE
 sta colors+1
-lda #COLOR_YELLOW
+lda #COLOR_L_GREEN
 sta colors+2
-lda #COLOR_MAGENTA
+lda #COLOR_L_BLUE
 sta colors+3
 rts
 

@@ -97,7 +97,7 @@ foundLine
 useVirus
 
     lda (zpPtr2),y
-    cmp #' '
+    cmp #CLEAR_CHAR
     bne printLevelWorth ; Already something there go back before dec viruses_to_print
 
     ; Look around, are there two viruses viruses next to this place

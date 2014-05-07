@@ -2,7 +2,7 @@
 rotate
     ; Cleared printed pill first
     ldy #$00
-    lda #" "
+    lda #CLEAR_CHAR
     sta (piece1), y
     sta (piece2), y
     lda ORIENTATION
@@ -21,12 +21,12 @@ rotateUnder
     sbc #0
     sta zpPtr2+1
     lda (zpPtr2), y
-    cmp #' '
+    cmp #CLEAR_CHAR
     beq rotateHasRoom
     ; Estabished there is no room above
     iny
     lda (zpPtr2),y
-    cmp #' '
+    cmp #CLEAR_CHAR
     bne CantDoRotateToLeftVertical
     ; There is room to the top left
     clc
@@ -63,7 +63,7 @@ CantDoRotateToLeftVertical
     adc #0
     sta zpPtr2+1
     lda (zpPtr2),y
-    cmp #' '
+    cmp #CLEAR_CHAR
 beq RotateCanContinue
 jmp RotateFinishedNoSound
 RotateCanContinue
@@ -103,7 +103,7 @@ rotateToLeft
     ldy #1
     lda (piece2), y
     ldy #0
-    cmp #' '
+    cmp #CLEAR_CHAR
     beq commitRotateToHorizontal ; We're okay just rotate as normal
     ; There is something on the right !
 
@@ -123,7 +123,7 @@ RotateCanContinue2
     ; clear out the piece to the right
     ; 1 converted to: <- 1 2
     ; 2
-    lda #' '
+    lda #CLEAR_CHAR
     sta (piece1),y
     lda piece2
     sec

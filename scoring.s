@@ -1,10 +1,14 @@
-
+; Print virus count
 UpdateVirusCount
     ldy #0
-    lda #$6f
+    lda #$6c
     sta zpPtr2
     lda #$05
     sta zpPtr2+1
+
+    lda #$30
+    sta (zpPtr2),y
+    iny
     ldx p1VirusCount
     txa
     and #$f0
@@ -102,8 +106,7 @@ printCurrentScore
     sta zpPtr2
     lda #$04
     sta zpPtr2+1
-
-    ldx #8
+    ldx #6 ; ldx #8 for two more numbers
 l2
     lda P1_SCORE,x
     ora #$30

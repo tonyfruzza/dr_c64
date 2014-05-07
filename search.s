@@ -166,7 +166,7 @@ fs_nextCharType
 cmp #PILL_CLEAR_2
 bne fs_nextRow
 inc fs_didWorkReturn
-lda #' '
+lda #CLEAR_CHAR
 sta (zpPtr2),y
 fs_nextRow
 dec fs_innerLoopIdx

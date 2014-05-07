@@ -22,7 +22,7 @@ MoveLeftHorizontalOnly
     bne leftMoveDoneNoSound ; ? 1
 
     ; Clear the current pos
-    lda #" "
+    lda #CLEAR_CHAR
     sta (piece1), y
 
     ; decrement the pointer value by one
@@ -36,7 +36,7 @@ MoveLeftHorizontalOnly
     lda pSideTmp1
     sta (piece1), y
     ; Second
-    lda #" "
+    lda #CLEAR_CHAR
     sta (piece2), y
 
     ; decrement the pointer value by one

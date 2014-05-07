@@ -12,6 +12,7 @@ SOUND_CLEAR         .byte $01, $93, $00, $c4, $81, $c4, $c4, $c4, $21, $c4, $c0,
 refreshCount        .byte $00
 refreshTimer2       .byte $00
 refreshTimer3       .byte $00
+refreshTimer4       .byte $00 ; Keep track of frames since virus last animated
 playMusic           .byte $00
 flashTimes          .byte $00
 
@@ -28,7 +29,7 @@ initRefreshCounter
     lda #$1b
     sta $d011
     ; %0001 1000 = 40 columns, multicolor mode
-    lda #$18 ;
+    lda #$08 ;
     sta $d016
 
 
@@ -49,7 +50,7 @@ initRefreshCounter
 ;
 ; Event entry point
 irq_refreshCounter ; void (y, x, a)
-    inc vBlanks ; for raster counter
+    jsr cycleAnimatedViruses
     ; See if we need to turn off a score sprite
     lda $d015
     and #4
@@ -70,8 +71,6 @@ irq_refreshCounter ; void (y, x, a)
     sta VMEM+41
     dec $d005
     dec $d005
-
-;jsr handleScreenFlash
 
 noScoreSpriteMods
     dec framesToShowSprite
@@ -110,7 +109,6 @@ lNoReset
     lda refreshTimer3
     cmp DELAY
     bne noRefreshTimer3Work
-    jsr cycleAnimatedViruses
     lda #0
     sta refreshTimer3
 
@@ -139,24 +137,3 @@ waitStart
 waitDone
     rts
 
-
-handleScreenFlash
-    lda SCREEN_BORDER
-    and #$0f ; Upper bits are being set to F here, not sure why!?
-    bne turnFlashOff ; Not black?
-    ; do we flash for a score?
-doWeFlash
-    lda flashTimes
-    beq doneFlash ; Do we need to flash?
-    lda #COLOR_DARK_GREY
-    sta SCREEN_BORDER
-    dec flashTimes
-    jsr zombieColorSwap
-    jmp doneFlash
-    turnFlashOff
-    lda framesToShowSprite ; extend flash time out as long as score is displayed
-    bne doneFlash
-    lda #COLOR_BLACK
-    sta SCREEN_BORDER
-doneFlash
-    rts

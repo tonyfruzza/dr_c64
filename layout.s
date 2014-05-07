@@ -1,111 +1,36 @@
-;OnePGameFieldLocLow   .equ $0f
-;OnePGameFieldLocHigh  .equ $04
 
+; Draw game board
+DrawGameBorder
+    lda #1
+    sta cutLastLine
+    lda #09 ; Width
+    pha
+    lda #17 ; Height
+    pha
+    ; Box in relation to play field is actually shifted up one row
 
-
-ClearTopLine
     sec
     lda #OnePGameFieldLocLow ; Low byte start location
-    sbc #40
-    sta zpPtr2
+    sbc #80
+    pha
     lda #OnePGameFieldLocHigh ; High byte start location
     sbc #0
-    sta zpPtr2+1
-ClearTopLineLoop
-    cpy #0
-    bne NotTopLeft
-    lda #110
-    jmp ApplyClearingTopLine
-NotTopLeft
-    cpy #9
-    bne NotTopRight
-    lda #73
-    jmp ApplyClearingTopLine
-NotTopRight
-    lda #' '
-ApplyClearingTopLine
-    sta (zpPtr2),y
-    iny
-    cpy #10
-    beq ctl_done
-    jmp ClearTopLineLoop
-ctl_done
+    pha
+    jsr DrawBorderBox
+;    jsr displayTopSprite ; enable the top sprites
+    jsr drawInlet
     rts
-
-
-; Draw game board using char 230 as the boarder
-DrawGameBorder
-    lda #$00 ; Our counter
-    tax
-    tay
-    sta TMP1 ; used to count how many viruses we've printed
-
-    jsr ClearTopLine
-dgb_start
-    ldy #$00
-
-    lda #OnePGameFieldLocLow ; Low byte start location
-    sta zpPtr2
-    lda #OnePGameFieldLocHigh ; High byte start location
-    sta zpPtr2+1
-dgbLoop
-    ldy #00
-    lda #WALL_SIDES
-    sta (zpPtr2), y
-    ldy #9
-    sta (zpPtr2), y
-
-    ; Draw centers
-    ldy #01
-    clearGameField
-    lda #' '
-    sta (zpPtr2),y
-    iny
-    cpy #9
-    bne clearGameField
-    ; Next line down
-    clc
-    lda zpPtr2
-    adc #40
-    sta zpPtr2
-    lda zpPtr2+1
-    adc #0
-    sta zpPtr2+1
-
-    inx
-    cpx #16 ; game field length
-    bne dgbLoop
-    ldy #00
-    lda #WALL_BL
-    sta (zpPtr2),y
-    ; then finish off the bottom line
-    iny
-DrawBottom
-    lda #WALL_B
-    sta (zpPtr2), y
-    iny
-    cpy #9
-    bne DrawBottom
-dgbDone
-    lda #WALL_BR
-    sta (zpPtr2),y
-    jsr displayTopSprite ; enable the top sprites
-    jsr removeBgNearTop
-    rts
-
-
-
 
 ;bin2hex8bit ; TMP, TMP2 (ret_2, ret_1, binNumber)
 printSinglePlayerLevelBox
     ; Print Level box and message
-    lda #10 ; Width
+    lda #08 ; Width
     pha
     lda #2 ; Height
     pha
-    lda #$33
+    lda #$36 ; Low pos
     pha
-    lda #$05
+    lda #$05 ; High pos
     pha
     jsr DrawBorderBox
 
@@ -114,7 +39,7 @@ printSinglePlayerLevelBox
     lda #>MSG_LEVEL
     pha
 
-    lda #$5e
+    lda #$60
     pha
     lda #$05
     pha
@@ -123,11 +48,14 @@ printSinglePlayerLevelBox
     lda currentLvl
     pha
     jsr bin2hex8bit
-    lda #$88
-    sta zpPtr2
+    lda #$89
+    sta zpPtr2 ; Low pos
     lda #$05
-    sta zpPtr2+1
+    sta zpPtr2+1 ; High pos
     ldy #0
+    lda #$30
+    sta (zpPtr2), y
+    iny
     lda TMP
     and #$f0
     lsr
@@ -145,13 +73,13 @@ printSinglePlayerLevelBox
 
 ; Virus count box and and message
 printSinglePlayerVirusCountBox
-    lda #10 ; Width
+    lda #08 ; Width
     pha
     lda #2 ; Height
     pha
-    lda #$1a
+    lda #$19 ; low pos
     pha
-    lda #$05
+    lda #$05 ; high pos
     pha
     jsr DrawBorderBox
 
@@ -161,22 +89,22 @@ printSinglePlayerVirusCountBox
     lda #>MSG_VIRUS
     pha
 
-    lda #$45
+    lda #$43 ; low pos
     pha
-    lda #$05
+    lda #$05 ; high pos
     pha
     jsr printMsgSub
     rts
 
 printSinglePlayerScoreBox
     ; Score box and message
-    lda #10 ; Width
+    lda #08 ; Width
     pha
     lda #2 ; Height
     pha
-    lda #$43
+    lda #$43 ; Low Pos
     pha
-    lda #$04
+    lda #$04 ; High Pos
     pha
     jsr DrawBorderBox
 
@@ -186,7 +114,7 @@ printSinglePlayerScoreBox
     lda #>MSG_SCORE
     pha
 
-    lda #$6e
+    lda #$6d
     pha
     lda #$04
     pha
@@ -194,14 +122,14 @@ printSinglePlayerScoreBox
     rts
 
 printSinglePlayerNextPieceBox
-    lda #10 ; width
+    lda #07 ; width
     pha
     lda #2 ; height
     pha
 
-    lda #$2a
+    lda #$2d ; Low pos
     pha
-    lda #$04
+    lda #$04 ; high pos
     pha
     jsr DrawBorderBox
 
@@ -213,19 +141,19 @@ printSinglePlayerNextPieceBox
     lda #>MSG_NEXT
     pha
 
-    lda #$56
+    lda #$57
     pha
     lda #$04
     pha
     jsr printMsgSub
 
     ; Set up the position of the "next" pill colors
-    lda #$7f
+    lda #$80
     sta piece1_next
     lda #$04
     sta piece1_next+1
 
-    lda #$80
+    lda #$81
     sta piece2_next
     lda #$04
     sta piece2_next+1
@@ -242,269 +170,86 @@ printSinglePlayerNextPieceBox
     jsr NewColors ; need to run this twice the first time
     rts
 
-printQuickZombieInBox
-    lda #10 ; width
-    pha
-    lda #5 ; height
-    pha
+drawInlet
+    ; Reset the value of some self modifying code that gets run multiple times
+    lda #<inletMapRow1
+    sta drawInletRowLoop+1
+    lda #>inletMapRow1
+    sta drawInletRowLoop+2
+    ; Same for color
+    lda #<inletClrRow1
+    sta drawInletRowColorLoop+1
+    lda #>inletClrRow1
+    sta drawInletRowColorLoop+2
 
-    lda #$0A ; 1,546
-    pha
-    lda #$06
-    pha
-    jsr DrawBorderBox
-
-; The right side box
-    lda #10 ; Width
-    pha
-    lda #5 ; Height
-    pha
-    lda #$23
-    pha
-    lda #$06
-    pha
-    jsr DrawBorderBox
-
-pqzib_drawSomething
-    lda DrawRightSide
-    beq pqzib_DrawLeftSide
-    cmp #1
-    beq pqzib_drawRightSide
-    jmp pqzib_done
-    ; Draw Left side
-pqzib_DrawLeftSide
-    lda #$33 ; 1,587
-    sta zpPtr2
-    lda #$06
-    sta zpPtr2+1
-    jmp pqzib_draw
-
-pqzib_drawRightSide
-    ; Right Row 1/5
-    lda #$4C ; 1,587
-    sta zpPtr2
-    lda #$06
-    sta zpPtr2+1
-    jmp pqzib_draw
-
-pqzib_draw
-    ; Row 1/5
     ldy #0
-    ldx #128
-    txa
+    sec
+    lda #OnePGameFieldLocLow
+    sbc #159
+    sta zpPtr1
+    sta zpPtr2 ; Color low
+    lda #OnePGameFieldLocHigh
+    sbc #0
+    sta zpPtr1+1
+    ; Do Color
+    clc
+    adc #$D4
+    sta zpPtr2+1 ; Color high
+
+    ldx #0
+drawInletRowLoop
+    lda inletMapRow1, y
+    sta (zpPtr1), y
+drawInletRowColorLoop
+    lda inletClrRow1, y
     sta (zpPtr2), y
+    iny
+    cpy #8
+    bne drawInletRowLoop
     inx
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    iny
-    lda #' '
-    sta (zpPtr2), y
-    lda #143
-    iny
-    sta (zpPtr2), y
-    iny
-    lda #' '
-    sta (zpPtr2), y
-    ; Right Zombie
-    dex
-    dex
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
+    cpx #3
+    beq drawInletFinished
+
+    clc
+    lda zpPtr1
+    adc #40
+    sta zpPtr1
+    sta zpPtr2
+    lda zpPtr1+1
+    adc #0
+    sta zpPtr1+1
+    ; Do Color
+    clc
+    adc #$D4
+    sta zpPtr2+1 ; Color high
+
+    ldy #0 ; reset counter
+    ; Self modify inletMapRow1 memaddress used above
+    clc
+    lda drawInletRowLoop+1 ; Load low byte
+    adc #8
+    sta drawInletRowLoop+1
+    lda drawInletRowLoop+2 ; Load high byte
+    adc #0
+    sta drawInletRowLoop+2
+    ; Do the same for the color part
+    clc
+    lda drawInletRowColorLoop+1 ; Load low byte
+    adc #8
+    sta drawInletRowColorLoop+1
+    lda drawInletRowColorLoop+2 ; Load high byte
+    adc #0
+    sta drawInletRowColorLoop+2
 
 
-    ; Row 2/5
-    ldy #40
-    inx
-    txa
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    iny
-    lda #' '
-    sta (zpPtr2), y
-    lda #144
-    iny
-    sta (zpPtr2), y
-    iny
-    lda #' '
-    sta (zpPtr2), y
-    ; Right Zombie
-    dex
-    dex
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-
-
-
-    ; Row 3/5
-    ldy #80
-    inx
-    txa
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    iny
-    lda #' '
-    sta (zpPtr2), y
-    lda #145
-    iny
-    sta (zpPtr2), y
-    iny
-    lda #' '
-    sta (zpPtr2), y
-    ; Right Zombie
-    dex
-    dex
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-
-
-
-    ; Row 4/5
-    ldy #120
-    inx
-    txa
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    iny
-    lda #' '
-    sta (zpPtr2), y
-    lda #146
-    iny
-    sta (zpPtr2), y
-    iny
-    lda #' '
-    sta (zpPtr2), y
-    ; Right Zombie
-    dex
-    dex
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-
-
-
-    ; Row 5/5
-    ldy #160
-    inx
-    txa
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    iny
-    lda #' '
-    sta (zpPtr2), y
-    lda #147
-    iny
-    sta (zpPtr2), y
-    iny
-    lda #' '
-    sta (zpPtr2), y
-    ; Right Zombie
-    dex
-    dex
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-    inx
-    txa
-    iny
-    sta (zpPtr2), y
-
-    inc DrawRightSide
-    jmp pqzib_drawSomething
-pqzib_done
-    lda #0
-    sta DrawRightSide
-    jsr zombieColorSwap ; init color
+    jmp drawInletRowLoop
+drawInletFinished
     rts
-DrawRightSide   .byte $00
+; Characters used to create inlet top to mating point
+inletMapRow1    .byte 100, WALL_CHAR_TRT, 91, CLEAR_CHAR, 92, 93, WALL_CHAR_TLFT, 101
+inletMapRow2    .byte BACKGROUND_CHAR, WALL_SIDES, 94, CLEAR_CHAR, 95, 96, WALL_SIDES, BACKGROUND_CHAR
+inletMapRow3    .byte WALL_B, WALL_BR, 97, CLEAR_CHAR, 98, 99, WALL_BL, WALL_B
 
-
-
-
-TOP_CLEAR1 .equ 1161
-TOP_CLEAR2 .equ 1162
-TOP_CLEAR3 .equ 1163
-TOP_CLEAR4 .equ 1164
-TOP_CLEAR5 .equ 1165
-TOP_CLEAR6 .equ 1166
-removeBgNearTop
-    lda #' '
-    sta TOP_CLEAR1
-    sta TOP_CLEAR2
-    sta TOP_CLEAR3
-    sta TOP_CLEAR4
-    sta TOP_CLEAR5
-    sta TOP_CLEAR6
-    rts
-
+inletClrRow1    .byte COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BROWN, COLOR_BROWN, COLOR_BROWN, COLOR_ORANGE, COLOR_MAGENTA, COLOR_MAGENTA
+inletClrRow2    .byte COLOR_WHITE, COLOR_MAGENTA, COLOR_BROWN, COLOR_BROWN, COLOR_BROWN, COLOR_ORANGE, COLOR_MAGENTA, COLOR_WHITE
+inletClrRow3    .byte COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BROWN, COLOR_BROWN, COLOR_BROWN, COLOR_ORANGE, COLOR_MAGENTA, COLOR_MAGENTA

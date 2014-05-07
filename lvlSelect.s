@@ -1,48 +1,38 @@
 ; This is the screen used to select the current level to play
 ; Levels are 0 - 20 that can be chosen lvl 21 is only reachable if you play through 20
 ; Read input from joystick and print
-
-;                     C H O  O  S  E    L  E V  E L     W  I T  H    J  O  Y  1  :
-MSG_CHOOSE_LVL  .byte 3,8,15,15,19,5,32,12,5,22,5,12,58,0
+LEVELSELECTPOS  .equ 1096
 
 printLevelSelectScreen
+    lda #CLEAR_CHAR
+    sta clearingChar ; Set the clearing char for screen clearing
     jsr ClearScreen
+    jsr printWorldCharMap
+    jsr drawScreenFrame
+    jsr writeScreenTextForWorldMap
+    jsr updateColorWorldMap
 
-    ; Print Level box and message
-    lda #26 ; Width
-    pha
-    lda #1 ; Height
-    pha
-    lda #$1e ; low byte upper left corner
-    pha
-    lda #$05 ; high byte upper left corner
-    pha
-    jsr DrawBorderBox
-
-    lda #<MSG_CHOOSE_LVL
-    pha
-    lda #>MSG_CHOOSE_LVL
-    pha
-
-    lda #$47
-    pha
-    lda #$05
-    pha
-    jsr printMsgSub
     jsr resetInputMovement
-
     jsr WaitEventFrame
     lda #0
     sta turnInputOff
-
+    lda currentLvl
+    sta levelSelectedLast
 
 levelSelectLoop
     jsr updateTheLevelWeHaveSelected
+    lda currentLvl
+    cmp levelSelectedLast
+    beq lsl_noLevelChange
+    sta levelSelectedLast
+    jsr updateColorWorldMap
+lsl_noLevelChange
     jsr getJoystickInputForLevel
     bne levelSelected
     jmp levelSelectLoop
 levelSelected
     rts
+levelSelectedLast   .equ 0
 
 updateTheLevelWeHaveSelected
     lda #0
@@ -61,9 +51,9 @@ utlwhs_loop
     jmp utlwhs_loop
 utlwhs_print
     cld
-    lda #$5e
+    lda #<LEVELSELECTPOS
     sta zpPtr1
-    lda #$05
+    lda #>LEVELSELECTPOS
     sta zpPtr1+1
     lda tmp
     and #$f0

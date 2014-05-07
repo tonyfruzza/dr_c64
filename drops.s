@@ -142,7 +142,7 @@ ddviyc_start
     ; what's 2 below
     ldy #80
     lda (zpPtr3),y
-    cmp #' '
+    cmp #CLEAR_CHAR
     bne ddviyc_noDrop
     ; Okay we can drop, erase the top piece
     ldy #0
@@ -204,15 +204,15 @@ dropDoubleHorizontalIfYouCan ; inc tmp3  (ret2, ret1, pos+1, pos)
     ; What's below?
     ldy #40
     lda (zpPtr3), y ; What's below?
-    cmp #" "
+    cmp #CLEAR_CHAR
     bne ddhiyc_noDrop
     iny
     lda (zpPtr3),y ; +41
-    cmp #" "
+    cmp #CLEAR_CHAR
     bne ddhiyc_noDrop
     ; Piece dropped so remove the old piece
     ldy #$00
-    lda #' '
+    lda #CLEAR_CHAR
     sta (zpPtr3),y
     iny ; #1
     sta (zpPtr3),y
@@ -271,7 +271,7 @@ startDropDownIfYouCan
     ; Look below and store it into zpPtr4
     ldy #40
     lda (zpPtr3),y
-    cmp #' '
+    cmp #CLEAR_CHAR
     bne noDrop
     ; Copy piece down one
     ldy #0
@@ -279,7 +279,7 @@ startDropDownIfYouCan
     ldy #40
     sta (zpPtr3),y
     ; clear piece that was dropped
-    lda #' '
+    lda #CLEAR_CHAR
     ldy #0
     sta (zpPtr3),y
     ; now transfer color from above to below

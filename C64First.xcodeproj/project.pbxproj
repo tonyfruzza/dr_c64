@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		EA8034DF190EED3A004F7BAD /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA8034DE190EED3A004F7BAD /* main.cpp */; };
-		EA8CA22718CAF5E900017AE2 /* highResExp.s in Sources */ = {isa = PBXBuildFile; fileRef = EA8CA22618CAF5E900017AE2 /* highResExp.s */; };
 		EA96DB951666FD7000BC97D7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA96DB941666FD7000BC97D7 /* main.cpp */; };
 		EAA0A43B172DDD7200C60DF3 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EAA0A43A172DDD7200C60DF3 /* main.cpp */; };
 		EAAD45F6166B248C005EAC00 /* bitmapReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EAAD45F5166B248C005EAC00 /* bitmapReader.cpp */; };
@@ -55,23 +54,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		EA240D921723B22C006A10BA /* spritePath.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = spritePath.s; sourceTree = "<group>"; };
 		EA286E83160BE51300C4A9B2 /* drc64.prg */ = {isa = PBXFileReference; lastKnownFileType = file; path = drc64.prg; sourceTree = "<group>"; };
 		EA286E85160BE57E00C4A9B2 /* example.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.prg; path = ../../ISOs/example.prg; sourceTree = "<group>"; };
 		EA286E88160C486D00C4A9B2 /* flicker.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = flicker.prg; path = ../../ISOs/flicker.prg; sourceTree = "<group>"; };
-		EA2A90B518C2F8DF002EED14 /* pongBattle.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = pongBattle.s; sourceTree = "<group>"; };
-		EA4D2B9F16A605C8005FF3E9 /* koalaplay.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = koalaplay.s; sourceTree = "<group>"; };
-		EA4E3EEB182C4C6500DA4F54 /* timerBasedCountDown.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = timerBasedCountDown.s; sourceTree = "<group>"; };
-		EA8034C5190EDCA7004F7BAD /* chars.raw */ = {isa = PBXFileReference; lastKnownFileType = file; name = chars.raw; path = ../../../ISOs/chars.raw; sourceTree = "<group>"; };
 		EA8034CC190EEB2E004F7BAD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		EA8034DC190EED3A004F7BAD /* bin2raw */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bin2raw; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA8034DE190EED3A004F7BAD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		EA8034E5190EF327004F7BAD /* TestOneBitOn.raw */ = {isa = PBXFileReference; lastKnownFileType = file; name = TestOneBitOn.raw; path = ../../../ISOs/TestOneBitOn.raw; sourceTree = "<group>"; };
 		EA859D7D1644E83F0016FB33 /* lookForConnect4.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lookForConnect4.s; sourceTree = "<group>"; };
 		EA859D7F1644EAEA0016FB33 /* search.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = search.s; sourceTree = "<group>"; };
-		EA894E30176AE99900FADFA7 /* int2.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = int2.s; sourceTree = "<group>"; };
-		EA894E321776B5C000FADFA7 /* multiSprite.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = multiSprite.s; sourceTree = "<group>"; };
-		EA894E331776C67600FADFA7 /* songBy.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = songBy.s; sourceTree = "<group>"; };
 		EA8961AA1658B6B300C48645 /* down.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = down.s; sourceTree = "<group>"; };
 		EA8961AB1658B71A00C48645 /* left.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = left.s; sourceTree = "<group>"; };
 		EA8961AC1658B73C00C48645 /* right.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = right.s; sourceTree = "<group>"; };
@@ -80,32 +71,19 @@
 		EA8961B01658BB1700C48645 /* colorUtils.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = colorUtils.s; sourceTree = "<group>"; };
 		EA8961B11658BC6100C48645 /* rotate.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = rotate.s; sourceTree = "<group>"; };
 		EA8B35EB163A971000C1059B /* input.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = input.s; sourceTree = "<group>"; };
-		EA8CA22618CAF5E900017AE2 /* highResExp.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = highResExp.s; sourceTree = "<group>"; };
 		EA8D86DC162696C40003415E /* subroutines.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = subroutines.s; sourceTree = "<group>"; };
 		EA8D871C163177730003415E /* customchars.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = customchars.s; sourceTree = "<group>"; };
-		EA8D873E1634AFCD0003415E /* interrupt.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = interrupt.s; sourceTree = "<group>"; };
 		EA8D873F1634E60D0003415E /* refreshCounter.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = refreshCounter.s; sourceTree = "<group>"; };
 		EA8D87431635D1AE0003415E /* arkanoid.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = arkanoid.prg; path = "../../Downloads/Arkanoid.Imagine+3.TCS/arkanoid.prg"; sourceTree = "<group>"; };
 		EA8DD136163D3ED400D3D0E5 /* drops.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = drops.s; sourceTree = "<group>"; };
 		EA8DD138163EA5C000D3D0E5 /* virusLevels.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = virusLevels.s; sourceTree = "<group>"; };
 		EA8DD13916412F0300D3D0E5 /* lvlSelect.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lvlSelect.s; sourceTree = "<group>"; };
-		EA92E7A1166329FA00DBF1B8 /* scroller.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = scroller.s; sourceTree = "<group>"; };
-		EA933B07165AF90E000B3E34 /* highres.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = highres.s; sourceTree = "<group>"; };
 		EA96DB901666FD7000BC97D7 /* bitmapReader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bitmapReader; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA96DB941666FD7000BC97D7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		EA97AB6B1919508B0097FE02 /* wmColor.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = wmColor.s; sourceTree = "<group>"; };
 		EAA0A438172DDD7200C60DF3 /* bin2hex */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bin2hex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAA0A43A172DDD7200C60DF3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		EAA0A441172E1AB800C60DF3 /* dna4.kla */ = {isa = PBXFileReference; lastKnownFileType = file; path = dna4.kla; sourceTree = SOURCE_ROOT; };
-		EAA29EAA16110FA200C87D7F /* number.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = number.s; sourceTree = "<group>"; };
-		EAA2A0A11620115800C87D7F /* joytest.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = joytest.s; sourceTree = "<group>"; };
-		EAA45CF11781480C00CDE19E /* prof.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = prof.s; sourceTree = "<group>"; };
-		EAA4ED5117534AAC00636B0B /* colorZombies.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = colorZombies.s; sourceTree = "<group>"; };
-		EAA4ED521755283B00636B0B /* vscroller.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vscroller.s; sourceTree = "<group>"; };
-		EAA4ED5317552F5100636B0B /* vScrollScreen.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vScrollScreen.s; sourceTree = "<group>"; };
-		EAA4ED541756C5C100636B0B /* openBorders.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = openBorders.s; sourceTree = "<group>"; };
-		EAA4ED581759422300636B0B /* spriteTextScroller.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = spriteTextScroller.s; sourceTree = "<group>"; };
-		EAA4ED59175DA56A00636B0B /* hSpriteScroller.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = hSpriteScroller.s; sourceTree = "<group>"; };
-		EAA4ED5A175DA5C900636B0B /* openBorderInGame.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = openBorderInGame.s; sourceTree = "<group>"; };
 		EAAC7FDC170F834B004B023E /* pill_h.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = pill_h.raw; sourceTree = "<group>"; };
 		EAAC7FDD170F834B004B023E /* pill_v.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = pill_v.raw; sourceTree = "<group>"; };
 		EAAC7FDE170F834B004B023E /* pillHalf.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = pillHalf.raw; sourceTree = "<group>"; };
@@ -114,26 +92,22 @@
 		EAAC7FED171332D6004B023E /* numbers.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = numbers.raw; sourceTree = "<group>"; };
 		EAAD45F3166B2204005EAC00 /* bitmapReader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bitmapReader.h; sourceTree = "<group>"; };
 		EAAD45F5166B248C005EAC00 /* bitmapReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmapReader.cpp; sourceTree = "<group>"; };
-		EAAD45FA166C77A6005EAC00 /* friday.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = friday.s; sourceTree = "<group>"; };
 		EAAD4600166C8562005EAC00 /* linker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = linker; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAAD4603166C8562005EAC00 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		EAAD46D0167494E2005EAC00 /* charAni.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = charAni.s; sourceTree = "<group>"; };
-		EAAD47F51677D1C7005EAC00 /* showSprite.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = showSprite.s; sourceTree = "<group>"; };
+		EAB37BBA1917DE8C00D54E4B /* wmBorderText.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = wmBorderText.s; sourceTree = "<group>"; };
+		EAB37BBC1917F59500D54E4B /* asciiToPETSCII.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; name = asciiToPETSCII.php; path = tools/asciiToPETSCII.php; sourceTree = "<group>"; };
+		EAB37BBD19180A8500D54E4B /* worldmap-base40x25.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = "worldmap-base40x25.raw"; sourceTree = "<group>"; };
+		EAB37BBE1918112E00D54E4B /* convertBitmapToCharMap.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; name = convertBitmapToCharMap.php; path = tools/convertBitmapToCharMap.php; sourceTree = "<group>"; };
 		EAB47DD0155219BF00516343 /* baseGame.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = baseGame.s; sourceTree = "<group>"; };
 		EABC8DE215CA2145006F2067 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		EABF2B1F1732E3F200813708 /* quiet.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = quiet.prg; path = ../../quiet.prg; sourceTree = "<group>"; };
 		EABF2B2117344ED700813708 /* gameborder.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = gameborder.raw; sourceTree = "<group>"; };
 		EABF2B221734540100813708 /* leftTopSprite.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = leftTopSprite.raw; sourceTree = "<group>"; };
-		EABF2B23173455CB00813708 /* layout_sprites.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = layout_sprites.s; sourceTree = "<group>"; };
-		EABF2B241734DA2500813708 /* showSplashScreen.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = showSplashScreen.s; sourceTree = "<group>"; };
 		EABF2B28173A104600813708 /* scoreOverTop.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = scoreOverTop.s; sourceTree = "<group>"; };
 		EABF2B311748AE7A00813708 /* lvlPieceColor.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = lvlPieceColor.s; sourceTree = "<group>"; };
 		EABF2B321748B7D300813708 /* scoring.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = scoring.s; sourceTree = "<group>"; };
-		EAD5AB2B17667AE900FEBEA6 /* queue.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = queue.s; sourceTree = "<group>"; };
+		EAC86C0E1915C80F002C103F /* vDemo16x40.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = vDemo16x40.raw; sourceTree = "<group>"; };
 		EAD8212F163BCAD3007DFD49 /* drawBox.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = drawBox.s; sourceTree = "<group>"; };
 		EAD82131163CB59F007DFD49 /* layout.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = layout.s; sourceTree = "<group>"; };
-		EAE21A1115A3BB9600DCE4B2 /* Notes.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = Notes.s; sourceTree = "<group>"; };
-		EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = SimpleAddition.s; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -189,8 +163,6 @@
 			isa = PBXGroup;
 			children = (
 				EAD82131163CB59F007DFD49 /* layout.s */,
-				EAA4ED5117534AAC00636B0B /* colorZombies.s */,
-				EABF2B23173455CB00813708 /* layout_sprites.s */,
 				EA859D7F1644EAEA0016FB33 /* search.s */,
 				EA859D7D1644E83F0016FB33 /* lookForConnect4.s */,
 				EABF2B28173A104600813708 /* scoreOverTop.s */,
@@ -219,36 +191,6 @@
 				EABF2B311748AE7A00813708 /* lvlPieceColor.s */,
 			);
 			name = Colors;
-			sourceTree = "<group>";
-		};
-		EA8D86F6162FE6CB0003415E /* experiements */ = {
-			isa = PBXGroup;
-			children = (
-				EA8CA22618CAF5E900017AE2 /* highResExp.s */,
-				EA2A90B518C2F8DF002EED14 /* pongBattle.s */,
-				EAA45CF11781480C00CDE19E /* prof.s */,
-				EA933B07165AF90E000B3E34 /* highres.s */,
-				EA8D873E1634AFCD0003415E /* interrupt.s */,
-				EA894E321776B5C000FADFA7 /* multiSprite.s */,
-				EA894E331776C67600FADFA7 /* songBy.s */,
-				EA894E30176AE99900FADFA7 /* int2.s */,
-				EAE21A1115A3BB9600DCE4B2 /* Notes.s */,
-				EAA29EAA16110FA200C87D7F /* number.s */,
-				EAE21A9715ABC95A00DCE4B2 /* SimpleAddition.s */,
-				EAA2A0A11620115800C87D7F /* joytest.s */,
-				EA92E7A1166329FA00DBF1B8 /* scroller.s */,
-				EAAD45FA166C77A6005EAC00 /* friday.s */,
-				EAAD46D0167494E2005EAC00 /* charAni.s */,
-				EAAD47F51677D1C7005EAC00 /* showSprite.s */,
-				EA4D2B9F16A605C8005FF3E9 /* koalaplay.s */,
-				EA240D921723B22C006A10BA /* spritePath.s */,
-				EAA4ED521755283B00636B0B /* vscroller.s */,
-				EAA4ED541756C5C100636B0B /* openBorders.s */,
-				EAA4ED581759422300636B0B /* spriteTextScroller.s */,
-				EAD5AB2B17667AE900FEBEA6 /* queue.s */,
-				EA4E3EEB182C4C6500DA4F54 /* timerBasedCountDown.s */,
-			);
-			name = experiements;
 			sourceTree = "<group>";
 		};
 		EA96DB911666FD7000BC97D7 /* Products */ = {
@@ -283,9 +225,8 @@
 		EAAC7FDB170F834B004B023E /* outbreak_assets */ = {
 			isa = PBXGroup;
 			children = (
-				EA8034C5190EDCA7004F7BAD /* chars.raw */,
+				EAB37BBD19180A8500D54E4B /* worldmap-base40x25.raw */,
 				EABF2B221734540100813708 /* leftTopSprite.raw */,
-				EABF2B1F1732E3F200813708 /* quiet.prg */,
 				EAA0A441172E1AB800C60DF3 /* dna4.kla */,
 				EABF2B2117344ED700813708 /* gameborder.raw */,
 				EAAC7FED171332D6004B023E /* numbers.raw */,
@@ -294,6 +235,7 @@
 				EAAC7FDE170F834B004B023E /* pillHalf.raw */,
 				EAAC7FEB17124026004B023E /* pillHalf2.raw */,
 				EAAC7FEC17124026004B023E /* v1_an.raw */,
+				EAC86C0E1915C80F002C103F /* vDemo16x40.raw */,
 			);
 			path = outbreak_assets;
 			sourceTree = "<group>";
@@ -306,18 +248,33 @@
 			path = linker;
 			sourceTree = "<group>";
 		};
+		EAB37BB91917DE4800D54E4B /* WorldMap */ = {
+			isa = PBXGroup;
+			children = (
+				EAB37BBA1917DE8C00D54E4B /* wmBorderText.s */,
+				EA97AB6B1919508B0097FE02 /* wmColor.s */,
+			);
+			name = WorldMap;
+			sourceTree = "<group>";
+		};
+		EAB37BBB1917F58400D54E4B /* tools */ = {
+			isa = PBXGroup;
+			children = (
+				EAB37BBE1918112E00D54E4B /* convertBitmapToCharMap.php */,
+				EAB37BBC1917F59500D54E4B /* asciiToPETSCII.php */,
+			);
+			name = tools;
+			sourceTree = "<group>";
+		};
 		EAB47DC31552197000516343 = {
 			isa = PBXGroup;
 			children = (
 				EABC8DE215CA2145006F2067 /* Makefile */,
 				EAB47DD0155219BF00516343 /* baseGame.s */,
-				EAA4ED5317552F5100636B0B /* vScrollScreen.s */,
-				EAA4ED59175DA56A00636B0B /* hSpriteScroller.s */,
-				EAA4ED5A175DA5C900636B0B /* openBorderInGame.s */,
-				EABF2B241734DA2500813708 /* showSplashScreen.s */,
 				EA8961AE1658BA1600C48645 /* Colors */,
 				EA8961A81658B6A700C48645 /* Movement */,
 				EA859D801644EB310016FB33 /* Clearing */,
+				EAB37BB91917DE4800D54E4B /* WorldMap */,
 				EA8DD138163EA5C000D3D0E5 /* virusLevels.s */,
 				EA8DD13916412F0300D3D0E5 /* lvlSelect.s */,
 				EA8DD136163D3ED400D3D0E5 /* drops.s */,
@@ -327,12 +284,12 @@
 				EA8D86DC162696C40003415E /* subroutines.s */,
 				EAD8212F163BCAD3007DFD49 /* drawBox.s */,
 				EAAC7FDB170F834B004B023E /* outbreak_assets */,
-				EA8D86F6162FE6CB0003415E /* experiements */,
 				EAB47DD11552219800516343 /* Target */,
 				EA96DB931666FD7000BC97D7 /* bitmapReader */,
 				EAAD4602166C8562005EAC00 /* linker */,
 				EAA0A439172DDD7200C60DF3 /* bin2hex */,
 				EA8034DD190EED3A004F7BAD /* bin2raw */,
+				EAB37BBB1917F58400D54E4B /* tools */,
 				EA8034CB190EEB2E004F7BAD /* Frameworks */,
 				EA96DB911666FD7000BC97D7 /* Products */,
 			);
@@ -481,7 +438,6 @@
 			files = (
 				EA96DB951666FD7000BC97D7 /* main.cpp in Sources */,
 				EAAD45F6166B248C005EAC00 /* bitmapReader.cpp in Sources */,
-				EA8CA22718CAF5E900017AE2 /* highResExp.s in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -701,6 +657,7 @@
 				EA8034E4190EED3A004F7BAD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		EA96DB9A1666FD7000BC97D7 /* Build configuration list for PBXNativeTarget "bitmapReader" */ = {
 			isa = XCConfigurationList;

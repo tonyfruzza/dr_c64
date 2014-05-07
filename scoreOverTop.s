@@ -1,6 +1,13 @@
 
 ; For calculating and displaying sprite scores where pieces are cleared
 ;
+SPRITE1_DATA    .equ $0240
+SPRITE2_DATA    .equ $0280
+SPRITE3_DATA    .equ $02C0
+
+SPRITE1_POINT   .equ $07f8
+SPRITE2_POINT   .equ $07f9
+SPRITE3_POINT   .equ $07fa
 
 virusesClearedForPopUpScore .byte $00
 ;                                   0,   1,   2,   3,   4,   5,   6 Virus clears values / 100
@@ -196,6 +203,11 @@ scoreDigitsToPrint  .byte $00, $00
 clearScoreSprite ; set bytesToClearForSprite to 63 initially then 15
     ; sprite is 3bytes by 21, so it's 63 bytes total
     ; when only clearing the first 5 lines it's 5*3 = 15 bytes total
+    lda #11
+    sta SPRITE3_POINT
+    lda #COLOR_WHITE
+    sta VMEM+41
+
     ldx #0
     txa
 css_loop

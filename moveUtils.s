@@ -20,7 +20,7 @@ tay
 adc zpPtr3+1
 sta zpPtr3+1
 lda (zpPtr3), y
-cmp #" "
+cmp #CLEAR_CHAR
 beq noCollitionDetected
 bne collitionDetected
 collitionDetected
@@ -56,7 +56,7 @@ pha
 ldy #$00
 lda (zpPtr3), y
 ;            sta tmp4 ; what, why did I have this here?
-cmp #' '
+cmp #CLEAR_CHAR
 beq noCollitionDetectedLeft
 collitionDetectedLeft
 lda #$01
@@ -84,7 +84,7 @@ lda ret1+1
 pha
 ldy #1
 lda (zpPtr3), y
-cmp #' '
+cmp #CLEAR_CHAR
 beq noCollitionDetectedRight
 collitionDetectedRight
 ldy ccr_rety
