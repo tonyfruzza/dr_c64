@@ -7,18 +7,21 @@ printLevelSelectScreen
     lda #CLEAR_CHAR
     sta clearingChar ; Set the clearing char for screen clearing
     jsr ClearScreen
+
+    lda #MAP_MASK_1
+    sta pwcm_mask
     jsr printWorldCharMap
     jsr drawScreenFrame
     jsr writeScreenTextForWorldMap
     jsr updateColorWorldMap
 
     jsr resetInputMovement
+
     jsr WaitEventFrame
     lda #0
-    sta turnInputOff
+    sta turnInputOff ; Not currently being set by anything at the moment
     lda currentLvl
     sta levelSelectedLast
-
 levelSelectLoop
     jsr updateTheLevelWeHaveSelected
     lda currentLvl
@@ -26,13 +29,14 @@ levelSelectLoop
     beq lsl_noLevelChange
     sta levelSelectedLast
     jsr updateColorWorldMap
+    jsr selectMapPerLevel
 lsl_noLevelChange
     jsr getJoystickInputForLevel
     bne levelSelected
     jmp levelSelectLoop
 levelSelected
     rts
-levelSelectedLast   .equ 0
+levelSelectedLast   .byte 0
 
 updateTheLevelWeHaveSelected
     lda #0

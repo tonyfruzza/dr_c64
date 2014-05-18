@@ -35,3 +35,17 @@ C64First.xcodeproj/project.xcworkspace/xcuserdata/tony.xcuserdatad/UserInterface
 /pongBattleCombine.s
 
 /showSpriteCombine.s
+
+/baseGameCombine.rwa
+/baseGameCombine.rwb
+
+*.d64
+
+*.rw
+
+/showSprite.rwa
+/showSprite.rwb
+
+*.prg
+
+*.t64

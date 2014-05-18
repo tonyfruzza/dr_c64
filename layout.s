@@ -5,18 +5,19 @@ DrawGameBorder
     sta cutLastLine
     lda #09 ; Width
     pha
-    lda #17 ; Height
+    lda #16 ; Height
     pha
     ; Box in relation to play field is actually shifted up one row
 
     sec
     lda #OnePGameFieldLocLow ; Low byte start location
-    sbc #80
+    sbc #40
     pha
     lda #OnePGameFieldLocHigh ; High byte start location
     sbc #0
     pha
     jsr DrawBorderBox
+    jsr copySpriteDataInForPlayerHead ; Do this once when setting up layout
 ;    jsr displayTopSprite ; enable the top sprites
     jsr drawInlet
     rts
@@ -185,7 +186,7 @@ drawInlet
     ldy #0
     sec
     lda #OnePGameFieldLocLow
-    sbc #159
+    sbc #119
     sta zpPtr1
     sta zpPtr2 ; Color low
     lda #OnePGameFieldLocHigh
@@ -207,7 +208,7 @@ drawInletRowColorLoop
     cpy #8
     bne drawInletRowLoop
     inx
-    cpx #3
+    cpx #2
     beq drawInletFinished
 
     clc
@@ -244,12 +245,62 @@ drawInletRowColorLoop
 
     jmp drawInletRowLoop
 drawInletFinished
+    jsr ClearTopLine
     rts
 ; Characters used to create inlet top to mating point
 inletMapRow1    .byte 100, WALL_CHAR_TRT, 91, CLEAR_CHAR, 92, 93, WALL_CHAR_TLFT, 101
 inletMapRow2    .byte BACKGROUND_CHAR, WALL_SIDES, 94, CLEAR_CHAR, 95, 96, WALL_SIDES, BACKGROUND_CHAR
-inletMapRow3    .byte WALL_B, WALL_BR, 97, CLEAR_CHAR, 98, 99, WALL_BL, WALL_B
 
 inletClrRow1    .byte COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BROWN, COLOR_BROWN, COLOR_BROWN, COLOR_ORANGE, COLOR_MAGENTA, COLOR_MAGENTA
 inletClrRow2    .byte COLOR_WHITE, COLOR_MAGENTA, COLOR_BROWN, COLOR_BROWN, COLOR_BROWN, COLOR_ORANGE, COLOR_MAGENTA, COLOR_WHITE
-inletClrRow3    .byte COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BROWN, COLOR_BROWN, COLOR_BROWN, COLOR_ORANGE, COLOR_MAGENTA, COLOR_MAGENTA
+
+
+ClearTopLine
+    sec
+    lda #OnePGameFieldLocLow ; Low byte start location
+    sta zpPtr1 ; Top visible line
+    sbc #40
+    sta zpPtr2 ; Top line under sprite
+    lda #OnePGameFieldLocHigh ; High byte start location
+    sta zpPtr1+1
+    sbc #0
+    sta zpPtr2+1
+    ldy #8
+ClearTopLineLoop
+    lda (zpPtr2),y
+    cmp #PILL_TOP ; If there is a pill hanging up above
+    bne ctl_NoConvertChar
+    lda #PILL_SIDE ; then convert the bottom half to a single pill cell
+    sta (zpPtr1),y
+ctl_NoConvertChar
+    lda #CLEAR_CHAR
+    sta (zpPtr2),y
+    dey
+    bne ClearTopLineLoop
+ctl_done
+    rts
+
+
+printVirusContainerBox
+    lda #10 ; Width
+    pha
+    lda #3 ; Height
+    pha
+    lda #$32 ; low pos + 280
+    pha
+    lda #$06 ; high pos
+    pha
+    jsr DrawBorderBox
+    rts
+
+printPlayerContainerBox
+    lda #05 ; Width
+    pha
+    lda #3 ; Height
+    pha
+    lda #$9c ; Low pos
+    pha
+    lda #$06 ; High pos
+    pha
+    jsr DrawBorderBox
+    rts

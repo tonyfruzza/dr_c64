@@ -1,10 +1,4 @@
-; 4 possible video memory locations, switchable by the first 2
-; bits of 56576 (CIA) (0, 1, 2, 3). The other bits are for something else, so keep those
-
-; 648 has the upper eight bits of 16 bit value to where the "screen editor" is located
-
-ROMCHARBITMAP   .equ 53248 ; - 57343 from ROM
-NEWCHARMAP      .equ 12288 ; $3000 new place for Charset
+NEWCHARMAP      .equ $3800
 
 V1_AN2          .equ NEWCHARMAP+608 ; 8 * 76 + 3000
 V1_AN3          .equ NEWCHARMAP+616 ; 8 * 77 + 3000
@@ -34,18 +28,10 @@ PillMakerLoop
 
     inx
     cpx #8
-
-    beq charMakerComplete
-    jmp PillMakerLoop
-charMakerComplete
-
-    ; Tell VIC where to get charmap from ($3000)
-    lda 53272
-    and #240
-    clc
-    adc #12
-    sta 53272
-
+    bne PillMakerLoop
+; Configure screen memory
+    lda #%00011111 ; Screen mem = $0400, and Charmap starts at $3800
+    sta $d018
     rts
 
 

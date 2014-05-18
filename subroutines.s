@@ -23,14 +23,14 @@ Clearing
     BNE Clearing
     ldx retx
     RTS
-clearingChar    .byte BACKGROUND_CHAR
+clearingChar    .byte BACKGROUND_CHAR ; Can be set before using routine
 
 
 get_random_number ; reg a ()
-            lda $d012 ; load current screen raster value
-            eor $dc04 ; xor against value in $dc04
-            sbc $dc05 ; then subtract value in $dc05
-            rts
+    lda $d012 ; load current screen raster value
+    eor $dc04 ; xor against value in $dc04
+    sbc $dc05 ; then subtract value in $dc05
+    rts
 
 ; converts 10 digits (32 bit values have max. 10 decimal digits)
 ; Using a byte per digit hrm...
@@ -139,4 +139,12 @@ itsZero
     pha
     rts ; and return
 
+
+switchOutRom
+    sei
+    lda $01
+    and #%11111110
+    sta $01
+    cli
+    rts
 

@@ -8,6 +8,11 @@ LR_MOVE_REPEAT_TIME     .equ 5
 LR_FIRST_MOVE_R_TIME    .equ 7
 DOWN_REPEAT_TIME        .equ 2
 FIRE_REPEAT_TIME        .equ 7
+JOY_BIT_UP              .equ 1
+JOY_BIT_DOWN            .equ 2
+JOY_BIT_LEFT            .equ 4
+JOY_BIT_RIGHT           .equ 8
+JOY_BIT_FIRE            .equ 16
 
 l_repeatTime    .byte LR_FIRST_MOVE_R_TIME
 r_repeatTime    .byte LR_FIRST_MOVE_R_TIME
@@ -42,7 +47,7 @@ updateJoyPos
 
 nextJoy1
     txa ; Cache joystick input values
-    and #2 ; Down
+    and #JOY_BIT_DOWN
     bne nextJoy2
     lda d_repeatTime
     cmp #DOWN_REPEAT_TIME
@@ -54,7 +59,7 @@ nextJoy1
 nextJoy2 ; Left
     ldy #0
     txa
-    and #4
+    and #JOY_BIT_LEFT
     bne LeftNotPressed
 
     lda l_firstPress   ; 0 is true in this case
@@ -82,7 +87,7 @@ LeftNotPressed
 nextJoy3 ; Right
     ldy #0
     txa
-    and #8
+    and #JOY_BIT_RIGHT
     bne RightNotPressed
 
     lda r_firstPress
@@ -109,7 +114,7 @@ RightNotPressed
 nextJoy4
     ldy #0
     txa
-    and #16 ; Button push
+    and #JOY_BIT_FIRE
     bne ButtonNotPressed
 
     lda rotate_Hold
@@ -129,29 +134,27 @@ finishJoy
     rts
 
 
+
+;
+;       For LEVEL SELECT
+;
 getJoystickInputForLevel ; returns 1 if button pressed to accept
     lda turnInputOff
     beq gjifl_readInput
     jmp gjifl_ButtonNotPressed
 gjifl_readInput
-
-    ldx JOY1 ; cache JOY1 value in x
-; Left
+    ldx JOY2 ; cache JOY1 value in x
     ldy #0
     txa
-    and #4
+    and #JOY_BIT_LEFT
     bne gjifl_LeftNotPressed
-lda currentLvl
-beq gjifl_nextJoy3
-
-
+    lda currentLvl
+    beq gjifl_nextJoy3
     lda l_firstPress   ; 0 is true in this case
     cmp #2
     bcc gjifl_LeftFirstPress ; < 2 then
-
-
     lda l_repeatTime
-lsr
+    lsr
     cmp #LR_MOVE_REPEAT_TIME
     bcc gjifl_nextJoy3
     jmp gjifl_LeftNotFirstMove
@@ -162,29 +165,25 @@ gjifl_LeftFirstPress
     inc l_firstPress
 gjifl_LeftNotFirstMove
     sty l_repeatTime ; Reset repeat time back to 0
-dec currentLvl
-    ;jsr MoveLeftOne
+    dec currentLvl
     jmp gjifl_nextJoy3
 gjifl_LeftNotPressed
     lda #LR_FIRST_MOVE_R_TIME
     sta l_repeatTime
     sty l_firstPress ; Reset first press to 0
-
 gjifl_nextJoy3 ; Right
     ldy #0
     txa
-    and #8
+    and #JOY_BIT_RIGHT
     bne gjifl_RightNotPressed
-lda currentLvl
-cmp #20
-beq gjifl_nextJoy4
-
-
+    lda currentLvl
+    cmp #20
+    beq gjifl_nextJoy4
     lda r_firstPress
     cmp #2
     bcc gjifl_RightFirstPress ; < 2 then
     lda r_repeatTime
-lsr
+    lsr
     cmp #LR_MOVE_REPEAT_TIME
     bcc gjifl_nextJoy4
     jmp gjifl_RightNotFirstMove
@@ -195,23 +194,31 @@ gjifl_RightFirstPress
     inc r_firstPress
 gjifl_RightNotFirstMove
     sty r_repeatTime
-inc currentLvl
-    ;;jsr MoveRightOne
+    inc currentLvl
     jmp gjifl_nextJoy4
 gjifl_RightNotPressed
     lda #LR_FIRST_MOVE_R_TIME
     sta r_repeatTime ; allow the key to be pressed again immediately after being picked up
     sty r_firstPress
-
 gjifl_nextJoy4
-    ldy #0
     txa
-    and #16 ; Button push
+    and #JOY_BIT_FIRE
     bne gjifl_ButtonNotPressed
-    lda #1
+gjifl_buttonPressed
+    lda #1 ; return true
     rts
 gjifl_ButtonNotPressed
-    sty rotate_Hold
+    lda #0 ; return false
+    rts
+
+
+getFireButtonPressed
+    lda JOY2
+    and #JOY_BIT_FIRE
+    bne gfbp_notPressed
+    lda #1
+    rts
+gfbp_notPressed
     lda #0
     rts
 

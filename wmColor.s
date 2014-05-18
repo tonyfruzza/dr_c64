@@ -4,12 +4,14 @@ OUTBREAK_COLOR_LVL2 .equ COLOR_L_GREEN
 OUTBREAK_COLOR_LVL3 .equ COLOR_GREEN
 OUTBREAK_COLOR_LVL4 .equ COLOR_CYAN
 OUTBREAK_COLOR_LVL5 .equ COLOR_L_BLUE
-OUTBREAK_COLOR_LVL6 .equ $ff
+OUTBREAK_COLOR_LVL6 .equ COLOR_BLUE
+OUTBREAK_COLOR_LVL7 .equ $ff
 OUTBREAK_LVL1       .equ 0
 OUTBREAK_LVL2       .equ 1
 OUTBREAK_LVL3       .equ 2
 OUTBREAK_LVL4       .equ 3
 OUTBREAK_LVL5       .equ 4
+OUTBREAK_LVL6       .equ 5
 COLOR_PANDEMIC      .equ COLOR_RED
 COLOR_OUTBREAK      .equ COLOR_YELLOW
 COLOR_CLEAR         .equ COLOR_GREEN
@@ -26,6 +28,8 @@ updateColorWorldMap
     beq setupLevel4
     cmp #OUTBREAK_LVL5
     beq setupLevel5
+    cmp #OUTBREAK_LVL6
+    beq setupLevel6
     rts
 setupLevel1
     lda #OUTBREAK_COLOR_LVL1
@@ -62,9 +66,17 @@ setupLevel4
 setupLevel5
     lda #OUTBREAK_COLOR_LVL5
     sta valueForRed
-    lda #OUTBREAK_COLOR_LVL5
-    sta valueForYellow
     lda #OUTBREAK_COLOR_LVL6
+    sta valueForYellow
+    lda #OUTBREAK_COLOR_LVL7
+    sta valueForGreen
+    jmp doColorWorldMap
+setupLevel6
+    lda #OUTBREAK_COLOR_LVL6
+    sta valueForRed
+    lda #OUTBREAK_COLOR_LVL6
+    sta valueForYellow
+    lda #OUTBREAK_COLOR_LVL7
     sta valueForGreen
     jmp doColorWorldMap
 doColorWorldMap

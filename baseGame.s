@@ -3,14 +3,18 @@
 ;.byte $0C,$08,$0A,$00,$9E,' ','2','0','6','4',$00,$00,$00,$00,$00
 ;
 ; - - Master Memory Layout - -
-; $0400 - $07e8 screen memory
-; $0801 - $21b1 main game
-; $3000 - $3800 Custom Character RAM
-; $4000 - $???? Sprite data
+; $0400 - $07e8 screen memory, but we clear $0400 - $0800 for ease
+; $0801 - $220c main game
+; $3000 - $37FF Temp working sprite area, possibly?
+; $3800 - $3FFF Character RAM
 ; $8000 - $8f36 SID
-; $9000 - $9614 Game Data, worldmap, clearing sprite numbers, text
+; $9000 - $9614 Game Data, worldmap, clearing sprite numbers, text (2540 bytes free)
+; $a000 - $b000 Sprite data - original location
 ; $D000 - $DFFF VIC/SID/CIA/IO registers
 ;  $D800 - $DBFF Reserved Color ram
+
+; $A000 - $BFFF BASIC ROM
+; $E000 - $FFFF KERNEL ROM
 
 
 ; - - Monitor Help - -
@@ -24,12 +28,11 @@
 ;  d $0fdd $0fff
 ;  return
 
-SCREENMEM       .equ 1024 ; Start of character screen map, color map is + $D400
+SCREENMEM       .equ $0400 ; Start of character screen map, color map is + $D400
 COLORMEM        .equ $D800
 VMEM            .equ $D000
 SCREEN_BORDER   .equ VMEM + 32
 SCREEN_BG_COLOR .equ VMEM + 33
-SCREEN_CHAR     .equ 52224
 COLOR_BLACK     .equ $00
 COLOR_WHITE     .equ $01
 COLOR_RED       .equ $02
@@ -81,6 +84,7 @@ CLEAR_CHAR      .equ 32 ; Space char
 
 OnePGameFieldLocLow   .equ $D7
 OnePGameFieldLocHigh  .equ $04
+
 
 ; Zero Page Pointers for indirect indexing
 piece1          .equ $b0
@@ -144,11 +148,13 @@ P1_SCORE    .byte 0,0,0,0,0,0,0,0,0,0 ;
 P1_SCORE_B  .byte $00, $00, $00, $00 ; Binary value of current score
 VIRUS_MUL_1 .byte $64, $00 ; 100
 VIRUS_CHAR_LIST .byte VIRUS_ONE, VIRUS_TWO, VIRUS_THREE
-colors      .byte COLOR_L_BLUE, COLOR_CYAN, COLOR_L_GREEN, COLOR_L_GREEN ; Get overwritten by changeColorSet if run
+;colors      .byte COLOR_L_BLUE, COLOR_CYAN, COLOR_L_GREEN, COLOR_L_GREEN ; Get overwritten by changeColorSet if run
+colors      .byte COLOR_CYAN, COLOR_L_BLUE, COLOR_YELLOW, COLOR_L_BLUE
 
 
 
 init
+    jsr initRefreshCounter
     ; Look for button press
     jsr setUpVirusAnimationSequences ; This also sets VIC to know where custom char data is at
     ; Disable all sprites
@@ -158,7 +164,7 @@ init
     sta SCREEN_BG_COLOR
     sta SCREEN_BORDER
 
-    jsr initRefreshCounter
+
     ; Init START_POS for where pill drops from, 4 to the right of left border
     clc
     lda #OnePGameFieldLocLow
@@ -172,9 +178,10 @@ init
     lda #63
     sta bytesToClearForSprite
     jsr clearScoreSprite
-    lda #15 ; 5 * 3 bytes only need to be cleared
+    lda #15 ; 5 * 3 bytes only need to be cleared now that it's clean
     sta bytesToClearForSprite
 levelScreen
+    jsr doTheChatRoom
     jsr printLevelSelectScreen
 clears ; Run at beginning of new level/game
     ; Programatically create game layout
@@ -187,6 +194,8 @@ clears ; Run at beginning of new level/game
     jsr printSinglePlayerScoreBox
     jsr printSinglePlayerVirusCountBox
     jsr printSinglePlayerLevelBox
+    jsr printVirusContainerBox
+    jsr printPlayerContainerBox
     jsr putVirusesOnTheField
     jsr FieldSearch ; Tally up the virus count, so it can be printed, finish clearing
     jsr printCurrentScore
@@ -210,6 +219,7 @@ DropNew
     ; Loop through every piece to see if they can be cleared
     jsr lookForAnyConnect4s
     jsr FieldSearch
+    jsr ClearTopLine
     jsr UpdateVirusCount
     lda p1VirusCount
     beq NextLevel ; disable for debugging
@@ -480,7 +490,6 @@ cl_SideManipulationComplete
     cmp #VIRUS_THREE
     bne cl_storeValue ; not a virus
 cl_itIsAVirus
-    inc flashTimes
 stx posOffsetXY
 sty posOffsetXY+1
 ; Play noise
@@ -588,8 +597,6 @@ beq cl_itIsAVirus_2
 cmp #VIRUS_THREE
 bne cl_storeValue_2 ; not a virus
 cl_itIsAVirus_2
-inc flashTimes
-
 stx posOffsetXY
 sty posOffsetXY+1
 ; Play noise
