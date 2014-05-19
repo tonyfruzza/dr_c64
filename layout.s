@@ -1,4 +1,16 @@
 
+; Init START_POS for where pill drops from, 4 to the right of left border
+initPillStartLocation
+    clc
+    lda #OnePGameFieldLocLow
+    adc #4 ; Put it in the middle
+    sta START_POS
+    lda #OnePGameFieldLocHigh
+    adc #0
+    sta START_POS+1
+    rts
+
+
 ; Draw game board
 DrawGameBorder
     lda #1
@@ -29,7 +41,7 @@ printSinglePlayerLevelBox
     pha
     lda #2 ; Height
     pha
-    lda #$36 ; Low pos
+    lda #$D6 ; Low pos
     pha
     lda #$05 ; High pos
     pha
@@ -40,18 +52,18 @@ printSinglePlayerLevelBox
     lda #>MSG_LEVEL
     pha
 
-    lda #$60
+    lda #$00
     pha
-    lda #$05
+    lda #$06
     pha
     jsr printMsgSub
 
     lda currentLvl
     pha
     jsr bin2hex8bit
-    lda #$89
+    lda #$29
     sta zpPtr2 ; Low pos
-    lda #$05
+    lda #$06
     sta zpPtr2+1 ; High pos
     ldy #0
     lda #$30
@@ -103,7 +115,7 @@ printSinglePlayerScoreBox
     pha
     lda #2 ; Height
     pha
-    lda #$43 ; Low Pos
+    lda #$e3 ; Low Pos
     pha
     lda #$04 ; High Pos
     pha
@@ -115,9 +127,9 @@ printSinglePlayerScoreBox
     lda #>MSG_SCORE
     pha
 
-    lda #$6d
+    lda #$0d
     pha
-    lda #$04
+    lda #$05
     pha
     jsr printMsgSub
     rts
@@ -294,11 +306,13 @@ printVirusContainerBox
     rts
 
 printPlayerContainerBox
+    lda #1
+    sta cutLastLine
     lda #05 ; Width
     pha
     lda #3 ; Height
     pha
-    lda #$9c ; Low pos
+    lda #$ec ; Low pos
     pha
     lda #$06 ; High pos
     pha

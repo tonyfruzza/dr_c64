@@ -58,6 +58,9 @@
 		EA286E83160BE51300C4A9B2 /* drc64.prg */ = {isa = PBXFileReference; lastKnownFileType = file; path = drc64.prg; sourceTree = "<group>"; };
 		EA286E85160BE57E00C4A9B2 /* example.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.prg; path = ../../ISOs/example.prg; sourceTree = "<group>"; };
 		EA286E88160C486D00C4A9B2 /* flicker.prg */ = {isa = PBXFileReference; lastKnownFileType = file; name = flicker.prg; path = ../../ISOs/flicker.prg; sourceTree = "<group>"; };
+		EA3FDF23192A83A8005C3940 /* hvArrayRoutines.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = hvArrayRoutines.s; sourceTree = "<group>"; };
+		EA3FDF24192A865F005C3940 /* hArrayClearing.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = hArrayClearing.s; sourceTree = "<group>"; };
+		EA3FDF25192A86A1005C3940 /* vArrayClearing.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vArrayClearing.s; sourceTree = "<group>"; };
 		EA4C41A51925DD8C00ACC119 /* dialogLayout.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = dialogLayout.s; sourceTree = "<group>"; };
 		EA8034CC190EEB2E004F7BAD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		EA8034DC190EED3A004F7BAD /* bin2raw */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bin2raw; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,6 +95,8 @@
 		EAAC7FEB17124026004B023E /* pillHalf2.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = pillHalf2.raw; sourceTree = "<group>"; };
 		EAAC7FEC17124026004B023E /* v1_an.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = v1_an.raw; sourceTree = "<group>"; };
 		EAAC7FED171332D6004B023E /* numbers.raw */ = {isa = PBXFileReference; lastKnownFileType = file; path = numbers.raw; sourceTree = "<group>"; };
+		EAAD132819288CD900F2F3CC /* zombieSprites.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = zombieSprites.s; sourceTree = "<group>"; };
+		EAAD132919288E8C00F2F3CC /* vicmem.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = vicmem.html; path = tools/vicmem.html; sourceTree = "<group>"; };
 		EAAD45F3166B2204005EAC00 /* bitmapReader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bitmapReader.h; sourceTree = "<group>"; };
 		EAAD45F5166B248C005EAC00 /* bitmapReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmapReader.cpp; sourceTree = "<group>"; };
 		EAAD4600166C8562005EAC00 /* linker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = linker; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -181,6 +186,9 @@
 				EA859D7D1644E83F0016FB33 /* lookForConnect4.s */,
 				EABF2B28173A104600813708 /* scoreOverTop.s */,
 				EABF2B321748B7D300813708 /* scoring.s */,
+				EA3FDF23192A83A8005C3940 /* hvArrayRoutines.s */,
+				EA3FDF24192A865F005C3940 /* hArrayClearing.s */,
+				EA3FDF25192A86A1005C3940 /* vArrayClearing.s */,
 			);
 			name = Clearing;
 			sourceTree = "<group>";
@@ -269,6 +277,7 @@
 				EAAF05D6191B03F300A5AADB /* upperSpriteManagement.s */,
 				EAF7BE641922EBAC00DFDC94 /* layoutSprites.s */,
 				EA011E461923F22E005AC5AB /* faceSprites.s */,
+				EAAD132819288CD900F2F3CC /* zombieSprites.s */,
 			);
 			name = SpriteFromUpperMem;
 			sourceTree = "<group>";
@@ -285,6 +294,7 @@
 		EAB37BBB1917F58400D54E4B /* tools */ = {
 			isa = PBXGroup;
 			children = (
+				EAAD132919288E8C00F2F3CC /* vicmem.html */,
 				EAAF05D81920269D00A5AADB /* convertRawToMultiCharmap.php */,
 				EAB37BBE1918112E00D54E4B /* convertBitmapToCharMap.php */,
 				EAB37BBC1917F59500D54E4B /* asciiToPETSCII.php */,

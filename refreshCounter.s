@@ -1,6 +1,7 @@
 ; Interup based timing events
 
-RASTER_TO_COUNT_AT  .equ 220
+RASTER_TO_COUNT_AT  .equ 192
+RASTER_TO_FOR_ZBIE  .equ 150
 DELAY2              .equ 6
 SID_VOLUME          .equ $D418
 songStartAdress     .equ $8000
@@ -58,9 +59,15 @@ irq_refreshCounter ; void (y, x, a)
     pha        ;store register X in stack
     tya
     pha        ;store register Y in stack
+    lda gameInPlay
+    beq gameNotInPlay
+    jsr enableFaceSprite
     jsr cycleAnimatedViruses
+    jsr displayTopSprite
+
+gameNotInPlay
     ; See if we need to turn off a score sprite
-    lda $d015
+    lda $d015 ; Is it enabled?
     and #4
     beq noScoreSpriteEnabled
     lda framesToShowSprite
@@ -69,16 +76,20 @@ irq_refreshCounter ; void (y, x, a)
     bne noScoreSpriteMods
     ; For 15 do
     lda #COLOR_GREY
-    sta VMEM+41
-    dec $d005
-    dec $d005
+    sta SPRITE3_COLOR
+    dec SPRITE3_Y_POS
+    dec SPRITE3_Y_POS
+    dec SPRITE8_Y_POS
+    dec SPRITE8_Y_POS
     jmp noScoreSpriteMods
 
-    cmp #5
+    cmp #5 ; 5 left
     lda #COLOR_DARK_GREY
-    sta VMEM+41
-    dec $d005
-    dec $d005
+    sta SPRITE3_COLOR
+    dec SPRITE3_Y_POS
+    dec SPRITE3_Y_POS
+    dec SPRITE8_Y_POS
+    dec SPRITE8_Y_POS
 
 noScoreSpriteMods
     dec framesToShowSprite
@@ -86,7 +97,7 @@ noScoreSpriteMods
 disableScoreSprite
     ; everything except for sprite 3 enabled
     lda $d015
-    and #%11111011
+    and #%01111011
     sta $d015
 noScoreSpriteEnabled
 
@@ -123,6 +134,42 @@ lNoReset
 ;    jsr cycleBackgroundAnimation
 noRefreshTimer3Work
     asl $d019    ; ACK interrupt (to re-enable it)
+    sei
+    lda #RASTER_TO_FOR_ZBIE     ; line to trigger interrupt
+    sta $d012
+
+    lda #<rasterLineToEnableZombieFaces    ; low part of address of interrupt handler code
+    sta $fffe
+    lda #>rasterLineToEnableZombieFaces    ; high part of address of interrupt handler code
+    sta $ffff
+    cli          ; turn interrupts back on
+
+
+    pla
+    tay
+    pla
+    tax
+    pla
+    rti          ; return from interrupt
+
+rasterLineToEnableZombieFaces
+    pha        ;store register A in stack
+    txa
+    pha        ;store register X in stack
+    tya
+    pha        ;store register Y in stack
+    jsr enableZombieFaceSprites
+    asl $d019    ; ACK interrupt (to re-enable it)
+    sei
+    lda #RASTER_TO_COUNT_AT     ; line to trigger interrupt
+    sta $d012
+
+    lda #<irq_refreshCounter    ; low part of address of interrupt handler code
+    sta $fffe
+    lda #>irq_refreshCounter    ; high part of address of interrupt handler code
+    sta $ffff
+    cli          ; turn interrupts back on
+
     pla
     tay
     pla

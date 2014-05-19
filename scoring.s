@@ -102,9 +102,9 @@ printCurrentScoreWithNoChange
 printCurrentScore
     jsr convertP1ScoreToDecimal
     ldy #$00
-    lda #$94
+    lda #$34
     sta zpPtr2
-    lda #$04
+    lda #$05
     sta zpPtr2+1
     ldx #6 ; ldx #8 for two more numbers
 l2

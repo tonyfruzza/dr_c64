@@ -36,14 +36,9 @@ csdifph_loop
     lda SpritePackBase+$500,x
     sta SPRITE6_DATA+$500,x
     lda SpritePackBase+$600,x
-    sta SPRITE6_DATA+$600,x
+    sta SPRITE6_DATA+$600,x ; This should be enough for 28 sprites
 ;    lda SpritePackBase+$700,x
 ;    sta SPRITE6_DATA+$700,x
-
-
-
-; Now copy down another
-
     inx
     bne csdifph_loop
     rts
@@ -51,9 +46,9 @@ csdifph_loop
 
 enableFaceSprite
     lda #195
-    sta SPRITE1_POINT+5 ; Sprite pointer to SPRITE6_DATA
+    sta SPRITE6_POINT
     lda #194
-    sta SPRITE1_POINT+6 ;
+    sta SPRITE7_POINT
 
     lda $d015 ; See what sprites are enabled
     ora #%01100000
@@ -71,7 +66,7 @@ enableFaceSprite
     lda #3
     sta $d00a ; x pos sprite 6
     sta $d00c
-    lda #187
+    lda #203
     sta $d00b ; y pos sprite 6
     sta $d00d
 

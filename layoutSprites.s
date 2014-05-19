@@ -49,8 +49,6 @@ displayTopSprite
     lda #COLOR_MAGENTA
     sta VMEM+39 ; set color
     sta VMEM+40
-;    lda #COLOR_WHITE
-;    sta VMEM+41 ; Score
     lda #COLOR_BROWN
     sta VMEM+42 ; Top center left
     lda #COLOR_ORANGE
@@ -67,13 +65,4 @@ displayTopSprite
     lda #192
     sta $d008 ; x pos sprite 5
     sta $d002 ; x pos sprite 2
-
-
-    jsr enableFaceSprite
-    rts
-
-hideTopSprites
-    lda $d015
-    and #%11111100
-    sta $d015 ; disable sprite 1 & 2
     rts

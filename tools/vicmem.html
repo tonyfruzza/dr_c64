@@ -12,7 +12,7 @@ function calcCharMemLocation(){
 function calcSpriteMemLoc(){
  // Take video offset + (64 * sprite pointer value)
  var base = parseInt(viccalc.bank.options[viccalc.bank.selectedIndex].value);
- spritecalc.sprtZeroLocation.value = (spritecalc.sprtZeroValue.value * 64) + base;
+ spritecalc.sprtZeroLocation.value = ((spritecalc.sprtZeroValue.value * 64) + base).toString(16);
 }
 
 function calcAll(){
@@ -117,7 +117,7 @@ $D018 Screen memory offset (#4-#7 bits) 1k increments<br>
 <form name=spritecalc>
 <table border=1>
 <tr><td align=right>Sprite 0 Value: #</td><td> <input type=text name=sprtZeroValue value='0'></td></tr>
-<tr><td align=right>Sprite 0 location: #</td><td> <input type=text disabled=true name=sprtZeroLocation value='$0000'></td></tr>
+<tr><td align=right>Sprite 0 location: $</td><td> <input type=text disabled=true name=sprtZeroLocation value='$0000'></td></tr>
 <tr><td colspan=2><input type=button value=calc onClick='calcSpriteMemLoc()'></td></tr>
 </table>
 Sprite visible location is x:24- /0-320 y:50-229 (if 21 tall) 0-320

@@ -7,7 +7,13 @@ all:
 	tools/bitmapReader -t SN45 -cf outbreak_assets/smallNums/smallNum45.raw -w 8 -h 8 >> compiledAssets.s
 	tools/bitmapReader -t SN67 -cf outbreak_assets/smallNums/smallNum67.raw -w 8 -h 8 >> compiledAssets.s
 	tools/bitmapReader -t SN89 -cf outbreak_assets/smallNums/smallNum89.raw -w 8 -h 8 >> compiledAssets.s
-	php tools/convertBitmapToCharMap.php -f outbreak_assets/worldmap-base40x25.raw -t WORLDCHARMAP -z >> compiledAssets.s
+	tools/bitmapReader -t leftTopSprite -sf outbreak_assets/topOverLayLeft.raw -w 24 -h 21 >> compiledAssets.s
+	tools/bitmapReader -t rightTopSprite -sf outbreak_assets/topOverLayRight.raw -w 24 -h 21 >> compiledAssets.s
+	tools/bitmapReader -t centerLeftTopSprite -sf outbreak_assets/topOverlaycenterLeft.raw -w 24 -h 21 >> compiledAssets.s
+	tools/bitmapReader -t centerRightTopSprite -sf outbreak_assets/topOverlaycenterRight.raw -w 24 -h 21 >> compiledAssets.s
+#	php tools/convertBitmapToCharMap.php -f outbreak_assets/worldmap-base40x25.raw -t WORLDCHARMAP -z >> compiledAssets.s
+#	php tools/convertBitmapToCharMap.php -f outbreak_assets/map-usa-base.raw -t WORLDCHARMAP -z >> compiledAssets.s
+	php tools/convertRawToMultiCharmap.php -t WORLDCHARMAP -a outbreak_assets/worldmap-base40x25.raw -b outbreak_assets/map-europe.raw -c outbreak_assets/map-usa-base.raw -d outbreak_assets/map-asia.raw >> compiledAssets.s
 	php tools/convertBitmapToCharMap.php -f outbreak_assets/worldmap-progression40x25.raw -t WMCOLORMAP -z >> compiledAssets.s
 	php tools/asciiToPETSCII.php -n "ENDMSG" -m "end" >> compiledAssets.s
 	php tools/asciiToPETSCII.php -n "MSG_NEXT" -m "next" >> compiledAssets.s
@@ -20,15 +26,21 @@ all:
 
 	cat baseGame.s subroutines.s customchars.s refreshCounter.s input.s drawBox.s layout.s drops.s \
     virusLevels.s lvlSelect.s search.s lookForConnect4.s down.s left.s right.s moveUtils.s newColor.s colorUtils.s \
-    rotate.s scoreOverTop.s lvlPieceColor.s scoring.s wmBorderText.s  wmColor.s compiledAssets.s \
-    > baseGameCombine.s
+    rotate.s scoreOverTop.s lvlPieceColor.s scoring.s wmBorderText.s  wmColor.s compiledAssets.s layoutSprites.s \
+    faceSprites.s dialogLayout.s zombieSprites.s hvArrayRoutines.s hArrayClearing.s vArrayClearing.s > baseGameCombine.s
+# hvArrayRoutines.s hArrayClearing.s vArrayClearing.s > baseGameCombine.s
 	/usr/local/bin/mac2c64 -r baseGameCombine.s
 	tools/linker baseGameCombine.rwa baseGameCombine.rwb > drc64.prg
 	tools/linker drc64.prg Outbreak-8000sng.prg > outbreak_wsong.prg
-	tools/linker outbreak_wsong.prg outbreak_assets/chars3000.prg > outbreak_wchars.prg
-	tools/exomizer sfx \$$$0801 -q outbreak_wchars.prg -o outbreak.prg
+	tools/linker outbreak_wsong.prg outbreak_assets/chars3800.prg > outbreak_wchars.prg
+	tools/linker outbreak_wchars.prg outbreak_assets/Sprites-a000.prg > outbreak_wsprites.prg
+#	tools/exomizer sfx 0x0801 -q outbreak_wsprites.prg -o outbreak.prg -s 'lda $$4c sta $$0002 lda $$01 sta $$0003 lda $$08 sta $$0004 lda #0 sta $$d020 sta $$d021 lda #$$1f sta $$d018 ldx #0 Loop: lda #73 sta $$0400,x sta $$0500,x sta $$0600,x sta $$0700,x inx bne Loop' -Di_ram_exit=0x35
+#	tools/exomizer sfx 0x0801 -q outbreak_wsprites.prg -o outbreak.prg -s 'lda $$4c sta $$0002 lda $$01 sta $$0003 lda $$08 sta $$0004 lda #0 sta $$d020 sta $$d021 lda #$$1f sta $$d018 ldx #0 Loop: lda #73 sta $$0400,x sta $$0500,x sta $$0600,x sta $$0700,x inx bne Loop' -Di_ram_exit=0x36
+	tools/exomizer sfx 0x0801 -q outbreak_wsprites.prg -o outbreak.prg
 	@./createLabels.sh baseGameCombine.s
 	/Applications/x64.app/Contents/MacOS/c1541 -format outbreak,02 d64 outbreak.d64 -attach outbreak.d64 -write outbreak.prg outbreak
+
+#	tools/exomizer sfx 0x0801 -q outbreak_wsprites.prg -o outbreak.prg -s 'lda #0 sta $d020 sta $d021 lda #$1f sta $d018 ldx #0 Loop: lda #73 sta $0400,x sta $0500,x sta $0600,x sta $0700,x inx bne Loop'
 
 
 #	tools/bitmapReader -t PILL_H -cf outbreak_assets/pill_h.raw -w 16 -h 8 > compiledAssets.s
@@ -171,3 +183,9 @@ highResExp:
 	mv highResExpCombine.rw highResExp.prg
 	@./createLabels.sh highResExpCombine.s
 #	/Applications/x64.app/Contents/MacOS/c1541 -format highresdraw,02 d64 highresdraw.d64 -attach highresdraw.d64 -write highResExp.prg highresdraw
+pillDrop:
+	mac2c64 -r pillDrop.s
+	mv pillDrop.rw pillDrop.prg
+test01:	
+	mac2c64 -r test01.s
+	mv test01.rw test01.prg

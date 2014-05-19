@@ -8,11 +8,25 @@ SPRITE3_DATA    .equ $02C0
 SPRITE1_POINT   .equ $07f8
 SPRITE2_POINT   .equ $07f9
 SPRITE3_POINT   .equ $07fa
+SPRITE4_POINT   .equ $07fb
+SPRITE5_POINT   .equ $07fc
+SPRITE6_POINT   .equ $07fd
+SPRITE7_POINT   .equ $07fe
+SPRITE8_POINT   .equ $07ff
 
 virusesClearedForPopUpScore .byte $00
 ;                                   0,   1,   2,   3,   4,   5,   6 Virus clears values / 100
 scorePreCalcValues          .byte $00, $01, $03, $07, $15, $31, $63
 
+
+initScorePopUpSprites
+    ; init the pop over sprite. Initially clear the whole sprite, after that we only use the first 5 lines
+    lda #63
+    sta bytesToClearForSprite
+    jsr clearScoreSprite
+    lda #15 ; 5 * 3 bytes only need to be cleared now that it's clean
+    sta bytesToClearForSprite
+    rts
 
 ; Sprite Locations
 ; 24, 50 is top right = character 0
@@ -59,7 +73,9 @@ DIV3
     ; Add 24
     clc
     adc #24
-    sta $d004
+    sta SPRITE3_X_POS
+    adc #1
+    sta SPRITE8_X_POS
 
     ; Multiply by 8
     lda charPosCopy
@@ -71,12 +87,16 @@ DIV3
     ;    lda charPosCopy
     clc
     adc #50
-    sta $d005
+    sta SPRITE3_Y_POS
+    adc #2
+    sta SPRITE8_Y_POS
 ; Display sprite by enabling
     lda #COLOR_WHITE
-    sta VMEM+41
+    sta SPRITE3_COLOR
+    lda #COLOR_BLACK ; Shadow
+    sta SPRITE8_COLOR
     lda $d015
-    ora #4 ; for sprite 3
+    ora #%10000100 ; for sprite 3, 8
     sta $d015
     lda #25
     sta framesToShowSprite
@@ -185,14 +205,14 @@ csnts_gotDigit2
     lsr
     lsr
     ora copyDigit
-sta SPRITE3_DATA,y
+    sta SPRITE3_DATA,y
 
     iny
     iny
     inx
     cpx #5
-beq csnts_done
-jmp copySmallNumToSprite
+    beq csnts_done
+    jmp copySmallNumToSprite
 csnts_done
     rts
 
@@ -205,8 +225,9 @@ clearScoreSprite ; set bytesToClearForSprite to 63 initially then 15
     ; when only clearing the first 5 lines it's 5*3 = 15 bytes total
     lda #11
     sta SPRITE3_POINT
+    sta SPRITE8_POINT
     lda #COLOR_WHITE
-    sta VMEM+41
+    sta SPRITE3_COLOR
 
     ldx #0
     txa
