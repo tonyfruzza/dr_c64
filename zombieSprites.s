@@ -1,6 +1,7 @@
 ; Data is already copied in because of copySpriteDataInForPlayerHead
 ; All we need to do is configure them using 
 
+ZMB_FLICKER_FRAMES    .equ  25 ; How many frames to flicker when dying
 ; Seems to be sprite pad # - 1
 ZMB1_BASE   .equ 194 + 11
 ZMB1_OVR1   .equ 194 + 12
@@ -40,6 +41,13 @@ SPRITE7_Y_POS   .equ $d00d
 SPRITE8_X_POS   .equ $d00e
 SPRITE8_Y_POS   .equ $d00f
 
+initZombieSprites
+    lda #%01111011
+    sta faceSpriteEnableMask
+    lda #0
+    sta whoIsCompletelyDead
+    sta whoDiedLast
+    rts
 
 enableZombieFaceSprites
     ; Configure memory locations
@@ -109,8 +117,83 @@ zmbOverTopSet
     sta SPRITE5_Y_POS
     sta SPRITE6_Y_POS
     sta SPRITE7_Y_POS
-    ; Enable 124567
-;    lda #%01111011
-;    sta $d015
+    ; Enable 124567 at first
+    lda $d015
+    and #%10000100 ; If score over the top is active then leave.
+    ora faceSpriteEnableMask
+    sta $d015
+    jsr handleZmbiFlicker
     rts
 
+
+handleZmbiFlicker
+    lda framesFlickered
+    beq noFlickers
+    and #%00000001 ; Is it an odd number?
+    beq hzf_notOdd
+    lda whoDiedLast
+    ora $d015 ; Enable them
+    eor whoIsCompletelyDead
+    sta $d015
+    dec framesFlickered
+    beq hzf_lastFlicker
+    rts
+hzf_notOdd
+    lda whoDiedLast
+    lda #$ff
+    eor whoDiedLast
+    eor whoIsCompletelyDead
+    and $d015
+    sta $d015
+    dec framesFlickered
+    beq hzf_lastFlicker
+    rts
+noFlickers
+    lda #0
+    sta whoDiedLast
+    rts
+hzf_lastFlicker
+    lda whoDiedLast
+    sta whoIsCompletelyDead
+    rts
+
+shouldWeDisableAFace
+    lda virus1_count
+    bne getMaskForVirus2
+    lda #%11100111
+    and faceSpriteEnableMask
+    sta faceSpriteEnableMask
+    lda #ZMB_FLICKER_FRAMES
+    sta framesFlickered
+    lda #%00011000
+    ora whoDiedLast
+    sta whoDiedLast
+getMaskForVirus2
+    lda virus2_count
+    bne getMaskForVirus3
+    lda #%11111100
+    and faceSpriteEnableMask
+    sta faceSpriteEnableMask
+    lda #ZMB_FLICKER_FRAMES
+    sta framesFlickered
+    lda #%00000011
+    ora whoDiedLast
+    sta whoDiedLast
+getMaskForVirus3
+    lda virus3_count
+    bne getMaskForVirusDone
+    lda #%10011111
+    and faceSpriteEnableMask
+    sta faceSpriteEnableMask
+    lda #ZMB_FLICKER_FRAMES
+    sta framesFlickered
+    lda #%01100000
+    ora whoDiedLast
+    sta whoDiedLast
+getMaskForVirusDone
+    rts
+
+faceSpriteEnableMask    .byte 0
+framesFlickered         .byte 0
+whoDiedLast             .byte 0
+whoIsCompletelyDead     .byte 0

@@ -58,9 +58,9 @@ dlpm_notSame
     lda #0
     rts
 
-    dlpm_ret    .byte $00, $00
-    dlpm_color  .byte $00
-    dlpm_rety   .byte $00
+dlpm_ret    .byte $00, $00
+dlpm_color  .byte $00
+dlpm_rety   .byte $00
 
 
 

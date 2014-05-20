@@ -49,8 +49,8 @@ LandingPieceBright
     lda #COLOR_WHITE
     sta (zpPtr2),y
 
-lda ORIENTATION
-bne dropOnVertical
+    lda ORIENTATION
+    bne dropOnVertical
     lda #PILL_LEFT_D ; Left dropped piece
     sta (piece1),y
     lda #PILL_RIGHT_D ; Right dropped piece

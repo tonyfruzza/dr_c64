@@ -52,6 +52,7 @@ COLOR_L_GREY    .equ $0f
 delay_slow      .equ 37
 VIRUS_ANI_DELAY .equ 7
 
+; Some on screen character mappings
 BACKGROUND_CHAR .equ 64
 
 WALL_CHAR_TRT   .equ 107
@@ -143,8 +144,7 @@ P1_SCORE    .byte 0,0,0,0,0,0,0,0,0,0 ;
 P1_SCORE_B  .byte $00, $00, $00, $00 ; Binary value of current score
 VIRUS_MUL_1 .byte $64, $00 ; 100
 VIRUS_CHAR_LIST .byte VIRUS_ONE, VIRUS_TWO, VIRUS_THREE
-;colors      .byte COLOR_L_BLUE, COLOR_CYAN, COLOR_L_GREEN, COLOR_L_GREEN ; Get overwritten by changeColorSet if run
-colors      .byte COLOR_CYAN, COLOR_L_BLUE, COLOR_YELLOW, COLOR_L_BLUE
+colors      .byte COLOR_CYAN, COLOR_L_BLUE, COLOR_YELLOW, COLOR_L_BLUE ; Get overwritten by changeColorSet if run
 gameInPlay  .byte 0 ; Set to 1 if game is in play
 
 
@@ -195,6 +195,7 @@ clears ; Run at beginning of new level/game
     jsr songStartAdress
     lda #15
     jsr songStartAdress+9
+    jsr initZombieSprites
     jmp firstPieceToDrop
 DropNew
     ; Loop through every piece to see if they can be cleared
@@ -209,6 +210,7 @@ DropNew
     jsr incrementPillUsedP1
 firstPieceToDrop
     jsr FieldSearch
+    jsr shouldWeDisableAFace
     jsr UpdateVirusCount
     jsr updateScore
 
@@ -254,6 +256,8 @@ MoveDownForced
     jsr ZeroCountAndMoveDown
     jmp GameLoop
 NextLevel
+    lda #0
+    sta faceSpriteEnableMask ; Disable all virus sprite faces
     jsr updateScore
     inc currentLvl
     inc currentLvl ; Twice ?
@@ -281,14 +285,11 @@ GotButtonPress2
     jmp clears
 EndGame
     lda #0
+    sta faceSpriteEnableMask ; Disable all virus sprite faces
     sta gameInPlay
     sta SID_VOLUME
     jsr songStartAdress+9 ; turn volume to 0
     sta playMusic ; stop laying music
     jmp levelScreen
-
-
-
-
 
 
