@@ -15,6 +15,10 @@ ZMB3_BASE   .equ 194 + 17
 ZMB3_OVR1   .equ 194 + 18
 ZMB3_OVR2   .equ 194 + 19
 
+ZMB1_X_POS  .equ 50
+ZMB2_X_POS  .equ 70
+ZMB3_X_POS  .equ 90
+
 SPRITE1_COLOR   .equ VMEM + 39
 SPRITE2_COLOR   .equ VMEM + 40
 SPRITE3_COLOR   .equ VMEM + 41
@@ -41,6 +45,10 @@ SPRITE7_Y_POS   .equ $d00d
 SPRITE8_X_POS   .equ $d00e
 SPRITE8_Y_POS   .equ $d00f
 
+ZMB1_SPRITES_MASK    .equ %00011000
+ZMB2_SPRITES_MASK    .equ %00000011
+ZMB3_SPRITES_MASK    .equ %01100000
+
 initZombieSprites
     lda #%01111011
     sta faceSpriteEnableMask
@@ -57,30 +65,55 @@ enableZombieFaceSprites
     sta SPRITE1_POINT+4
     lda #ZMB3_BASE
     sta SPRITE1_POINT+6
+SeeWhoIsGettingInjured
+    ldy #ZMB1_X_POS
+    ldx #ZMB1_OVR1
+    lda injuredVirusMask
+    and #ZMB1_SPRITES_MASK ; Purple?
+    beq sotih_notZombie1
+    ldx #ZMB1_OVR2
+    lda injuredFrameCount
+    and #1 ; Is it odd?
+    beq sotih_notZombie1
+    ldy #ZMB1_X_POS+1 ; Shake him!
+sotih_notZombie1
+    sty SPRITE1_X_POS ; x pos sprite 1
+    sty SPRITE2_X_POS ; x pos sprite 2
+    stx SPRITE1_POINT
 
-    lda $d015
-    and #%00000100
-    bne ScoreOverTopIsHappening
-    lda #ZMB1_OVR1
-    sta SPRITE1_POINT
-    lda #ZMB2_OVR1
-    sta SPRITE1_POINT+3
-    lda #ZMB3_OVR1
-    sta SPRITE1_POINT+5
-    jmp zmbOverTopSet
-ScoreOverTopIsHappening
-    lda #ZMB1_OVR2
-    sta SPRITE1_POINT
-    lda #ZMB2_OVR2
-    sta SPRITE1_POINT+3
-    lda #ZMB3_OVR2
-    sta SPRITE1_POINT+5
+    ldy #ZMB2_X_POS
+    ldx #ZMB2_OVR1
+    lda injuredVirusMask
+    and #ZMB2_SPRITES_MASK
+    beq sotih_notZombie2
+    ldx #ZMB2_OVR2
+    lda injuredFrameCount
+    and #1 ; Is it odd?
+    beq sotih_notZombie2
+    ldy #ZMB2_X_POS+1 ; Shake him!
+sotih_notZombie2
+    stx SPRITE1_POINT+3
+    sty SPRITE5_X_POS
+    sty SPRITE4_X_POS
+
+    ldy #ZMB3_X_POS
+    ldx #ZMB3_OVR1
+    lda injuredVirusMask
+    and #ZMB3_SPRITES_MASK
+    beq sotih_notZombie3
+    ldx #ZMB3_OVR2
+    lda injuredFrameCount
+    and #1 ; Is it odd?
+    beq sotih_notZombie3
+    ldy #ZMB3_X_POS+1 ; Shake him!
+sotih_notZombie3
+    sty SPRITE6_X_POS
+    sty SPRITE7_X_POS
+    stx SPRITE1_POINT+5
 zmbOverTopSet
-
     ; Bases are multicolor which are 1, 4, 6
     lda #%01010010
     sta $d01C
-
     lda #COLOR_DARK_GREY
     sta SPRITE1_COLOR
     lda #COLOR_L_BLUE
@@ -100,16 +133,7 @@ zmbOverTopSet
 
     lda #0
     sta $d010 ; Everyone is x<=256
-    ; Zombie 1 pos
-    lda #50
-    sta SPRITE1_X_POS ; x pos sprite 1
-    sta SPRITE2_X_POS ; x pos sprite 2
-    lda #70
-    sta SPRITE5_X_POS
-    sta SPRITE4_X_POS
-    lda #90
-    sta SPRITE6_X_POS
-    sta SPRITE7_X_POS
+
     lda #171
     sta SPRITE1_Y_POS
     sta SPRITE2_Y_POS
@@ -119,10 +143,11 @@ zmbOverTopSet
     sta SPRITE7_Y_POS
     ; Enable 124567 at first
     lda $d015
-    and #%10000100 ; If score over the top is active then leave.
+    and #%10000100 ; If score over the top is active then leave sprite 3 and 8 enabled
     ora faceSpriteEnableMask
     sta $d015
     jsr handleZmbiFlicker
+    inc injuredFrameCount
     rts
 
 
@@ -165,7 +190,7 @@ shouldWeDisableAFace
     sta faceSpriteEnableMask
     lda #ZMB_FLICKER_FRAMES
     sta framesFlickered
-    lda #%00011000
+    lda #ZMB1_SPRITES_MASK
     ora whoDiedLast
     sta whoDiedLast
 getMaskForVirus2
@@ -176,7 +201,7 @@ getMaskForVirus2
     sta faceSpriteEnableMask
     lda #ZMB_FLICKER_FRAMES
     sta framesFlickered
-    lda #%00000011
+    lda #ZMB2_SPRITES_MASK
     ora whoDiedLast
     sta whoDiedLast
 getMaskForVirus3
@@ -187,7 +212,7 @@ getMaskForVirus3
     sta faceSpriteEnableMask
     lda #ZMB_FLICKER_FRAMES
     sta framesFlickered
-    lda #%01100000
+    lda #ZMB3_SPRITES_MASK
     ora whoDiedLast
     sta whoDiedLast
 getMaskForVirusDone
@@ -197,3 +222,5 @@ faceSpriteEnableMask    .byte 0
 framesFlickered         .byte 0
 whoDiedLast             .byte 0
 whoIsCompletelyDead     .byte 0
+injuredFrameCount       .byte 0
+

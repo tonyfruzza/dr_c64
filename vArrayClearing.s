@@ -76,12 +76,26 @@ cl_SideManipulationComplete
     ; Look for viruses for total Vertical
     lda (zpPtr4), y
     cmp #VIRUS_ONE
-    beq cl_itIsAVirus
+    beq cl_itIsVirus1
     cmp #VIRUS_TWO
-    beq cl_itIsAVirus
-    cmp #VIRUS_THREE
+    beq cl_itIsVirus2
+    cmp #VIRUS_THREE ; Works
     bne cl_storeValue ; not a virus
-    cl_itIsAVirus
+cl_itIsVirus3 ; Works
+    lda #ZMB3_SPRITES_MASK
+    ora injuredVirusMask
+    sta injuredVirusMask
+    jmp cl_itIsAVirus
+cl_itIsVirus1
+    lda #ZMB2_SPRITES_MASK
+    ora injuredVirusMask
+    sta injuredVirusMask
+    jmp cl_itIsAVirus
+cl_itIsVirus2
+    lda #ZMB1_SPRITES_MASK
+    ora injuredVirusMask
+    sta injuredVirusMask
+cl_itIsAVirus
     stx posOffsetXY
     sty posOffsetXY+1
     ; Play noise

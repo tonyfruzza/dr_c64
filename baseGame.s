@@ -4,7 +4,7 @@
 ;
 ; - - Master Memory Layout - -
 ; $0400 - $07e8 screen memory, but we clear $0400 - $0800 for ease
-; $0801 - $220c main game
+; $0801 - $20c3 main game
 ; $3000 - $37FF Temp working sprite area, possibly?
 ; $3800 - $3FFF Character RAM
 ; $8000 - $8f36 SID
@@ -149,7 +149,7 @@ gameInPlay  .byte 0 ; Set to 1 if game is in play
 
 
 init
-    jsr initRefreshCounter
+;    jsr initRefreshCounter
     jsr setUpVirusAnimationSequences ; This also sets VIC to know where custom char data is at
     jsr initPillStartLocation
     jsr initScorePopUpSprites
@@ -211,6 +211,9 @@ DropNew
 firstPieceToDrop
     jsr FieldSearch
     jsr shouldWeDisableAFace
+    lda #0
+    sta injuredVirusMask ; no zombies are getting hurt anymore
+
     jsr UpdateVirusCount
     jsr updateScore
 

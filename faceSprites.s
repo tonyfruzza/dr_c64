@@ -44,8 +44,9 @@ csdifph_loop
     rts
 
 
-enableFaceSprite
+enableFaceSprite ; Using sprites 6 and 7
     lda #195
+    lda spriteOverLaySelectedFace
     sta SPRITE6_POINT
     lda #194
     sta SPRITE7_POINT
@@ -78,3 +79,17 @@ enableFaceSprite
     lda #COLOR_WHITE
     sta $d026 ; Multi color #2
     rts
+
+incFrameForOverFace
+    ; 195 - 204
+    lda spriteOverLaySelectedFace
+    cmp #204
+    beq iffof_Reset
+    inc spriteOverLaySelectedFace
+    rts
+iffof_Reset
+    lda #195
+    sta spriteOverLaySelectedFace
+    rts
+
+spriteOverLaySelectedFace   .byte 195

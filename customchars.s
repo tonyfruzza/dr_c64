@@ -44,6 +44,8 @@ cycleAnimatedViruses
     inc refreshTimer4
     rts
 doCycleAni
+; Testing
+    jsr incFrameForOverFace
     ldx #0 ; Init our x index
     lda PILL_STATE
     cmp #0

@@ -74,12 +74,26 @@ clh_SideManipulationComplete
     ; Clearing a piece for this pill drop
     lda (zpPtr4), y
     cmp #VIRUS_ONE
-    beq cl_itIsAVirus_2
+    beq cl_itWasVirus1
     cmp #VIRUS_TWO
-    beq cl_itIsAVirus_2
+    beq cl_itWasVirus2
     cmp #VIRUS_THREE
     bne cl_storeValue_2 ; not a virus
-    cl_itIsAVirus_2
+cl_itwasVirus3
+    lda #ZMB3_SPRITES_MASK
+    ora injuredVirusMask
+    sta injuredVirusMask
+    jmp cl_itIsAVirus_2
+cl_itWasVirus1
+    lda #ZMB2_SPRITES_MASK
+    ora injuredVirusMask
+    sta injuredVirusMask
+    jmp cl_itIsAVirus_2
+cl_itWasVirus2
+    lda #ZMB1_SPRITES_MASK
+    ora injuredVirusMask
+    sta injuredVirusMask
+cl_itIsAVirus_2
     stx posOffsetXY
     sty posOffsetXY+1
     ; Play noise
@@ -106,3 +120,4 @@ cl_storeValue_2
 finishedClearingH
     rts
 
+injuredVirusMask    .byte 0

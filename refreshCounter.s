@@ -137,14 +137,11 @@ noRefreshTimer3Work
     sei
     lda #RASTER_TO_FOR_ZBIE     ; line to trigger interrupt
     sta $d012
-
     lda #<rasterLineToEnableZombieFaces    ; low part of address of interrupt handler code
     sta $fffe
     lda #>rasterLineToEnableZombieFaces    ; high part of address of interrupt handler code
     sta $ffff
     cli          ; turn interrupts back on
-
-
     pla
     tay
     pla
