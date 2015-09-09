@@ -23,12 +23,14 @@ all:
 	php tools/asciiToPETSCII.php -n "MSG_CLEAR" -m "clear" >> compiledAssets.s
 	php tools/asciiToPETSCII.php -n "PROGRESS" -m "global infestation progress  [00:00]" >> compiledAssets.s
 	php tools/asciiToPETSCII.php -n "LABELS" -m "~all clear    ~outbreak    ~pandemic" >> compiledAssets.s
+	php tools/scriptParser.php -f outbreak_assets/dialog.txt -l obscript >> compiledAssets.s
 
 	cat baseGame.s subroutines.s customchars.s refreshCounter.s input.s drawBox.s layout.s drops.s \
     virusLevels.s lvlSelect.s search.s lookForConnect4.s down.s left.s right.s moveUtils.s newColor.s colorUtils.s \
-    rotate.s scoreOverTop.s lvlPieceColor.s scoring.s wmBorderText.s  wmColor.s compiledAssets.s layoutSprites.s \
-    faceSprites.s dialogLayout.s zombieSprites.s hvArrayRoutines.s hArrayClearing.s vArrayClearing.s > baseGameCombine.s
-# hvArrayRoutines.s hArrayClearing.s vArrayClearing.s > baseGameCombine.s
+    rotate.s scoreOverTop.s lvlPieceColor.s scoring.s wmBorderText.s  wmColor.s layoutSprites.s \
+    faceSprites.s dialogLayout.s zombieSprites.s hvArrayRoutines.s hArrayClearing.s vArrayClearing.s chatRoutines.s \
+    dialogBubble.s scriptDecoder.s \
+    compiledAssets.s > baseGameCombine.s
 	/usr/local/bin/mac2c64 -r baseGameCombine.s
 	tools/linker baseGameCombine.rwa baseGameCombine.rwb > drc64.prg
 	tools/linker drc64.prg Outbreak-8000sng.prg > outbreak_wsong.prg
@@ -189,3 +191,16 @@ pillDrop:
 test01:	
 	mac2c64 -r test01.s
 	mv test01.rw test01.prg
+ciatiming:
+	mac2c64 -r ciatiming.s
+	mv ciatiming.rw ciatiming.prg
+ntscpaldetect:
+	mac2c64 -r ntscpaldetect.s
+	mv ntscpaldetect.rw ntscpaldetect.prg
+newtimer:
+	mac2c64 -r newtimer.s
+	tools/linker newtimer.rw Outbreak-8000sng.prg > newtimer.prg
+blocks:
+	mac2c64 -r blocks.s
+	mv blocks.rw blocks.prg
+	
